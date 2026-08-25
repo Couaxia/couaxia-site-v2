@@ -10,8 +10,7 @@ import "../assets/styles/pages/twitch.css";
    COMPOSANTS
 ========================================================= */
 
-import TwitchSection
-    from "../components/twitch/TwitchSection.vue";
+
 
 import TwitchHero
     from "../components/twitch/TwitchHero.vue";   
