@@ -1,0 +1,443 @@
+/* =========================================================
+   COUAXIA — RESPONSIVE GLOBAL
+   Vue 3 + TypeScript
+========================================================= */
+
+
+/* =========================================================
+   LARGE DESKTOP
+========================================================= */
+
+@media (min-width: 1600px) {
+
+    .page-container {
+        width:
+            min(
+                1500px,
+                calc(100% - 60px)
+            );
+    }
+
+}
+
+
+/* =========================================================
+   DESKTOP / PETITS ÉCRANS
+========================================================= */
+
+@media (max-width: 1200px) {
+
+    .page-container {
+        width:
+            min(
+                1200px,
+                calc(100% - 36px)
+            );
+    }
+
+
+    .page-section {
+        padding:
+            26px;
+    }
+
+}
+
+
+/* =========================================================
+   TABLETTE
+========================================================= */
+
+@media (max-width: 900px) {
+
+    body {
+        font-size:
+            15.5px;
+    }
+
+
+    .page-container {
+        width:
+            min(
+                100% - 28px,
+                1000px
+            );
+    }
+
+
+    .page-section {
+        margin:
+            24px auto;
+
+        padding:
+            24px;
+
+        border-radius:
+            24px;
+    }
+
+
+    h1 {
+        font-size:
+            clamp(
+                1.8rem,
+                6vw,
+                3.2rem
+            );
+    }
+
+
+    h2 {
+        font-size:
+            clamp(
+                1.4rem,
+                4vw,
+                2.2rem
+            );
+    }
+
+
+    h3 {
+        font-size:
+            clamp(
+                1.15rem,
+                3vw,
+                1.6rem
+            );
+    }
+
+}
+
+
+/* =========================================================
+   TABLETTE PETITE / GRAND MOBILE
+========================================================= */
+
+@media (max-width: 700px) {
+
+    body {
+        font-size:
+            15px;
+    }
+
+
+    .page-container {
+        width:
+            calc(100% - 24px);
+    }
+
+
+    .page-section {
+        margin:
+            20px auto;
+
+        padding:
+            20px;
+
+        border-radius:
+            22px;
+    }
+
+
+    h1 {
+        font-size:
+            clamp(
+                1.7rem,
+                8vw,
+                2.7rem
+            );
+    }
+
+
+    h2 {
+        font-size:
+            clamp(
+                1.35rem,
+                6vw,
+                2rem
+            );
+    }
+
+
+    h3 {
+        font-size:
+            clamp(
+                1.1rem,
+                5vw,
+                1.5rem
+            );
+    }
+
+
+    p {
+        line-height:
+            1.55;
+    }
+
+
+    /* =============================================
+       BOUTONS ET LIENS INTERACTIFS
+    ============================================== */
+
+    button,
+    a {
+        touch-action:
+            manipulation;
+    }
+
+
+    /* =============================================
+       FORMULAIRES
+    ============================================== */
+
+    input,
+    textarea,
+    select,
+    button {
+        font-size:
+            16px;
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 520px) {
+
+    .page-container {
+        width:
+            calc(100% - 18px);
+    }
+
+
+    .page-section {
+        margin:
+            16px auto;
+
+        padding:
+            18px;
+
+        border-radius:
+            20px;
+    }
+
+
+    h1 {
+        font-size:
+            clamp(
+                1.6rem,
+                9vw,
+                2.4rem
+            );
+    }
+
+
+    h2 {
+        font-size:
+            clamp(
+                1.25rem,
+                7vw,
+                1.8rem
+            );
+    }
+
+
+    h3 {
+        font-size:
+            clamp(
+                1.05rem,
+                6vw,
+                1.4rem
+            );
+    }
+
+
+    p {
+        font-size:
+            0.95rem;
+    }
+
+
+    /* =============================================
+       MEDIA
+    ============================================== */
+
+    img,
+    video {
+        max-width:
+            100%;
+    }
+
+}
+
+
+/* =========================================================
+   PETITS MOBILES
+========================================================= */
+
+@media (max-width: 400px) {
+
+    body {
+        font-size:
+            14.5px;
+    }
+
+
+    .page-container {
+        width:
+            calc(100% - 14px);
+    }
+
+
+    .page-section {
+        margin:
+            14px auto;
+
+        padding:
+            15px;
+
+        border-radius:
+            18px;
+    }
+
+
+    h1 {
+        font-size:
+            1.8rem;
+    }
+
+
+    h2 {
+        font-size:
+            1.45rem;
+    }
+
+
+    h3 {
+        font-size:
+            1.2rem;
+    }
+
+}
+
+
+/* =========================================================
+   TRÈS PETITS ÉCRANS
+========================================================= */
+
+@media (max-width: 340px) {
+
+    .page-container {
+        width:
+            calc(100% - 10px);
+    }
+
+
+    .page-section {
+        padding:
+            12px;
+    }
+
+
+    h1 {
+        font-size:
+            1.6rem;
+    }
+
+
+    h2 {
+        font-size:
+            1.3rem;
+    }
+
+}
+
+
+/* =========================================================
+   ÉCRANS EN MODE PAYSAGE
+========================================================= */
+
+@media (
+    max-height: 600px
+)
+and (
+    orientation: landscape
+) {
+
+    .page-section {
+        margin:
+            14px auto;
+
+        padding:
+            18px;
+    }
+
+}
+
+
+/* =========================================================
+   GRANDES DENSITÉS / TOUCH
+========================================================= */
+
+@media (hover: none) {
+
+    a:hover,
+    button:hover {
+        transform:
+            none;
+    }
+
+}
+
+
+/* =========================================================
+   ACCESSIBILITÉ — CONTRASTE FORCÉ
+========================================================= */
+
+@media (forced-colors: active) {
+
+    * {
+        box-shadow:
+            none !important;
+    }
+
+
+    a,
+    button,
+    input,
+    textarea,
+    select {
+        border:
+            1px solid
+            CanvasText;
+    }
+
+}
+
+
+/* =========================================================
+   ACCESSIBILITÉ — ANIMATIONS RÉDUITES
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration:
+            0.01ms !important;
+
+        animation-iteration-count:
+            1 !important;
+
+        transition-duration:
+            0.01ms !important;
+
+        scroll-behavior:
+            auto !important;
+    }
+
+}
