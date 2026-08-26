@@ -8,25 +8,25 @@ import {
    VIEWS
 ========================================================= */
 
-import HomeView from "../views/HomeView.vue";
+import HomeView from "../views/Home.vue";
 
-import AboutView from "../views/AboutView.vue";
+import AboutView from "../views/About.vue";
 
-import GamesView from "../views/GamesView.vue";
+import GamesView from "../views/Games.vue";
 
-import PollsView from "../views/PollsView.vue";
+import PollsView from "../views/Polls.vue";
 
-import HistoryView from "../views/HistoryView.vue";
+import HistoryView from "../views/History.vue";
 
-import CreditsView from "../views/CreditsView.vue";
+import CreditsView from "../views/Credits.vue";
 
-import LoginView from "../views/LoginView.vue";
+import LoginView from "../views/Login.vue";
 
-import ProfileView from "../views/ProfileView.vue";
+import ProfileView from "../views/Profile.vue";
 
-import AdminView from "../views/AdminView.vue";
+import AdminView from "../views/Admin.vue";
 
-import TwitchView from "../views/TwitchView.vue";
+import TwitchView from "../views/Twitch.vue";
 
 /* =========================================================
    ROUTES

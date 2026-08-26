@@ -12,8 +12,7 @@ import "../assets/styles/pages/twitch.css";
 
 
 
-import TwitchHero
-    from "../components/twitch/TwitchHero.vue";   
+import TwitchHero from "../components/twitch/TwitchHero.vue";   
     
 import TwitchLive from "../components/twitch/TwitchLive.vue"   
 

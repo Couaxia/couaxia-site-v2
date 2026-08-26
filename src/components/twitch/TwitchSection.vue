@@ -1,4 +1,5 @@
 <script setup lang="ts">
+
 import {
     onMounted,
     ref
@@ -12,6 +13,7 @@ import AppLoader from "../ui/AppLoader.vue";
 ========================================================= */
 
 interface TwitchLiveData {
+
     isLive: boolean;
 
     userId: string;
@@ -39,10 +41,12 @@ interface TwitchLiveData {
     thumbnailUrl: string | null;
 
     isMature: boolean;
+
 }
 
 
 interface TwitchLiveResponse {
+
     success: boolean;
 
     data?: TwitchLiveData;
@@ -50,6 +54,30 @@ interface TwitchLiveResponse {
     message?: string;
 
     error?: string;
+
+}
+
+
+/* =========================================================
+   API URL
+========================================================= */
+
+const rawApiUrl =
+    import.meta.env.VITE_API_URL;
+
+
+const apiUrl =
+    rawApiUrl
+        ? rawApiUrl.replace(/\/+$/, "")
+        : "";
+
+
+if (!apiUrl) {
+
+    throw new Error(
+        "VITE_API_URL est manquante."
+    );
+
 }
 
 
@@ -92,13 +120,57 @@ async function loadTwitch():
 
         const response =
             await fetch(
-                "/api/twitch/live"
+                `${apiUrl}/api/twitch/live`
             );
 
+
+        /* =================================================
+           CONTENT TYPE
+        ================================================= */
+
+        const contentType =
+            response.headers.get(
+                "content-type"
+            );
+
+
+        if (
+            !contentType?.includes(
+                "application/json"
+            )
+        ) {
+
+            const text =
+                await response.text();
+
+
+            console.error(
+                "❌ Réponse Twitch non JSON :",
+                text.slice(
+                    0,
+                    300
+                )
+            );
+
+
+            throw new Error(
+                "Le serveur Twitch n'a pas renvoyé du JSON."
+            );
+
+        }
+
+
+        /* =================================================
+           JSON
+        ================================================= */
 
         const result =
             await response.json() as TwitchLiveResponse;
 
+
+        /* =================================================
+           API ERROR
+        ================================================= */
 
         if (
             !response.ok ||
@@ -114,6 +186,10 @@ async function loadTwitch():
 
         }
 
+
+        /* =================================================
+           SUCCESS
+        ================================================= */
 
         twitch.value =
             result.data;
@@ -167,6 +243,7 @@ function formatViewers(
 onMounted(
     loadTwitch
 );
+
 </script>
 
 
@@ -256,6 +333,8 @@ onMounted(
 
             <div class="home-twitch__visual">
 
+                <!-- LIVE PREVIEW -->
+
                 <img
                     v-if="
                         twitch.isLive &&
@@ -268,6 +347,8 @@ onMounted(
                     class="home-twitch__preview"
                 >
 
+
+                <!-- OFFLINE -->
 
                 <div
                     v-else
@@ -323,6 +404,11 @@ onMounted(
 
             <div class="home-twitch__content">
 
+
+                <!-- =========================================
+                     IDENTITY
+                ========================================== -->
+
                 <div class="home-twitch__identity">
 
                     <img
@@ -364,6 +450,8 @@ onMounted(
 
                     <div class="home-twitch__meta">
 
+                        <!-- GAME -->
+
                         <span
                             v-if="twitch.gameName"
                             class="home-twitch__game"
@@ -373,18 +461,24 @@ onMounted(
                         </span>
 
 
+                        <!-- VIEWERS -->
+
                         <span class="home-twitch__viewers">
+
                             👁
+
                             {{
                                 formatViewers(
                                     twitch.viewers
                                 )
                             }}
+
                             spectateur{{
                                 twitch.viewers > 1
                                     ? "s"
                                     : ""
                             }}
+
                         </span>
 
                     </div>
@@ -412,6 +506,8 @@ onMounted(
 
                 <div class="home-twitch__actions">
 
+                    <!-- LIVE BUTTON -->
+
                     <a
                         v-if="twitch.isLive"
                         :href="
@@ -425,11 +521,15 @@ onMounted(
                         "
                     >
                         Regarder le live
+
                         <span aria-hidden="true">
                             ↗
                         </span>
+
                     </a>
 
+
+                    <!-- TWITCH PAGE -->
 
                     <RouterLink
                         to="/twitch"
@@ -439,9 +539,11 @@ onMounted(
                         "
                     >
                         Découvrir ma chaîne
+
                         <span aria-hidden="true">
                             →
                         </span>
+
                     </RouterLink>
 
                 </div>
