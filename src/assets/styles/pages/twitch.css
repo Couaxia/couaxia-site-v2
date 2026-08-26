@@ -1912,10 +1912,10 @@ html[data-theme="light"]
 
     font-size:
         clamp(
-            2.5rem,
-            5vw,
-            4.7rem
-        );
+            1.7rem,
+            3vw,
+            2.4rem
+            );
 
     font-weight:
         900;
@@ -1926,75 +1926,131 @@ html[data-theme="light"]
 
 
 /* =========================================================
-   VOIR TOUS
+   BOUTONS — VOIR TOUS LES CLIPS / TOUTES LES VIDÉOS
 ========================================================= */
 
 .twitch-clips__all,
 .twitch-videos__all {
-    display:
-        inline-flex;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 
-    align-items:
-        center;
+    gap: 8px;
 
-    justify-content:
-        center;
+    flex-shrink: 0;
 
-    gap:
-        8px;
+    min-height: 50px;
 
-    min-height:
-        50px;
+    padding: 11px 22px;
 
-    padding:
-        10px 22px;
+    color: #7200a8;
 
-    color:
-        var(--twitch-cyan);
+    border: 1px solid rgba(109, 0, 163, 0.45);
 
-    border:
-        1px solid
-        rgba(34, 242, 239, 0.65);
+    /* Même arrondi pour les deux */
+    border-radius: 999px;
 
-    border-radius:
-        999px;
+    background: rgba(255, 255, 255, 0.70);
 
-    background:
-        rgba(255, 255, 255, 0.06);
+    box-shadow:
+        0 5px 18px
+        rgba(109, 0, 163, 0.08);
 
-    font-weight:
-        900;
+    font-size: 0.86rem;
+    font-weight: 800;
+    font-family: inherit;
 
-    text-decoration:
-        none;
+    text-decoration: none;
+
+    cursor: pointer;
 
     transition:
-        transform 0.22s ease,
-        background 0.22s ease,
-        box-shadow 0.22s ease;
+        transform 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease,
+        background 0.2s ease,
+        box-shadow 0.2s ease;
 }
 
 
+/* =========================================================
+   SURVOL
+========================================================= */
+
 .twitch-clips__all:hover,
 .twitch-videos__all:hover {
-    color:
-        #ffffff;
+    color: #7200a8;
 
+    /* Le bouton reste blanc */
     background:
-        linear-gradient(
-            135deg,
-            #6d00a3,
-            #f22292
+        rgba(
+            255,
+            255,
+            255,
+            0.90
         );
+
+    /* Bordure cyan */
+    border-color:
+        var(--twitch-cyan);
 
     transform:
         translateY(-3px);
 
+    /* Lumière bleutée derrière le bouton */
     box-shadow:
-        0 0 20px
-        rgba(34, 242, 239, 0.25);
+        0 0 12px
+        rgba(34, 242, 239, 0.35),
+
+        0 0 28px
+        rgba(34, 242, 239, 0.25),
+
+        0 0 45px
+        rgba(34, 242, 239, 0.12);
 }
 
+
+/* =========================================================
+   MODE JOUR
+========================================================= */
+
+html[data-theme="light"] .twitch-clips__all,
+html[data-theme="light"] .twitch-videos__all {
+    color: #7200a8;
+
+    border-color: rgba(109, 0, 163, 0.45);
+
+    background: rgba(255, 255, 255, 0.70);
+}
+
+
+/* SURVOL MODE JOUR */
+
+html[data-theme="light"] .twitch-clips__all:hover,
+html[data-theme="light"] .twitch-videos__all:hover {
+    color: #7200a8;
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            0.90
+        );
+
+    border-color:
+        var(--twitch-cyan);
+
+    box-shadow:
+        0 0 12px
+        rgba(34, 242, 239, 0.35),
+
+        0 0 28px
+        rgba(34, 242, 239, 0.25),
+
+        0 0 45px
+        rgba(34, 242, 239, 0.12);
+}
 
 /* =========================================================
    GRILLE CLIPS / VIDÉOS
@@ -2356,42 +2412,76 @@ html[data-theme="light"]
 }
 
 
+/* =========================================================
+   PAGINATION — BUTTONS
+========================================================= */
+
 .twitch-clips__pagination-button,
 .twitch-videos__pagination-button {
-    min-width:
-        135px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 
-    min-height:
-        48px;
+    min-width: 135px;
+    min-height: 48px;
 
-    padding:
-        10px 18px;
+    padding: 10px 20px;
 
-    color:
-        var(--twitch-text);
-
-    border:
-        2px solid
-        var(--twitch-purple);
-
-    border-radius:
-        13px;
+    color: #7200a8;
 
     background:
-        rgba(109, 0, 163, 0.20);
+        rgba(
+            255,
+            255,
+            255,
+            0.70
+        );
 
-    font-weight:
-        900;
+    border:
+        1px solid
+        rgba(
+            109,
+            0,
+            163,
+            0.45
+        );
+
+    /* Rectangulaire, contrairement aux boutons "Voir tous" */
+    border-radius: 12px;
+
+    box-shadow:
+        0 5px 18px
+        rgba(
+            109,
+            0,
+            163,
+            0.08
+        );
+
+    font-size: 0.9rem;
+    font-weight: 800;
+
+    cursor: pointer;
 
     transition:
-        border-color 0.22s ease,
-        box-shadow 0.22s ease,
-        transform 0.22s ease;
+        transform 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
 }
-
 
 .twitch-clips__pagination-button:hover:not(:disabled),
 .twitch-videos__pagination-button:hover:not(:disabled) {
+    color: #7200a8;
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            0.90
+        );
+
     border-color:
         var(--twitch-cyan);
 
@@ -2399,30 +2489,48 @@ html[data-theme="light"]
         translateY(-2px);
 
     box-shadow:
-        0 0 18px
-        rgba(34, 242, 239, 0.25);
-}
+        0 0 12px
+        rgba(34, 242, 239, 0.35),
 
+        0 0 28px
+        rgba(34, 242, 239, 0.22),
+
+        0 0 45px
+        rgba(34, 242, 239, 0.10);
+}
 
 .twitch-clips__pagination-button:disabled,
 .twitch-videos__pagination-button:disabled {
-    opacity:
-        0.32;
-
-    cursor:
-        not-allowed;
-}
-
-
-.twitch-clips__page,
-.twitch-videos__page {
     color:
-        var(--twitch-cyan);
+        rgba(
+            109,
+            0,
+            163,
+            0.30
+        );
 
-    font-weight:
-        900;
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            0.35
+        );
+
+    border-color:
+        rgba(
+            109,
+            0,
+            163,
+            0.15
+        );
+
+    box-shadow: none;
+
+    cursor: not-allowed;
+
+    transform: none;
 }
-
 
 /* =========================================================
    MODE JOUR — AJUSTEMENTS
@@ -2468,16 +2576,6 @@ html[data-theme="light"]
 }
 
 
-html[data-theme="light"]
-.twitch-clips__all,
-html[data-theme="light"]
-.twitch-videos__all {
-    color:
-        #6d00a3;
-
-    background:
-        rgba(255, 255, 255, 0.65);
-}
 
 
 html[data-theme="light"]
@@ -2878,4 +2976,1735 @@ html[data-theme="light"]
             none;
     }
 
+}
+/* =========================================================
+   LIVE — INFORMATIONS
+========================================================= */
+
+.twitch-live__infos {
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0, 1fr)
+        );
+
+    gap:
+        20px;
+
+    margin-top:
+        24px;
+}
+
+
+.twitch-live__info {
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        space-between;
+
+    gap:
+        18px;
+
+    min-height:
+        82px;
+
+    padding:
+        18px 23px;
+
+    color:
+        var(--twitch-text);
+
+    border:
+        1px solid
+        var(--twitch-border);
+
+    border-radius:
+        20px;
+
+    background:
+        var(--twitch-card-soft);
+
+    box-shadow:
+        0 8px 20px
+        rgba(0, 0, 0, 0.16);
+}
+
+
+.twitch-live__info-label {
+    color:
+        var(--twitch-muted);
+
+    font-size:
+        0.9rem;
+
+    font-weight:
+        800;
+
+    letter-spacing:
+        0.08em;
+
+    text-transform:
+        uppercase;
+}
+
+
+.twitch-live__info strong {
+    overflow:
+        hidden;
+
+    color:
+        var(--twitch-cyan);
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    font-size:
+        clamp(
+            1.05rem,
+            2vw,
+            1.45rem
+        );
+
+    text-align:
+        right;
+
+    text-overflow:
+        ellipsis;
+
+    white-space:
+        nowrap;
+}
+
+
+/* =========================================================
+   TITRE DU LIVE
+========================================================= */
+
+.twitch-live__stream-details {
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    gap:
+        8px;
+
+    margin-top:
+        20px;
+
+    padding:
+        20px 23px;
+
+    border:
+        1px solid
+        var(--twitch-border);
+
+    border-radius:
+        20px;
+
+    background:
+        var(--twitch-card-soft);
+}
+
+
+.twitch-live__stream-label {
+    color:
+        var(--twitch-muted);
+
+    font-size:
+        0.8rem;
+
+    font-weight:
+        900;
+
+    letter-spacing:
+        0.08em;
+
+    text-transform:
+        uppercase;
+}
+
+
+.twitch-live__stream-details strong {
+    color:
+        var(--twitch-text);
+
+    font-size:
+        1.05rem;
+
+    line-height:
+        1.5;
+}
+
+
+/* =========================================================
+   LOADING
+========================================================= */
+
+.twitch-live__loading {
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    gap:
+        12px;
+
+    min-height:
+        300px;
+
+    color:
+        var(--twitch-muted);
+
+    font-weight:
+        800;
+}
+
+
+.twitch-live__loading-spinner {
+    color:
+        var(--twitch-cyan);
+
+    font-size:
+        1.6rem;
+
+    animation:
+        twitchRefreshRotate
+        0.9s
+        linear
+        infinite;
+}
+
+
+/* =========================================================
+   ERREUR
+========================================================= */
+
+.twitch-live__error {
+    padding:
+        20px;
+
+    color:
+        #ffffff;
+
+    border:
+        1px solid
+        rgba(255, 80, 80, 0.52);
+
+    border-radius:
+        18px;
+
+    background:
+        rgba(216, 44, 44, 0.14);
+}
+
+
+.twitch-live__error p {
+    margin:
+        7px 0 0;
+}
+
+
+/* =========================================================
+   RESPONSIVE LIVE INFOS
+========================================================= */
+
+@media (max-width: 700px) {
+
+    .twitch-live__infos {
+        grid-template-columns:
+            1fr;
+    }
+
+}
+/* =========================================================
+   HERO — ERREUR FOLLOWERS
+========================================================= */
+
+.twitch-hero__followers-error {
+    margin:
+        -8px 0 18px;
+
+    color:
+        #ff9ea8;
+
+    font-size:
+        0.85rem;
+
+    font-weight:
+        700;
+}
+
+
+html[data-theme="light"]
+.twitch-hero__followers-error {
+    color:
+        #a02a3d;
+}
+/* =========================================================
+   CLIPS — PLAY
+========================================================= */
+
+.twitch-clip-card__play {
+    position: absolute;
+
+    inset: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    color: #ffffff;
+
+    font-size: 2.5rem;
+
+    opacity: 0;
+
+    background:
+        rgba(0, 0, 0, 0.15);
+
+    transition:
+        opacity 0.22s ease;
+}
+
+
+.twitch-clip-card:hover
+.twitch-clip-card__play {
+    opacity: 1;
+}
+
+
+/* =========================================================
+   CLIPS — LOADING / ERROR
+========================================================= */
+
+.twitch-clips__loading,
+.twitch-clips__empty {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 12px;
+
+    min-height: 250px;
+
+    color: var(--twitch-muted);
+
+    font-weight: 800;
+}
+
+
+.twitch-clips__loading span {
+    color: var(--twitch-cyan);
+
+    font-size: 1.6rem;
+
+    animation:
+        twitchRefreshRotate
+        0.9s
+        linear
+        infinite;
+}
+
+
+.twitch-clips__error {
+    padding: 20px;
+
+    color: #ffffff;
+
+    border: 1px solid
+        rgba(255, 80, 80, 0.52);
+
+    border-radius: 18px;
+
+    background:
+        rgba(216, 44, 44, 0.14);
+}
+
+/* =========================================================
+   CLIP — DURÉE
+========================================================= */
+
+.twitch-clip-card__duration {
+    position:
+        absolute;
+
+    right:
+        10px;
+
+    bottom:
+        10px;
+
+    padding:
+        5px 8px;
+
+    color:
+        #ffffff;
+
+    border-radius:
+        8px;
+
+    background:
+        rgba(
+            0,
+            0,
+            0,
+            0.78
+        );
+
+    font-size:
+        0.72rem;
+
+    font-weight:
+        900;
+}
+
+
+/* =========================================================
+   CLIP — PLAY
+========================================================= */
+
+.twitch-clip-card__play {
+    position:
+        absolute;
+
+    inset:
+        0;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    color:
+        #ffffff;
+
+    background:
+        rgba(
+            0,
+            0,
+            0,
+            0.12
+        );
+
+    font-size:
+        2.5rem;
+
+    opacity:
+        0;
+
+    transition:
+        opacity
+        0.22s
+        ease;
+}
+
+
+.twitch-clip-card:hover
+.twitch-clip-card__play {
+    opacity:
+        1;
+}
+
+
+/* =========================================================
+   CLIPS — LOADING
+========================================================= */
+
+.twitch-clips__loading {
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    gap:
+        12px;
+
+    min-height:
+        260px;
+
+    color:
+        var(--twitch-muted);
+
+    font-weight:
+        800;
+}
+
+
+.twitch-clips__loading-icon {
+    color:
+        var(--twitch-cyan);
+
+    font-size:
+        1.6rem;
+
+    animation:
+        twitchRefreshRotate
+        0.9s
+        linear
+        infinite;
+}
+
+
+/* =========================================================
+   CLIPS — ERROR
+========================================================= */
+
+.twitch-clips__error {
+    padding:
+        20px;
+
+    color:
+        #ffffff;
+
+    border:
+        1px solid
+        rgba(
+            255,
+            80,
+            80,
+            0.52
+        );
+
+    border-radius:
+        18px;
+
+    background:
+        rgba(
+            216,
+            44,
+            44,
+            0.14
+        );
+}
+
+
+.twitch-clips__error p {
+    margin:
+        7px 0 0;
+}
+
+
+/* =========================================================
+   CLIPS — EMPTY
+========================================================= */
+
+.twitch-clips__empty {
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    flex-direction:
+        column;
+
+    gap:
+        12px;
+
+    min-height:
+        240px;
+
+    color:
+        var(--twitch-muted);
+
+    text-align:
+        center;
+}
+
+/* =========================================================
+   TWITCH VIDEOS
+========================================================= */
+
+.twitch-videos {
+    width: 100%;
+}
+
+
+
+
+
+
+
+
+/* =========================================================
+   VIDEOS — GRID
+========================================================= */
+
+.twitch-videos__grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(
+                0,
+                1fr
+            )
+        );
+
+    gap: 22px;
+}
+
+
+/* =========================================================
+   VIDEO CARD
+========================================================= */
+
+.twitch-video-card {
+    position: relative;
+
+    overflow: hidden;
+
+    display: flex;
+
+    flex-direction: column;
+
+    min-width: 0;
+
+    border:
+        1px solid
+        rgba(
+            145,
+            70,
+            255,
+            0.42
+        );
+
+    border-radius: 18px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(
+                24,
+                17,
+                39,
+                0.96
+            ),
+            rgba(
+                11,
+                9,
+                20,
+                0.98
+            )
+        );
+
+    box-shadow:
+        0
+        14px
+        35px
+        rgba(
+            0,
+            0,
+            0,
+            0.28
+        );
+
+    transition:
+        transform 0.22s ease,
+        border-color 0.22s ease,
+        box-shadow 0.22s ease;
+}
+
+
+.twitch-video-card:hover {
+    transform:
+        translateY(
+            -5px
+        );
+
+    border-color:
+        rgba(
+            34,
+            242,
+            239,
+            0.72
+        );
+
+    box-shadow:
+        0
+        18px
+        45px
+        rgba(
+            0,
+            0,
+            0,
+            0.4
+        ),
+        0
+        0
+        24px
+        rgba(
+            145,
+            70,
+            255,
+            0.12
+        );
+}
+
+
+/* =========================================================
+   VIDEO — THUMBNAIL
+========================================================= */
+
+.twitch-video-card__thumbnail-link {
+    position: relative;
+
+    overflow: hidden;
+
+    display: block;
+
+    width: 100%;
+
+    aspect-ratio: 16 / 9;
+
+    background: #09070e;
+}
+
+
+.twitch-video-card__thumbnail {
+    display: block;
+
+    width: 100%;
+
+    height: 100%;
+
+    object-fit: cover;
+
+    transition:
+        transform
+        0.35s
+        ease,
+        filter
+        0.35s
+        ease;
+}
+
+
+.twitch-video-card:hover
+.twitch-video-card__thumbnail {
+    transform:
+        scale(
+            1.045
+        );
+
+    filter:
+        brightness(
+            0.72
+        );
+}
+
+
+/* =========================================================
+   VIDEO — TYPE
+========================================================= */
+
+.twitch-video-card__type {
+    position: absolute;
+
+    top: 12px;
+
+    left: 12px;
+
+    z-index: 2;
+
+    padding:
+        6px
+        10px;
+
+    color: #ffffff;
+
+    border:
+        1px solid
+        rgba(
+            255,
+            255,
+            255,
+            0.16
+        );
+
+    border-radius: 8px;
+
+    background:
+        rgba(
+            145,
+            70,
+            255,
+            0.92
+        );
+
+    backdrop-filter:
+        blur(
+            8px
+        );
+
+    font-size: 0.7rem;
+
+    font-weight: 900;
+
+    text-transform: uppercase;
+}
+
+
+/* =========================================================
+   VIDEO — DURATION
+========================================================= */
+
+.twitch-video-card__duration {
+    position: absolute;
+
+    right: 12px;
+
+    bottom: 12px;
+
+    z-index: 2;
+
+    padding:
+        5px
+        8px;
+
+    color: #ffffff;
+
+    border-radius: 7px;
+
+    background:
+        rgba(
+            0,
+            0,
+            0,
+            0.82
+        );
+
+    font-size: 0.72rem;
+
+    font-weight: 900;
+}
+
+
+/* =========================================================
+   VIDEO — PLAY BUTTON
+========================================================= */
+
+.twitch-video-card__play {
+    position: absolute;
+
+    top: 50%;
+
+    left: 50%;
+
+    z-index: 3;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    width: 58px;
+
+    height: 58px;
+
+    padding-left: 4px;
+
+    color: #ffffff;
+
+    border:
+        1px solid
+        rgba(
+            255,
+            255,
+            255,
+            0.3
+        );
+
+    border-radius: 50%;
+
+    background:
+        rgba(
+            145,
+            70,
+            255,
+            0.92
+        );
+
+    box-shadow:
+        0
+        8px
+        25px
+        rgba(
+            0,
+            0,
+            0,
+            0.35
+        );
+
+    font-size: 1.25rem;
+
+    opacity: 0;
+
+    transform:
+        translate(
+            -50%,
+            -50%
+        )
+        scale(
+            0.8
+        );
+
+    transition:
+        opacity 0.22s ease,
+        transform 0.22s ease;
+}
+
+
+.twitch-video-card:hover
+.twitch-video-card__play {
+    opacity: 1;
+
+    transform:
+        translate(
+            -50%,
+            -50%
+        )
+        scale(
+            1
+        );
+}
+
+
+/* =========================================================
+   VIDEO — CONTENT
+========================================================= */
+
+.twitch-video-card__content {
+    display: flex;
+
+    flex: 1;
+
+    flex-direction: column;
+
+    align-items: flex-start;
+
+    padding: 20px;
+}
+
+
+/* =========================================================
+   VIDEO — TITLE
+========================================================= */
+
+.twitch-video-card__title {
+    display: -webkit-box;
+
+    overflow: hidden;
+
+    margin-bottom: 12px;
+
+    color: #ffffff;
+
+    font-size: 1rem;
+
+    font-weight: 900;
+
+    line-height: 1.45;
+
+    text-decoration: none;
+
+    -webkit-box-orient: vertical;
+
+
+
+    transition:
+        color
+        0.2s
+        ease;
+}
+
+
+.twitch-video-card__title:hover {
+    color:
+        var(--twitch-cyan);
+}
+
+
+/* =========================================================
+   VIDEO — META
+========================================================= */
+
+.twitch-video-card__meta {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    align-items: center;
+
+    gap:
+        8px
+        16px;
+
+    width: 100%;
+
+    margin-bottom: 14px;
+
+    color: var(--twitch-muted);
+
+    font-size: 0.78rem;
+
+    font-weight: 700;
+}
+
+
+.twitch-video-card__meta span {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 5px;
+}
+
+
+/* =========================================================
+   VIDEO — DESCRIPTION
+========================================================= */
+
+.twitch-video-card__description {
+    display: -webkit-box;
+
+    overflow: hidden;
+
+    margin:
+        0
+        0
+        18px;
+
+    color: var(--twitch-muted);
+
+    font-size: 0.82rem;
+
+    line-height: 1.55;
+
+    -webkit-box-orient: vertical;
+
+   
+}
+
+
+/* =========================================================
+   VIDEO — BUTTON
+========================================================= */
+
+.twitch-video-card__button {
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 8px;
+
+    margin-top: auto;
+
+    padding:
+        9px
+        14px;
+
+    color: #ffffff;
+
+    border:
+        1px solid
+        rgba(
+            34,
+            242,
+            239,
+            0.4
+        );
+
+    border-radius: 10px;
+
+    background:
+        rgba(
+            34,
+            242,
+            239,
+            0.08
+        );
+
+    font-size: 0.78rem;
+
+    font-weight: 900;
+
+    text-decoration: none;
+
+    transition:
+        transform 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease,
+        background 0.2s ease;
+}
+
+
+.twitch-video-card__button:hover {
+    transform:
+        translateY(
+            -2px
+        );
+
+    color:
+        var(--twitch-cyan);
+
+    border-color:
+        var(--twitch-cyan);
+
+    background:
+        rgba(
+            34,
+            242,
+            239,
+            0.14
+        );
+}
+
+
+.twitch-videos__page {
+    color: var(--twitch-muted);
+
+    font-size: 0.8rem;
+}
+
+
+.twitch-videos__page strong {
+    color: #ffffff;
+}
+
+
+/* =========================================================
+   VIDEOS — LOADING
+========================================================= */
+
+.twitch-videos__loading {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 12px;
+
+    min-height: 260px;
+
+    color: var(--twitch-muted);
+
+    font-weight: 800;
+}
+
+
+.twitch-videos__loading-icon {
+    color: var(--twitch-cyan);
+
+    font-size: 1.6rem;
+
+    animation:
+        twitchVideosRotate
+        0.9s
+        linear
+        infinite;
+}
+
+
+@keyframes twitchVideosRotate {
+
+    from {
+        transform:
+            rotate(
+                0deg
+            );
+    }
+
+    to {
+        transform:
+            rotate(
+                360deg
+            );
+    }
+
+}
+
+
+/* =========================================================
+   VIDEOS — ERROR
+========================================================= */
+
+.twitch-videos__error {
+    padding: 20px;
+
+    color: #ffffff;
+
+    border:
+        1px solid
+        rgba(
+            255,
+            80,
+            80,
+            0.5
+        );
+
+    border-radius: 16px;
+
+    background:
+        rgba(
+            216,
+            44,
+            44,
+            0.12
+        );
+}
+
+
+.twitch-videos__error p {
+    margin:
+        7px
+        0
+        0;
+
+    color:
+        rgba(
+            255,
+            255,
+            255,
+            0.72
+        );
+}
+
+
+/* =========================================================
+   VIDEOS — EMPTY
+========================================================= */
+
+.twitch-videos__empty {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    flex-direction: column;
+
+    gap: 10px;
+
+    min-height: 250px;
+
+    padding: 30px;
+
+    color: var(--twitch-muted);
+
+    text-align: center;
+}
+
+
+.twitch-videos__empty > span {
+    font-size: 2rem;
+}
+
+
+.twitch-videos__empty strong {
+    color: #ffffff;
+}
+
+
+.twitch-videos__empty p {
+    margin: 0;
+}
+
+
+/* =========================================================
+   VIDEOS — RESPONSIVE TABLET
+========================================================= */
+
+@media (
+    max-width: 900px
+) {
+
+    .twitch-videos__header {
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+
+    .twitch-videos__grid {
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .twitch-videos__all {
+        align-self: flex-start;
+    }
+
+}
+
+
+/* =========================================================
+   VIDEOS — RESPONSIVE MOBILE
+========================================================= */
+
+@media (
+    max-width: 600px
+) {
+
+    .twitch-videos__header {
+        margin-bottom: 20px;
+    }
+
+
+    @media (max-width: 600px) {
+
+    .twitch-clips__title,
+    .twitch-videos__title {
+        font-size:
+            clamp(
+                2rem,
+                10vw,
+                3rem
+            );
+    }
+
+}
+
+
+    .twitch-videos__description {
+        font-size: 0.86rem;
+    }
+
+
+    .twitch-video-card {
+        border-radius: 14px;
+    }
+
+
+    .twitch-video-card__content {
+        padding: 16px;
+    }
+
+
+    .twitch-video-card__play {
+        width: 48px;
+
+        height: 48px;
+
+        font-size: 1rem;
+    }
+
+
+    .twitch-videos__pagination {
+        gap: 10px;
+    }
+
+
+    .twitch-videos__pagination-button {
+        padding:
+            9px
+            11px;
+
+        font-size: 0.7rem;
+    }
+
+
+    .twitch-videos__page {
+        font-size: 0.72rem;
+    }
+
+}
+/* =========================================================
+   TWITCH VIDEOS — LIGHT MODE
+========================================================= */
+
+[data-theme="light"] .twitch-videos {
+    color: #2b123b;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+[data-theme="light"] .twitch-videos__eyebrow {
+    color: #22F2EF;
+}
+
+
+[data-theme="light"] .twitch-videos__title {
+    color: #291236;
+}
+
+
+[data-theme="light"] .twitch-videos__description {
+    color: #684d72;
+}
+
+
+[data-theme="light"] .twitch-videos__all {
+    color: #7200a8;
+
+    border-color:
+        rgba(
+            109,
+            0,
+            163,
+            0.45
+        );
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            0.7
+        );
+
+    box-shadow:
+        0 5px 18px
+        rgba(
+            109,
+            0,
+            163,
+            0.08
+        );
+}
+
+
+/* =========================================================
+   VIDEO CARD
+========================================================= */
+
+[data-theme="light"] .twitch-video-card {
+    border-color:
+        rgba(
+            109,
+            0,
+            163,
+            0.18
+        );
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(
+                255,
+                255,
+                255,
+                0.96
+            ),
+            rgba(
+                250,
+                243,
+                255,
+                0.96
+            )
+        );
+
+    box-shadow:
+        0 12px 30px
+        rgba(
+            72,
+            25,
+            95,
+            0.12
+        );
+}
+
+
+[data-theme="light"] .twitch-video-card:hover {
+    border-color:
+        rgba(
+            109,
+            0,
+            163,
+            0.5
+        );
+
+    box-shadow:
+        0 18px 40px
+        rgba(
+            72,
+            25,
+            95,
+            0.18
+        );
+}
+
+
+/* =========================================================
+   TITLE
+========================================================= */
+
+[data-theme="light"] .twitch-video-card__title {
+    color: #321340;
+}
+
+
+[data-theme="light"] .twitch-video-card__title:hover {
+    color: #6d00a3;
+}
+
+
+/* =========================================================
+   META
+========================================================= */
+
+[data-theme="light"] .twitch-video-card__meta {
+    color: #644d6d;
+}
+
+
+[data-theme="light"] .twitch-video-card__meta span {
+    color: #644d6d;
+}
+
+
+[data-theme="light"] .twitch-video-card__meta time {
+    color: #644d6d;
+}
+
+
+/* =========================================================
+   DESCRIPTION
+========================================================= */
+
+[data-theme="light"] .twitch-video-card__description {
+    color: #725f79;
+}
+
+
+/* =========================================================
+   WATCH BUTTON
+========================================================= */
+
+[data-theme="light"] .twitch-video-card__button {
+    color: #6d00a3;
+
+    border-color:
+        rgba(
+            109,
+            0,
+            163,
+            0.35
+        );
+
+    background:
+        rgba(
+            109,
+            0,
+            163,
+            0.06
+        );
+}
+
+
+
+
+/* =========================================================
+   TYPE BADGE
+========================================================= */
+
+[data-theme="light"] .twitch-video-card__type {
+    color: #ffffff;
+
+    border-color:
+        rgba(
+            255,
+            255,
+            255,
+            0.35
+        );
+
+    background:
+        linear-gradient(
+            135deg,
+            #9146ff,
+            #6d00a3
+        );
+
+    box-shadow:
+        0 4px 12px
+        rgba(
+            109,
+            0,
+            163,
+            0.25
+        );
+}
+
+
+/* =========================================================
+   DURATION
+========================================================= */
+
+[data-theme="light"] .twitch-video-card__duration {
+    color: #ffffff;
+
+    background:
+        rgba(
+            25,
+            12,
+            31,
+            0.88
+        );
+}
+
+
+/* =========================================================
+   PLAY BUTTON
+========================================================= */
+
+[data-theme="light"] .twitch-video-card__play {
+    color: #ffffff;
+
+    border-color:
+        rgba(
+            255,
+            255,
+            255,
+            0.6
+        );
+
+    background:
+        linear-gradient(
+            135deg,
+            #9146ff,
+            #6d00a3
+        );
+
+    box-shadow:
+        0 8px 25px
+        rgba(
+            109,
+            0,
+            163,
+            0.35
+        );
+}
+
+
+/* =========================================================
+   PAGINATION
+========================================================= */
+
+[data-theme="light"] .twitch-videos__pagination-button {
+    color: #6d00a3;
+
+    border-color:
+        rgba(
+            109,
+            0,
+            163,
+            0.3
+        );
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            0.75
+        );
+}
+
+
+
+
+[data-theme="light"] .twitch-videos__page {
+    color: #725f79;
+}
+
+
+[data-theme="light"] .twitch-videos__page strong {
+    color: #321340;
+}
+
+
+/* =========================================================
+   LOADING
+========================================================= */
+
+[data-theme="light"] .twitch-videos__loading {
+    color: #725f79;
+}
+
+
+[data-theme="light"] .twitch-videos__loading-icon {
+    color: #6d00a3;
+}
+
+
+/* =========================================================
+   ERROR
+========================================================= */
+
+[data-theme="light"] .twitch-videos__error {
+    color: #721c24;
+
+    border-color:
+        rgba(
+            180,
+            45,
+            55,
+            0.3
+        );
+
+    background:
+        rgba(
+            255,
+            225,
+            228,
+            0.8
+        );
+}
+
+
+[data-theme="light"] .twitch-videos__error p {
+    color: #7a3c43;
+}
+
+
+/* =========================================================
+   EMPTY
+========================================================= */
+
+[data-theme="light"] .twitch-videos__empty {
+    color: #725f79;
+}
+
+
+[data-theme="light"] .twitch-videos__empty strong {
+    color: #321340;
 }

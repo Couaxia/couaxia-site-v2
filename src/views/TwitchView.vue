@@ -17,7 +17,7 @@ import TwitchHero
     
 import TwitchLive from "../components/twitch/TwitchLive.vue"   
 
-import TwitchRecommendations from "../components/twitch/witchRecommendations.vue"
+import TwitchRecommendations from "../components/twitch/TwitchRecommendations.vue"
 
 import TwitchClips from "../components/twitch/TwitchClips.vue"
 

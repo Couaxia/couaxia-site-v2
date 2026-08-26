@@ -1,29 +1,103 @@
 <script setup lang="ts">
 import {
     computed,
+    onMounted,
     ref
 } from "vue";
 
 
 /* =========================================================
-   ÉTAT TEMPORAIRE
-   Sera remplacé ensuite par l'API Twitch
+   TYPES
 ========================================================= */
 
-const isLive =
-    ref(false);
+interface TwitchLiveData {
+    isLive: boolean;
+
+    userId: string;
+
+    login: string;
+
+    displayName: string;
+
+    profileImageUrl: string;
+
+    offlineImageUrl: string;
+
+    title: string | null;
+
+    gameId: string | null;
+
+    gameName: string | null;
+
+    viewers: number;
+
+    startedAt: string | null;
+
+    language: string | null;
+
+    thumbnailUrl: string | null;
+
+    isMature: boolean;
+}
 
 
-const isRefreshing =
-    ref(false);
+interface TwitchLiveResponse {
+    success: boolean;
+
+    data?: TwitchLiveData;
+
+    message?: string;
+
+    error?: string;
+}
 
 
 /* =========================================================
-   STATUT
+   STATE
 ========================================================= */
+
+const liveData =
+    ref<TwitchLiveData | null>(
+        null
+    );
+
+
+const loading =
+    ref(true);
+
+
+const refreshing =
+    ref(false);
+
+
+const errorMessage =
+    ref<string | null>(
+        null
+    );
+
+
+/* =========================================================
+   COMPUTED
+========================================================= */
+
+const isLive =
+    computed(() => {
+
+        return liveData.value?.isLive
+            ?? false;
+
+    });
+
 
 const liveStatusText =
     computed(() => {
+
+        if (loading.value) {
+
+            return "Vérification…";
+
+        }
+
 
         return isLive.value
             ? "En direct"
@@ -32,60 +106,157 @@ const liveStatusText =
     });
 
 
+const gameName =
+    computed(() => {
+
+        return liveData.value?.gameName
+            ?? "Hors ligne";
+
+    });
+
+
+const viewers =
+    computed(() => {
+
+        return liveData.value?.viewers
+            ?? 0;
+
+    });
+
+
+const streamTitle =
+    computed(() => {
+
+        return liveData.value?.title
+            ?? "Couaxia est actuellement hors ligne.";
+
+    });
+
+
+const twitchPlayerUrl =
+    computed(() => {
+
+        const parent =
+            window.location.hostname;
+
+
+        return (
+            "https://player.twitch.tv/" +
+            "?channel=couaxia" +
+            `&parent=${parent}` +
+            "&muted=true"
+        );
+
+    });
+
+
 /* =========================================================
-   ACTUALISATION
+   LOAD LIVE DATA
 ========================================================= */
 
-const refreshLive =
-    async () => {
+async function loadTwitchLive() {
 
-        if (isRefreshing.value) {
-            return;
-        }
+    errorMessage.value =
+        null;
 
 
-        isRefreshing.value =
-            true;
+    try {
+
+        const response =
+            await fetch(
+                "/api/twitch/live"
+            );
 
 
-        try {
+        const result: TwitchLiveResponse =
+    await response.json();
 
-            /*
-             * Plus tard :
-             *
-             * const response =
-             *     await fetch("/api/twitch/live");
-             *
-             * const data =
-             *     await response.json();
-             *
-             * isLive.value =
-             *     data.isLive;
-             */
 
-            console.log(
-                "Actualisation du statut Twitch..."
+        if (
+            !response.ok ||
+            !result.success ||
+            !result.data
+        ) {
+
+            throw new Error(
+                result.error
+                ?? result.message
+                ?? "Impossible de récupérer les informations Twitch."
             );
 
         }
 
-        catch (error) {
 
-            console.error(
-                "Impossible d'actualiser Twitch :",
-                error
-            );
+        liveData.value =
+            result.data;
 
-        }
+    }
 
-        finally {
+    catch (error) {
 
-            isRefreshing.value =
-                false;
+        console.error(
+            "Erreur Twitch :",
+            error
+        );
 
-        }
 
-    };
+        errorMessage.value =
+            error instanceof Error
+                ? error.message
+                : "Une erreur inconnue est survenue.";
+
+    }
+
+    finally {
+
+        loading.value =
+            false;
+
+    }
+
+}
+
+
+/* =========================================================
+   REFRESH
+========================================================= */
+
+async function refreshLive() {
+
+    if (refreshing.value) {
+
+        return;
+
+    }
+
+
+    refreshing.value =
+        true;
+
+
+    try {
+
+        await loadTwitchLive();
+
+    }
+
+    finally {
+
+        refreshing.value =
+            false;
+
+    }
+
+}
+
+
+/* =========================================================
+   MOUNT
+========================================================= */
+
+onMounted(
+    loadTwitchLive
+);
 </script>
 
 
@@ -153,24 +324,17 @@ const refreshLive =
                     rel="noopener noreferrer"
                     class="twitch-live__twitch-link"
                 >
-
-                    <span aria-hidden="true">
-                        💬
-                    </span>
-
                     Twitch
-
                     <span aria-hidden="true">
                         ↗
                     </span>
-
                 </a>
 
 
                 <button
                     type="button"
                     class="twitch-live__refresh"
-                    :disabled="isRefreshing"
+                    :disabled="refreshing"
                     @click="refreshLive"
                 >
 
@@ -178,7 +342,7 @@ const refreshLive =
                         class="twitch-live__refresh-icon"
                         :class="{
                             'twitch-live__refresh-icon--loading':
-                                isRefreshing
+                                refreshing
                         }"
                         aria-hidden="true"
                     >
@@ -188,7 +352,7 @@ const refreshLive =
 
                     <span>
                         {{
-                            isRefreshing
+                            refreshing
                                 ? "Actualisation..."
                                 : "Actualiser"
                         }}
@@ -202,77 +366,170 @@ const refreshLive =
 
 
         <!-- =================================================
-             LECTEUR TWITCH
+             ERREUR
         ================================================== -->
 
-        <div class="twitch-live__player">
+        <div
+            v-if="errorMessage"
+            class="twitch-live__error"
+            role="alert"
+        >
 
-            <!-- =============================================
-                 BADGE DANS LE PLAYER
-            ============================================== -->
+            <strong>
+                Impossible de récupérer Twitch.
+            </strong>
 
-            <span
-                class="twitch-live__player-status"
-                :class="{
-                    'twitch-live__player-status--online':
-                        isLive
-                }"
-            >
-
-                {{
-                    isLive
-                        ? "EN DIRECT"
-                        : "HORS LIGNE"
-                }}
-
-            </span>
-
-
-            <!-- =============================================
-                 TWITCH EMBED
-            ============================================== -->
-
-            <iframe
-                class="twitch-live__iframe"
-                src="https://player.twitch.tv/?channel=couaxia&parent=localhost&muted=true"
-                title="Live Twitch de Couaxia"
-                allowfullscreen
-            ></iframe>
+            <p>
+                {{ errorMessage }}
+            </p>
 
         </div>
 
 
         <!-- =================================================
-             MESSAGE HORS LIGNE
+             LOADING
         ================================================== -->
 
         <div
-            v-if="!isLive"
-            class="twitch-live__offline-message"
+            v-else-if="loading"
+            class="twitch-live__loading"
         >
 
             <span
-                class="twitch-live__offline-icon"
+                class="twitch-live__loading-spinner"
                 aria-hidden="true"
             >
-                🌙
+                ↻
             </span>
 
+            <span>
+                Vérification du statut Twitch...
+            </span>
 
-            <div>
+        </div>
 
-                <strong>
-                    Couaxia est actuellement hors ligne.
-                </strong>
 
-                <p>
-                    Tu peux tout de même retrouver les dernières
-                    rediffusions, vidéos et clips juste en dessous.
-                </p>
+        <template v-else>
+
+            <!-- =============================================
+                 PLAYER
+            ============================================== -->
+
+            <div class="twitch-live__player">
+
+                <span
+                    class="twitch-live__player-status"
+                    :class="{
+                        'twitch-live__player-status--online':
+                            isLive
+                    }"
+                >
+                    {{
+                        isLive
+                            ? "EN DIRECT"
+                            : "HORS LIGNE"
+                    }}
+                </span>
+
+
+                <iframe
+                    class="twitch-live__iframe"
+                    :src="twitchPlayerUrl"
+                    title="Live Twitch de Couaxia"
+                    allow="autoplay; fullscreen"
+                    allowfullscreen
+                ></iframe>
 
             </div>
 
-        </div>
+
+            <!-- =============================================
+                 INFORMATIONS
+            ============================================== -->
+
+            <div class="twitch-live__infos">
+
+                <div class="twitch-live__info">
+
+                    <span class="twitch-live__info-label">
+                        Catégorie
+                    </span>
+
+                    <strong>
+                        {{ gameName }}
+                    </strong>
+
+                </div>
+
+
+                <div class="twitch-live__info">
+
+                    <span class="twitch-live__info-label">
+                        Viewers
+                    </span>
+
+                    <strong>
+                        {{ viewers }}
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <!-- =============================================
+                 TITRE DU STREAM
+            ============================================== -->
+
+            <div
+                v-if="isLive"
+                class="twitch-live__stream-details"
+            >
+
+                <span class="twitch-live__stream-label">
+                    Titre du live
+                </span>
+
+                <strong>
+                    {{ streamTitle }}
+                </strong>
+
+            </div>
+
+
+            <!-- =============================================
+                 HORS LIGNE
+            ============================================== -->
+
+            <div
+                v-else
+                class="twitch-live__offline-message"
+            >
+
+                <span
+                    class="twitch-live__offline-icon"
+                    aria-hidden="true"
+                >
+                    🌙
+                </span>
+
+
+                <div>
+
+                    <strong>
+                        Couaxia est actuellement hors ligne.
+                    </strong>
+
+                    <p>
+                        Tu peux retrouver les derniers clips
+                        et les dernières vidéos juste en dessous.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </template>
 
     </section>
 

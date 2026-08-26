@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import {
     computed,
+    onMounted,
     ref
 } from "vue";
-
+import AppLoader from "../ui/AppLoader.vue";
 
 /* =========================================================
    TYPES
@@ -16,18 +17,39 @@ interface TwitchClip {
 
     creatorName: string;
 
-    thumbnailUrl: string;
-
     url: string;
+
+    embedUrl: string;
+
+    thumbnailUrl: string;
 
     views: number;
 
     createdAt: string;
+
+    duration: number;
+
+    gameId: string;
+
+    videoId: string;
+}
+
+
+interface TwitchClipsResponse {
+    success: boolean;
+
+    data?: TwitchClip[];
+
+    total?: number;
+
+    message?: string;
+
+    error?: string;
 }
 
 
 /* =========================================================
-   CONFIGURATION
+   CONFIG
 ========================================================= */
 
 const CLIPS_PER_PAGE =
@@ -35,139 +57,30 @@ const CLIPS_PER_PAGE =
 
 
 /* =========================================================
-   DONNÉES TEMPORAIRES
-
-   Plus tard, on branchera l'API Twitch.
+   STATE
 ========================================================= */
 
 const clips =
-    ref<TwitchClip[]>([
-
-        {
-            id:
-                "clip-1",
-
-            title:
-                "On est bien accueilli dite donc !",
-
-            creatorName:
-                "Couaxia",
-
-            thumbnailUrl:
-                "/images/twitch/clips/clip-1.jpg",
-
-            url:
-                "https://www.twitch.tv/couaxia/clips",
-
-            views:
-                307,
-
-            createdAt:
-                "2023-12-19T23:52:00Z"
-        },
-
-        {
-            id:
-                "clip-2",
-
-            title:
-                "En duo avec PIcaro ! On va tout casser !",
-
-            creatorName:
-                "Couaxia",
-
-            thumbnailUrl:
-                "/images/twitch/clips/clip-2.jpg",
-
-            url:
-                "https://www.twitch.tv/couaxia/clips",
-
-            views:
-                99,
-
-            createdAt:
-                "2025-04-26T23:27:00Z"
-        },
-
-        {
-            id:
-                "clip-3",
-
-            title:
-                "LA BAGARR !",
-
-            creatorName:
-                "kaka_o_lulu_vert",
-
-            thumbnailUrl:
-                "/images/twitch/clips/clip-3.jpg",
-
-            url:
-                "https://www.twitch.tv/couaxia/clips",
-
-            views:
-                78,
-
-            createdAt:
-                "2025-10-15T22:13:00Z"
-        },
-
-        {
-            id:
-                "clip-4",
-
-            title:
-                "Euh d'accord MDR",
-
-            creatorName:
-                "NaTsu_Le_Dragonnet",
-
-            thumbnailUrl:
-                "/images/twitch/clips/clip-4.jpg",
-
-            url:
-                "https://www.twitch.tv/couaxia/clips",
-
-            views:
-                78,
-
-            createdAt:
-                "2025-12-30T19:55:00Z"
-        },
-
-        {
-            id:
-                "clip-5",
-
-            title:
-                "Encore un moment totalement normal",
-
-            creatorName:
-                "Couaxia",
-
-            thumbnailUrl:
-                "/images/twitch/clips/clip-5.jpg",
-
-            url:
-                "https://www.twitch.tv/couaxia/clips",
-
-            views:
-                65,
-
-            createdAt:
-                "2026-01-12T20:10:00Z"
-        }
-
-    ]);
+    ref<TwitchClip[]>([]);
 
 
-/* =========================================================
-   PAGINATION
-========================================================= */
+const loading =
+    ref(true);
+
+
+const errorMessage =
+    ref<string | null>(
+        null
+    );
+
 
 const currentPage =
     ref(1);
 
+
+/* =========================================================
+   COMPUTED — TOTAL PAGES
+========================================================= */
 
 const totalPages =
     computed(() => {
@@ -182,6 +95,10 @@ const totalPages =
 
     });
 
+
+/* =========================================================
+   COMPUTED — CLIPS PAGE ACTUELLE
+========================================================= */
 
 const paginatedClips =
     computed(() => {
@@ -207,6 +124,10 @@ const paginatedClips =
     });
 
 
+/* =========================================================
+   COMPUTED — PAGINATION
+========================================================= */
+
 const canGoPrevious =
     computed(() => {
 
@@ -226,7 +147,83 @@ const canGoNext =
 
 
 /* =========================================================
-   PAGINATION — ACTIONS
+   LOAD CLIPS
+========================================================= */
+
+async function loadClips():
+    Promise<void> {
+
+    loading.value =
+        true;
+
+
+    errorMessage.value =
+        null;
+
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/twitch/clips?first=100"
+            );
+
+
+        const result: TwitchClipsResponse =
+            await response.json();
+
+
+        if (
+            !response.ok ||
+            !result.success ||
+            !result.data
+        ) {
+
+            throw new Error(
+                result.error ??
+                result.message ??
+                "Impossible de récupérer les clips Twitch."
+            );
+
+        }
+
+
+        clips.value =
+            result.data;
+
+
+        currentPage.value =
+            1;
+
+    }
+
+    catch (error: unknown) {
+
+        console.error(
+            "Erreur clips Twitch :",
+            error
+        );
+
+
+        errorMessage.value =
+            error instanceof Error
+                ? error.message
+                : "Une erreur inconnue est survenue.";
+
+    }
+
+    finally {
+
+        loading.value =
+            false;
+
+    }
+
+}
+
+
+/* =========================================================
+   PAGINATION — PRÉCÉDENT
 ========================================================= */
 
 function previousPage() {
@@ -236,6 +233,7 @@ function previousPage() {
     ) {
 
         return;
+
     }
 
 
@@ -245,6 +243,10 @@ function previousPage() {
 }
 
 
+/* =========================================================
+   PAGINATION — SUIVANT
+========================================================= */
+
 function nextPage() {
 
     if (
@@ -252,6 +254,7 @@ function nextPage() {
     ) {
 
         return;
+
     }
 
 
@@ -262,7 +265,7 @@ function nextPage() {
 
 
 /* =========================================================
-   FORMATAGE
+   FORMAT VIEWS
 ========================================================= */
 
 function formatViews(
@@ -275,6 +278,10 @@ function formatViews(
 
 }
 
+
+/* =========================================================
+   FORMAT DATE
+========================================================= */
 
 function formatDate(
     value: string
@@ -293,6 +300,7 @@ function formatDate(
     ) {
 
         return "";
+
     }
 
 
@@ -319,6 +327,57 @@ function formatDate(
     );
 
 }
+
+
+/* =========================================================
+   FORMAT DURATION
+========================================================= */
+
+function formatDuration(
+    value: number
+) {
+
+    const totalSeconds =
+        Math.max(
+            0,
+            Math.floor(
+                value
+            )
+        );
+
+
+    const minutes =
+        Math.floor(
+            totalSeconds /
+            60
+        );
+
+
+    const seconds =
+        totalSeconds %
+        60;
+
+
+    return (
+        `${minutes}:` +
+        `${seconds
+            .toString()
+            .padStart(
+                2,
+                "0"
+            )}`
+    );
+
+}
+
+
+/* =========================================================
+   MOUNT
+========================================================= */
+
+onMounted(
+    loadClips
+);
 </script>
 
 
@@ -343,6 +402,15 @@ function formatDate(
                     Mes derniers clips
                 </h2>
 
+                <p class="twitch-clips__description">
+
+                    Des fails, des fous rires 
+                    et du chaos 
+                    : retrouve ici les 
+                    meilleurs moments de mes lives !
+
+                </p>
+
             </div>
 
 
@@ -352,187 +420,278 @@ function formatDate(
                 rel="noopener noreferrer"
                 class="twitch-clips__all"
             >
+
                 Voir tous les clips
 
                 <span aria-hidden="true">
                     ↗
                 </span>
+
             </a>
 
         </header>
 
 
         <!-- =================================================
-             GRILLE
+             LOADING
+        ================================================== -->
+
+        <AppLoader
+            v-if="loading"
+            text="Chargement des clips..."
+        />
+
+
+        <!-- =================================================
+             ERROR
         ================================================== -->
 
         <div
-            v-if="paginatedClips.length > 0"
-            class="twitch-clips__grid"
+            v-else-if="errorMessage"
+            class="twitch-clips__error"
+            role="alert"
         >
 
-            <article
-                v-for="clip in paginatedClips"
-                :key="clip.id"
-                class="twitch-clip-card"
+            <strong>
+                Impossible de charger les clips.
+            </strong>
+
+
+            <p>
+                {{ errorMessage }}
+            </p>
+
+        </div>
+
+
+        <!-- =================================================
+             CONTENT
+        ================================================== -->
+
+        <template v-else>
+
+            <!-- =============================================
+                 GRID
+            ============================================== -->
+
+            <div
+                v-if="paginatedClips.length > 0"
+                class="twitch-clips__grid"
             >
 
-                <!-- =========================================
-                     IMAGE
-                ========================================== -->
-
-                <a
-                    :href="clip.url"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="twitch-clip-card__thumbnail-link"
+                <article
+                    v-for="clip in paginatedClips"
+                    :key="clip.id"
+                    class="twitch-clip-card"
                 >
 
-                    <img
-                        :src="clip.thumbnailUrl"
-                        :alt="`Miniature du clip ${clip.title}`"
-                        class="twitch-clip-card__thumbnail"
-                        loading="lazy"
-                    >
-
-
-                    <span class="twitch-clip-card__type">
-                        Clip
-                    </span>
-
-                </a>
-
-
-                <!-- =========================================
-                     CONTENU
-                ========================================== -->
-
-                <div class="twitch-clip-card__content">
+                    <!-- =====================================
+                         THUMBNAIL
+                    ====================================== -->
 
                     <a
                         :href="clip.url"
                         target="_blank"
                         rel="noopener noreferrer"
-                        class="twitch-clip-card__title"
+                        class="twitch-clip-card__thumbnail-link"
                     >
-                        {{ clip.title }}
+
+                        <img
+                            :src="clip.thumbnailUrl"
+                            :alt="`Miniature du clip ${clip.title}`"
+                            class="twitch-clip-card__thumbnail"
+                            loading="lazy"
+                        >
+
+
+                        <!-- =================================
+                             TYPE
+                        ================================== -->
+
+                        <span class="twitch-clip-card__type">
+                            Clip
+                        </span>
+
+
+                        <!-- =================================
+                             DURÉE
+                        ================================== -->
+
+                        <span class="twitch-clip-card__duration">
+
+                            {{
+                                formatDuration(
+                                    clip.duration
+                                )
+                            }}
+
+                        </span>
+
+
+                        <!-- =================================
+                             PLAY
+                        ================================== -->
+
+                        <span
+                            class="twitch-clip-card__play"
+                            aria-hidden="true"
+                        >
+                            ▶
+                        </span>
+
                     </a>
 
 
-                    <p class="twitch-clip-card__creator">
+                    <!-- =====================================
+                         CONTENT
+                    ====================================== -->
 
-                        Par
+                    <div class="twitch-clip-card__content">
 
-                        <strong>
-                            {{ clip.creatorName }}
-                        </strong>
+                        <!-- =================================
+                             TITLE
+                        ================================== -->
 
-                    </p>
-
-
-                    <p class="twitch-clip-card__views">
-
-                        {{
-                            formatViews(
-                                clip.views
-                            )
-                        }}
-
-                        vue{{
-                            clip.views > 1
-                                ? "s"
-                                : ""
-                        }}
-
-                    </p>
+                        <a
+                            :href="clip.url"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="twitch-clip-card__title"
+                        >
+                            {{ clip.title }}
+                        </a>
 
 
-                    <time
-                        class="twitch-clip-card__date"
-                        :datetime="clip.createdAt"
-                    >
-                        {{
-                            formatDate(
-                                clip.createdAt
-                            )
-                        }}
-                    </time>
+                        <!-- =================================
+                             CREATOR
+                        ================================== -->
 
-                </div>
+                        <p class="twitch-clip-card__creator">
 
-            </article>
+                            Par
 
-        </div>
+                            <strong>
+                                {{ clip.creatorName }}
+                            </strong>
+
+                        </p>
 
 
-        <!-- =================================================
-             VIDE
-        ================================================== -->
+                        <!-- =================================
+                             VIEWS
+                        ================================== -->
 
-        <div
-            v-else
-            class="twitch-clips__empty"
-        >
+                        <p class="twitch-clip-card__views">
 
-            <span aria-hidden="true">
-                🎬
-            </span>
+                            {{
+                                formatViews(
+                                    clip.views
+                                )
+                            }}
+
+                            vue{{
+                                clip.views > 1
+                                    ? "s"
+                                    : ""
+                            }}
+
+                        </p>
 
 
-            <strong>
-                Aucun clip disponible.
-            </strong>
+                        <!-- =================================
+                             DATE
+                        ================================== -->
 
-        </div>
+                        <time
+                            class="twitch-clip-card__date"
+                            :datetime="clip.createdAt"
+                        >
+
+                            {{
+                                formatDate(
+                                    clip.createdAt
+                                )
+                            }}
+
+                        </time>
+
+                    </div>
+
+                </article>
+
+            </div>
 
 
-        <!-- =================================================
-             PAGINATION
-        ================================================== -->
+            <!-- =============================================
+                 EMPTY
+            ============================================== -->
 
-        <nav
-            v-if="totalPages > 1"
-            class="twitch-clips__pagination"
-            aria-label="Pagination des clips Twitch"
-        >
-
-            <button
-                type="button"
-                class="twitch-clips__pagination-button"
-                :disabled="!canGoPrevious"
-                @click="previousPage"
+            <div
+                v-else
+                class="twitch-clips__empty"
             >
-                ← Précédent
-            </button>
 
+                <span aria-hidden="true">
+                    🎬
+                </span>
 
-            <span class="twitch-clips__page">
-
-                Page
 
                 <strong>
-                    {{ currentPage }}
+                    Aucun clip disponible.
                 </strong>
 
-                /
-
-                <strong>
-                    {{ totalPages }}
-                </strong>
-
-            </span>
+            </div>
 
 
-            <button
-                type="button"
-                class="twitch-clips__pagination-button"
-                :disabled="!canGoNext"
-                @click="nextPage"
+            <!-- =============================================
+                 PAGINATION
+            ============================================== -->
+
+            <nav
+                v-if="totalPages > 1"
+                class="twitch-clips__pagination"
+                aria-label="Pagination des clips Twitch"
             >
-                Suivant →
-            </button>
 
-        </nav>
+                <button
+                    type="button"
+                    class="twitch-clips__pagination-button"
+                    :disabled="!canGoPrevious"
+                    @click="previousPage"
+                >
+                    ← Précédent
+                </button>
+
+
+                <span class="twitch-clips__page">
+
+                    Page
+
+                    <strong>
+                        {{ currentPage }}
+                    </strong>
+
+                    /
+
+                    <strong>
+                        {{ totalPages }}
+                    </strong>
+
+                </span>
+
+
+                <button
+                    type="button"
+                    class="twitch-clips__pagination-button"
+                    :disabled="!canGoNext"
+                    @click="nextPage"
+                >
+                    Suivant →
+                </button>
+
+            </nav>
+
+        </template>
 
     </section>
 

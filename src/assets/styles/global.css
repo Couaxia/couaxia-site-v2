@@ -950,3 +950,66 @@ html {
     }
 
 }
+
+/* =========================================================
+   APP LOADER
+========================================================= */
+
+.app-loader {
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    width: 100%;
+
+    min-height: 180px;
+
+    gap: 10px;
+
+    text-align: center;
+}
+
+
+/* =========================================================
+   GIF
+========================================================= */
+
+.app-loader__gif {
+    display: block;
+
+    width: 65px;
+
+    height: 65px;
+
+    object-fit: contain;
+}
+
+
+/* =========================================================
+   TEXTE
+========================================================= */
+
+.app-loader__text {
+    margin: 0;
+
+    color: var(--twitch-muted);
+
+    font-size: 0.85rem;
+
+    font-weight: 700;
+
+    text-align: center;
+}
+
+
+/* =========================================================
+   LIGHT MODE
+========================================================= */
+
+html[data-theme="light"] .app-loader__text {
+    color: #654c70;
+}

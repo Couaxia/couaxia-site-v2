@@ -1,16 +1,55 @@
 <script setup lang="ts">
+import {
+    onMounted,
+    ref
+} from "vue";
+
+
 /* =========================================================
-   TWITCH HERO — COUAXIA
+   TYPES
+========================================================= */
+
+interface TwitchFollowersResponse {
+    success: boolean;
+
+    data?: {
+        followers: number;
+    };
+
+    message?: string;
+
+    error?: string;
+}
+
+
+/* =========================================================
+   STATE
 ========================================================= */
 
 const followerCount =
-    902;
+    ref<number | null>(
+        null
+    );
 
+
+const followersLoading =
+    ref(true);
+
+
+const followersError =
+    ref<string | null>(
+        null
+    );
+
+
+/* =========================================================
+   TAGS
+========================================================= */
 
 const tags =
     [
         "🎮 Multi-Gaming",
-        "👾 VTubueuse",
+        "👾 VTubeuse",
         "🇫🇷 Française",
         "💜 Safe Place",
         "🐙 Octopus",
@@ -19,6 +58,82 @@ const tags =
         "🌙 Chill",
         "🔞 +18"
     ];
+
+
+/* =========================================================
+   LOAD FOLLOWERS
+========================================================= */
+
+async function loadFollowers(): Promise<void> {
+
+    followersError.value =
+        null;
+
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/twitch/followers"
+            );
+
+
+        const result: TwitchFollowersResponse =
+            await response.json();
+
+
+        if (
+            !response.ok ||
+            !result.success ||
+            !result.data
+        ) {
+
+            throw new Error(
+                result.error ??
+                result.message ??
+                "Impossible de récupérer le nombre de followers."
+            );
+
+        }
+
+
+        followerCount.value =
+            result.data.followers;
+
+    }
+
+    catch (error: unknown) {
+
+        console.error(
+            "Erreur followers Twitch :",
+            error
+        );
+
+
+        followersError.value =
+            error instanceof Error
+                ? error.message
+                : "Une erreur inconnue est survenue.";
+
+    }
+
+    finally {
+
+        followersLoading.value =
+            false;
+
+    }
+
+}
+
+
+/* =========================================================
+   MOUNT
+========================================================= */
+
+onMounted(
+    loadFollowers
+);
 </script>
 
 
@@ -26,21 +141,16 @@ const tags =
 
     <section class="twitch-hero">
 
+        <!-- =================================================
+             TEXTE
+        ================================================== -->
+
         <div class="twitch-hero__content">
-
-
-            <!-- =========================================
-                 LABEL
-            ========================================== -->
 
             <span class="twitch-hero__eyebrow">
                 CHAÎNE TWITCH
             </span>
 
-
-            <!-- =========================================
-                 TITRE
-            ========================================== -->
 
             <h1 class="twitch-hero__title">
 
@@ -56,10 +166,6 @@ const tags =
             </h1>
 
 
-            <!-- =========================================
-                 DESCRIPTION
-            ========================================== -->
-
             <p class="twitch-hero__description">
 
                 Viens partager mes aventures,
@@ -70,16 +176,26 @@ const tags =
             </p>
 
 
-            <!-- =========================================
+            <!-- =============================================
                  FOLLOWERS
-            ========================================== -->
+            ============================================== -->
 
             <p class="twitch-hero__followers">
 
                 Vous êtes actuellement
 
-                <strong>
+                <strong v-if="followersLoading">
+                    …
+                </strong>
+
+
+                <strong v-else-if="followerCount !== null">
                     {{ followerCount }}
+                </strong>
+
+
+                <strong v-else>
+                    —
                 </strong>
 
                 à suivre les aventures de Couaxia sur Twitch !
@@ -87,9 +203,21 @@ const tags =
             </p>
 
 
-            <!-- =========================================
+            <!-- =============================================
+                 ERREUR FOLLOWERS
+            ============================================== -->
+
+            <p
+                v-if="followersError"
+                class="twitch-hero__followers-error"
+            >
+                Le nombre de followers est temporairement indisponible.
+            </p>
+
+
+            <!-- =============================================
                  TAGS
-            ========================================== -->
+            ============================================== -->
 
             <div class="twitch-hero__tags">
 
@@ -104,9 +232,9 @@ const tags =
             </div>
 
 
-            <!-- =========================================
-                 BOUTON
-            ========================================== -->
+            <!-- =============================================
+                 BOUTON TWITCH
+            ============================================== -->
 
             <div class="twitch-hero__actions">
 
@@ -134,23 +262,19 @@ const tags =
         </div>
 
 
-        <!-- =============================================
+        <!-- =================================================
              VISUEL
-        ============================================== -->
+        ================================================== -->
 
         <div class="twitch-hero__visual">
 
             <div class="twitch-hero__image-wrapper">
 
-                <!--
-                    TEMPORAIRE :
-                    on remplacera par ton vrai artwork
-                    ensuite.
-                -->
-
-                <div class="twitch-hero__placeholder">
-                    🐙
-                </div>
+                <img
+                    src="https://qudeuzkwvwprlhqtzsct.supabase.co/storage/v1/object/public/artworks/couple/Couaxia_Myo.png"
+                    alt="Couaxia et Myo"
+                    class="twitch-hero__image"
+                >
 
             </div>
 

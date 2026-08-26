@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import {
     computed,
+    onMounted,
     ref
 } from "vue";
+import AppLoader from "../ui/AppLoader.vue";
 
 
 /* =========================================================
@@ -14,20 +16,41 @@ interface TwitchVideo {
 
     title: string;
 
-    thumbnailUrl: string;
+    description: string;
 
     url: string;
 
+    thumbnailUrl: string;
+
     views: number;
+
+    createdAt: string;
+
+    publishedAt: string;
 
     duration: string;
 
-    createdAt: string;
+    language: string;
+
+    type: string;
+}
+
+
+interface TwitchVideosResponse {
+    success: boolean;
+
+    data?: TwitchVideo[];
+
+    total?: number;
+
+    message?: string;
+
+    error?: string;
 }
 
 
 /* =========================================================
-   CONFIGURATION
+   CONFIG
 ========================================================= */
 
 const VIDEOS_PER_PAGE =
@@ -35,140 +58,30 @@ const VIDEOS_PER_PAGE =
 
 
 /* =========================================================
-   DONNÉES TEMPORAIRES
-
-   Plus tard :
-   les vidéos viendront directement de l'API Twitch.
+   STATE
 ========================================================= */
 
 const videos =
-    ref<TwitchVideo[]>([
-
-        {
-            id:
-                "video-1",
-
-            title:
-                "Dernier live de Couaxia",
-
-            thumbnailUrl:
-                "/images/twitch/videos/video-1.jpg",
-
-            url:
-                "https://www.twitch.tv/couaxia/videos",
-
-            views:
-                120,
-
-            duration:
-                "03:42:18",
-
-            createdAt:
-                "2026-08-20T20:00:00Z"
-        },
-
-        {
-            id:
-                "video-2",
-
-            title:
-                "Soirée multigaming avec la communauté",
-
-            thumbnailUrl:
-                "/images/twitch/videos/video-2.jpg",
-
-            url:
-                "https://www.twitch.tv/couaxia/videos",
-
-            views:
-                98,
-
-            duration:
-                "04:15:32",
-
-            createdAt:
-                "2026-08-16T20:30:00Z"
-        },
-
-        {
-            id:
-                "video-3",
-
-            title:
-                "On découvre un nouveau jeu !",
-
-            thumbnailUrl:
-                "/images/twitch/videos/video-3.jpg",
-
-            url:
-                "https://www.twitch.tv/couaxia/videos",
-
-            views:
-                86,
-
-            duration:
-                "02:58:41",
-
-            createdAt:
-                "2026-08-12T19:45:00Z"
-        },
-
-        {
-            id:
-                "video-4",
-
-            title:
-                "Encore une soirée totalement normale",
-
-            thumbnailUrl:
-                "/images/twitch/videos/video-4.jpg",
-
-            url:
-                "https://www.twitch.tv/couaxia/videos",
-
-            views:
-                74,
-
-            duration:
-                "05:08:13",
-
-            createdAt:
-                "2026-08-08T21:00:00Z"
-        },
-
-        {
-            id:
-                "video-5",
-
-            title:
-                "Les aventures continuent !",
-
-            thumbnailUrl:
-                "/images/twitch/videos/video-5.jpg",
-
-            url:
-                "https://www.twitch.tv/couaxia/videos",
-
-            views:
-                62,
-
-            duration:
-                "03:27:54",
-
-            createdAt:
-                "2026-08-04T20:15:00Z"
-        }
-
-    ]);
+    ref<TwitchVideo[]>([]);
 
 
-/* =========================================================
-   PAGINATION
-========================================================= */
+const loading =
+    ref(true);
+
+
+const errorMessage =
+    ref<string | null>(
+        null
+    );
+
 
 const currentPage =
     ref(1);
 
+
+/* =========================================================
+   TOTAL PAGES
+========================================================= */
 
 const totalPages =
     computed(() => {
@@ -183,6 +96,10 @@ const totalPages =
 
     });
 
+
+/* =========================================================
+   VIDEOS DE LA PAGE
+========================================================= */
 
 const paginatedVideos =
     computed(() => {
@@ -208,6 +125,10 @@ const paginatedVideos =
     });
 
 
+/* =========================================================
+   PAGINATION
+========================================================= */
+
 const canGoPrevious =
     computed(() => {
 
@@ -227,7 +148,83 @@ const canGoNext =
 
 
 /* =========================================================
-   PAGINATION — ACTIONS
+   LOAD VIDEOS
+========================================================= */
+
+async function loadVideos():
+    Promise<void> {
+
+    loading.value =
+        true;
+
+
+    errorMessage.value =
+        null;
+
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/twitch/videos?first=100"
+            );
+
+
+        const result: TwitchVideosResponse =
+            await response.json();
+
+
+        if (
+            !response.ok ||
+            !result.success ||
+            !result.data
+        ) {
+
+            throw new Error(
+                result.error ??
+                result.message ??
+                "Impossible de récupérer les vidéos Twitch."
+            );
+
+        }
+
+
+        videos.value =
+            result.data;
+
+
+        currentPage.value =
+            1;
+
+    }
+
+    catch (error: unknown) {
+
+        console.error(
+            "Erreur vidéos Twitch :",
+            error
+        );
+
+
+        errorMessage.value =
+            error instanceof Error
+                ? error.message
+                : "Une erreur inconnue est survenue.";
+
+    }
+
+    finally {
+
+        loading.value =
+            false;
+
+    }
+
+}
+
+
+/* =========================================================
+   PREVIOUS PAGE
 ========================================================= */
 
 function previousPage() {
@@ -237,14 +234,22 @@ function previousPage() {
     ) {
 
         return;
+
     }
 
 
     currentPage.value -=
         1;
 
+
+    scrollToVideos();
+
 }
 
+
+/* =========================================================
+   NEXT PAGE
+========================================================= */
 
 function nextPage() {
 
@@ -253,17 +258,48 @@ function nextPage() {
     ) {
 
         return;
+
     }
 
 
     currentPage.value +=
         1;
 
+
+    scrollToVideos();
+
 }
 
 
 /* =========================================================
-   FORMATAGE DES VUES
+   SCROLL
+========================================================= */
+
+function scrollToVideos() {
+
+    window.requestAnimationFrame(
+        () => {
+
+            document
+                .querySelector(
+                    ".twitch-videos"
+                )
+                ?.scrollIntoView({
+                    behavior:
+                        "smooth",
+
+                    block:
+                        "start"
+                });
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   FORMAT VIEWS
 ========================================================= */
 
 function formatViews(
@@ -278,7 +314,7 @@ function formatViews(
 
 
 /* =========================================================
-   FORMATAGE DATE
+   FORMAT DATE
 ========================================================= */
 
 function formatDate(
@@ -298,6 +334,7 @@ function formatDate(
     ) {
 
         return "";
+
     }
 
 
@@ -311,19 +348,87 @@ function formatDate(
                 "2-digit",
 
             year:
-                "numeric",
-
-            hour:
-                "2-digit",
-
-            minute:
-                "2-digit"
+                "numeric"
         }
     ).format(
         date
     );
 
 }
+
+
+/* =========================================================
+   FORMAT THUMBNAIL
+========================================================= */
+
+function formatThumbnail(
+    url: string
+) {
+
+    return url
+        .replace(
+            "%{width}",
+            "640"
+        )
+        .replace(
+            "%{height}",
+            "360"
+        )
+        .replace(
+            "{width}",
+            "640"
+        )
+        .replace(
+            "{height}",
+            "360"
+        );
+
+}
+
+
+/* =========================================================
+   FORMAT TYPE
+========================================================= */
+
+function formatVideoType(
+    type: string
+) {
+
+    switch (
+        type
+    ) {
+
+        case "archive":
+
+            return "Rediffusion";
+
+
+        case "highlight":
+
+            return "Temps fort";
+
+
+        case "upload":
+
+            return "Vidéo";
+
+
+        default:
+
+            return "Vidéo";
+
+    }
+
+}
+
+
+/* =========================================================
+   MOUNT
+========================================================= */
+
+onMounted(
+    loadVideos
+);
 </script>
 
 
@@ -348,6 +453,15 @@ function formatDate(
                     Mes dernières vidéos
                 </h2>
 
+
+                <p class="twitch-videos__description">
+
+                    Tu as raté un live ?
+                    Retrouve ici mes dernières
+                    rediffusions Twitch.
+
+                </p>
+
             </div>
 
 
@@ -358,7 +472,7 @@ function formatDate(
                 class="twitch-videos__all"
             >
 
-                Voir toutes les vidéos
+                Toutes les vidéos
 
                 <span aria-hidden="true">
                     ↗
@@ -370,220 +484,301 @@ function formatDate(
 
 
         <!-- =================================================
-             GRILLE DES VIDÉOS
+             LOADING
+        ================================================== -->
+
+        <AppLoader
+            v-if="loading"
+            text="Chargement des vidéos..."
+        />
+
+
+        <!-- =================================================
+             ERROR
         ================================================== -->
 
         <div
-            v-if="paginatedVideos.length > 0"
-            class="twitch-videos__grid"
+            v-else-if="errorMessage"
+            class="twitch-videos__error"
+            role="alert"
         >
 
-            <article
-                v-for="video in paginatedVideos"
-                :key="video.id"
-                class="twitch-video-card"
+            <strong>
+                Impossible de charger les vidéos.
+            </strong>
+
+
+            <p>
+                {{ errorMessage }}
+            </p>
+
+        </div>
+
+
+        <!-- =================================================
+             CONTENT
+        ================================================== -->
+
+        <template v-else>
+
+            <!-- =============================================
+                 VIDEOS GRID
+            ============================================== -->
+
+            <div
+                v-if="paginatedVideos.length > 0"
+                class="twitch-videos__grid"
             >
 
-                <!-- =========================================
-                     MINIATURE
-                ========================================== -->
-
-                <a
-                    :href="video.url"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="twitch-video-card__thumbnail-link"
+                <article
+                    v-for="video in paginatedVideos"
+                    :key="video.id"
+                    class="twitch-video-card"
                 >
 
-                    <img
-                        :src="video.thumbnailUrl"
-                        :alt="`Miniature de ${video.title}`"
-                        class="twitch-video-card__thumbnail"
-                        loading="lazy"
-                    >
-
-
                     <!-- =====================================
-                         TYPE
+                         THUMBNAIL
                     ====================================== -->
-
-                    <span class="twitch-video-card__type">
-                        Vidéo
-                    </span>
-
-
-                    <!-- =====================================
-                         DURÉE
-                    ====================================== -->
-
-                    <span class="twitch-video-card__duration">
-
-                        {{ video.duration }}
-
-                    </span>
-
-
-                    <!-- =====================================
-                         PLAY
-                    ====================================== -->
-
-                    <span
-                        class="twitch-video-card__play"
-                        aria-hidden="true"
-                    >
-                        ▶
-                    </span>
-
-                </a>
-
-
-                <!-- =========================================
-                     CONTENU
-                ========================================== -->
-
-                <div class="twitch-video-card__content">
 
                     <a
                         :href="video.url"
                         target="_blank"
                         rel="noopener noreferrer"
-                        class="twitch-video-card__title"
+                        class="twitch-video-card__thumbnail-link"
                     >
 
-                        {{ video.title }}
+                        <img
+                            :src="
+                                formatThumbnail(
+                                    video.thumbnailUrl
+                                )
+                            "
+                            :alt="
+                                `Miniature de ${video.title}`
+                            "
+                            class="twitch-video-card__thumbnail"
+                            loading="lazy"
+                        >
+
+
+                        <!-- =================================
+                             TYPE
+                        ================================== -->
+
+                        <span class="twitch-video-card__type">
+
+                            {{
+                                formatVideoType(
+                                    video.type
+                                )
+                            }}
+
+                        </span>
+
+
+                        <!-- =================================
+                             DURATION
+                        ================================== -->
+
+                        <span class="twitch-video-card__duration">
+
+                            {{ video.duration }}
+
+                        </span>
+
+
+                        <!-- =================================
+                             PLAY
+                        ================================== -->
+
+                        <span
+                            class="twitch-video-card__play"
+                            aria-hidden="true"
+                        >
+                            ▶
+                        </span>
 
                     </a>
 
 
                     <!-- =====================================
-                         VUES
+                         CONTENT
                     ====================================== -->
 
-                    <p class="twitch-video-card__views">
+                    <div class="twitch-video-card__content">
 
-                        {{
-                            formatViews(
-                                video.views
-                            )
-                        }}
+                        <!-- =================================
+                             TITLE
+                        ================================== -->
 
-                        vue{{
-                            video.views > 1
-                                ? "s"
-                                : ""
-                        }}
+                        <a
+                            :href="video.url"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="twitch-video-card__title"
+                        >
 
-                    </p>
+                            {{ video.title }}
 
-
-                    <!-- =====================================
-                         DATE
-                    ====================================== -->
-
-                    <time
-                        class="twitch-video-card__date"
-                        :datetime="video.createdAt"
-                    >
-
-                        {{
-                            formatDate(
-                                video.createdAt
-                            )
-                        }}
-
-                    </time>
-
-                </div>
-
-            </article>
-
-        </div>
+                        </a>
 
 
-        <!-- =================================================
-             AUCUNE VIDÉO
-        ================================================== -->
+                        <!-- =================================
+                             META
+                        ================================== -->
 
-        <div
-            v-else
-            class="twitch-videos__empty"
-        >
+                        <div class="twitch-video-card__meta">
 
-            <span aria-hidden="true">
-                📺
-            </span>
+                            <span>
+
+                                👁
+
+                                {{
+                                    formatViews(
+                                        video.views
+                                    )
+                                }}
+
+                                vue{{
+                                    video.views > 1
+                                        ? "s"
+                                        : ""
+                                }}
+
+                            </span>
 
 
-            <strong>
-                Aucune vidéo disponible.
-            </strong>
+                            <time
+                                :datetime="video.createdAt"
+                            >
 
-        </div>
+                                {{
+                                    formatDate(
+                                        video.createdAt
+                                    )
+                                }}
+
+                            </time>
+
+                        </div>
 
 
-        <!-- =================================================
-             PAGINATION
-        ================================================== -->
+                        <!-- =================================
+                             DESCRIPTION
+                        ================================== -->
 
-        <nav
-            v-if="totalPages > 1"
-            class="twitch-videos__pagination"
-            aria-label="Pagination des vidéos Twitch"
-        >
+                        <p
+                            v-if="video.description"
+                            class="twitch-video-card__description"
+                        >
+
+                            {{ video.description }}
+
+                        </p>
+
+
+                        <!-- =================================
+                             BUTTON
+                        ================================== -->
+
+                        <a
+                            :href="video.url"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="twitch-video-card__button"
+                        >
+
+                            Regarder
+
+                            <span aria-hidden="true">
+                                ↗
+                            </span>
+
+                        </a>
+
+                    </div>
+
+                </article>
+
+            </div>
+
 
             <!-- =============================================
-                 PRÉCÉDENT
+                 EMPTY
             ============================================== -->
 
-            <button
-                type="button"
-                class="twitch-videos__pagination-button"
-                :disabled="!canGoPrevious"
-                @click="previousPage"
+            <div
+                v-else
+                class="twitch-videos__empty"
             >
 
-                ← Précédent
+                <span aria-hidden="true">
+                    📺
+                </span>
 
-            </button>
+
+                <strong>
+                    Aucune rediffusion disponible.
+                </strong>
+
+
+                <p>
+                    Les prochaines rediffusions
+                    apparaîtront automatiquement ici.
+                </p>
+
+            </div>
 
 
             <!-- =============================================
-                 PAGE
+                 PAGINATION
             ============================================== -->
 
-            <span class="twitch-videos__page">
-
-                Page
-
-                <strong>
-                    {{ currentPage }}
-                </strong>
-
-                /
-
-                <strong>
-                    {{ totalPages }}
-                </strong>
-
-            </span>
-
-
-            <!-- =============================================
-                 SUIVANT
-            ============================================== -->
-
-            <button
-                type="button"
-                class="twitch-videos__pagination-button"
-                :disabled="!canGoNext"
-                @click="nextPage"
+            <nav
+                v-if="totalPages > 1"
+                class="twitch-videos__pagination"
+                aria-label="Pagination des vidéos Twitch"
             >
 
-                Suivant →
+                <button
+                    type="button"
+                    class="twitch-videos__pagination-button"
+                    :disabled="!canGoPrevious"
+                    @click="previousPage"
+                >
+                    ← Précédent
+                </button>
 
-            </button>
 
-        </nav>
+                <span class="twitch-videos__page">
+
+                    Page
+
+                    <strong>
+                        {{ currentPage }}
+                    </strong>
+
+                    /
+
+                    <strong>
+                        {{ totalPages }}
+                    </strong>
+
+                </span>
+
+
+                <button
+                    type="button"
+                    class="twitch-videos__pagination-button"
+                    :disabled="!canGoNext"
+                    @click="nextPage"
+                >
+                    Suivant →
+                </button>
+
+            </nav>
+
+        </template>
 
     </section>
 
