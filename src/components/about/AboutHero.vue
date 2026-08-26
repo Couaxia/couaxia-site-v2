@@ -4,7 +4,40 @@
    ABOUT HERO
 ========================================================= */
 
+import {
+    ref
+} from "vue";
 
+
+const activeMessage =
+    ref<string | null>(
+        null
+    );
+
+
+function showRandomMessage(
+    messages: string[]
+) {
+
+    const randomIndex =
+        Math.floor(
+            Math.random() *
+            messages.length
+        );
+
+
+    activeMessage.value =
+        messages[randomIndex] ?? null;
+
+}
+
+
+function hideMessage() {
+
+    activeMessage.value =
+        null;
+
+}
 /* =========================================================
    TYPES
 ========================================================= */
@@ -14,9 +47,19 @@ interface SocialLink {
     url: string;
     icon?: string;
     emoji?: string;
-    external?: boolean;
+    messages: string[];
 }
+const storyMessages = [
 
+    "Prêt à découvrir comment mon aventure a commencé ?",
+
+    "Tout a commencé sur la planète Saphira…",
+
+    "Viens découvrir les secrets des Kraduks !",
+
+    "Avadora, Natsu, Myo… toute mon histoire t’attend !"
+
+];
 
 /* =========================================================
    SOCIAL LINKS
@@ -25,102 +68,117 @@ interface SocialLink {
 const socialLinks: SocialLink[] = [
 
     {
-        name:
-            "Twitch",
+        name: "Twitch",
 
-        url:
-            "https://www.twitch.tv/couaxia",
+        url: "https://www.twitch.tv/couaxia",
 
         icon:
             "https://qudeuzkwvwprlhqtzsct.supabase.co/storage/v1/object/public/site-asset/logo/twitch-logo-transparent.png",
 
-        external:
-            true
+        messages: [
+            "Viens suivre mes aventures en direct sur Twitch !",
+            "Rejoins-moi sur Twitch pour partager mes prochaines aventures !",
+            "Le direct commence peut-être bientôt… viens jeter un œil !",
+            "Sur Twitch, même mes tentacules participent au stream !"
+        ]
     },
 
     {
-        name:
-            "YouTube",
+        name: "YouTube",
 
-        url:
-            "https://www.youtube.com/@couaxia",
+        url: "https://www.youtube.com/@couaxia",
 
         icon:
             "https://qudeuzkwvwprlhqtzsct.supabase.co/storage/v1/object/public/site-asset/logo/youtube-logo-png.png",
 
-        external:
-            true
+        messages: [
+            "Viens jeter un œil à mes vidéos !",
+            "Tu trouveras mes aventures et mes meilleurs moments sur YouTube !",
+            "Une petite vidéo de Couaxia, ça te tente ?",
+            "Mes souvenirs de stream t’attendent sur YouTube !"
+        ]
     },
 
     {
-        name:
-            "TikTok",
+        name: "TikTok",
 
-        url:
-            "https://www.tiktok.com/@couaxia_tv",
+        url: "https://www.tiktok.com/@couaxia_tv",
 
         icon:
             "https://qudeuzkwvwprlhqtzsct.supabase.co/storage/v1/object/public/site-asset/logo/logo-tiktok-png.png",
 
-        external:
-            true
+        messages: [
+            "Viens découvrir mes petites vidéos sur TikTok !",
+            "Des clips, des bêtises et beaucoup de tentacules t’attendent !",
+            "Attention, mes TikTok peuvent provoquer des fous rires !",
+            "Tu veux voir mes aventures en format court ?"
+        ]
     },
 
     {
-        name:
-            "X (Twitter)",
+        name: "X (Twitter)",
 
-        url:
-            "https://x.com/couaxia",
+        url: "https://x.com/couaxia",
 
         icon:
             "https://qudeuzkwvwprlhqtzsct.supabase.co/storage/v1/object/public/site-asset/logo/x-logo-x.png",
 
-        external:
-            true
+        messages: [
+            "Viens suivre mes nouvelles aventures sur X !",
+            "J’y partage mes annonces et mes petites pensées !",
+            "Besoin de nouvelles fraîches de Couaxia ?",
+            "Mes prochaines aventures sont peut-être déjà annoncées ici !"
+        ]
     },
 
     {
-        name:
-            "Instagram",
+        name: "Instagram",
 
-        url:
-            "https://www.instagram.com/couaxia/",
+        url: "https://www.instagram.com/couaxia/",
 
         icon:
             "https://qudeuzkwvwprlhqtzsct.supabase.co/storage/v1/object/public/site-asset/logo/instagram-logo.png",
 
-        external:
-            true
+        messages: [
+            "Viens découvrir mon univers en images !",
+            "Mes plus belles publications t’attendent sur Instagram !",
+            "Un peu de rose, de violet et de magie ?",
+            "Instagram est parfait pour découvrir mon univers visuel !"
+        ]
     },
 
     {
-        name:
-            "Throne",
+        name: "Throne",
 
-        url:
-            "https://throne.com/couaxia",
+        url: "https://throne.com/couaxia",
 
         icon:
             "https://qudeuzkwvwprlhqtzsct.supabase.co/storage/v1/object/public/site-asset/logo/Throne_Icon.png",
 
-        external:
-            true
+        messages: [
+            "Voici ma petite liste de souhaits !",
+            "Tu es curieux de découvrir les objets qui me font envie ?",
+            "Même les Kraduks ont une liste de souhaits !",
+            "Un cadeau pour nourrir mes aventures intergalactiques ?"
+        ]
     },
 
     {
-        name:
-            "Discord",
+        name: "Discord",
 
-        url:
-            "https://discord.com/invite/YeCXm8JZ7e",
+        url: "https://discord.com/invite/YeCXm8JZ7e",
 
         icon:
             "https://qudeuzkwvwprlhqtzsct.supabase.co/storage/v1/object/public/site-asset/logo/discord-logo.png",
 
-        external:
-            true
+        messages: [
+            "Viens rejoindre notre communauté sur Discord !",
+            "Les Poups t’attendent sur le serveur !",
+            "Entre, installe-toi et viens discuter avec nous !",
+            "Notre petit royaume communautaire t’ouvre ses portes !"
+        ]
     }
+
 
 ];
 
@@ -234,6 +292,8 @@ const characterImage =
                             about-hero__action
                             about-hero__action--secondary
                         "
+                        @mouseenter="showRandomMessage(social.messages)"
+                        @mouseleave="hideMessage"
                     >
 
                         <img
@@ -269,9 +329,11 @@ const characterImage =
                         class="
                             about-hero__action
                             about-hero__action--secondary
-                            about-hero__action--story
-                        "
+                            about-hero__action--story"
+                        @mouseenter="showRandomMessage(storyMessages)"
+                        @mouseleave="hideMessage"
                     >
+
 
                         <span
                             class="about-hero__action-emoji"

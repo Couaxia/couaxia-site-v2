@@ -1,108 +1,211 @@
 <script setup lang="ts">
 
 /* =========================================================
-   CE QUE J'AIME
+   TYPES
 ========================================================= */
-const likes = [
+
+interface TasteItem {
+    icon: string;
+    text: string;
+}
+
+interface TasteCard {
+    type: "like" | "dislike";
+    icon: string;
+    label: string;
+    title: string;
+    messages: string[];
+    items: TasteItem[];
+}
+
+
+/* =========================================================
+   CARDS
+========================================================= */
+
+const tasteCards: TasteCard[] = [
 
     {
-        icon: "🎮",
-        text: "Les jeux vidéo et les jeux en coopération"
+        type: "like",
+
+        icon: "💜",
+
+        label:
+            "Mes favoris",
+
+        title:
+            "Ce que j’aime",
+
+        messages: [
+            "Tu as certains goûts en commun avec moi ?",
+            "Je vous aime, mes femmes !",
+            "Les jeux vidéo et les poulpes, c’est une excellente combinaison !",
+            "J’adore partager tout cela avec les Poups !",
+            "Le rose, le violet et les tentacules : la perfection !",
+            "Natsu fait évidemment partie de mes choses préférées !"
+        ],
+
+        items: [
+
+            {
+                icon: "🎮",
+                text: "Les jeux vidéo et les jeux en coopération"
+            },
+
+            {
+                icon: "🐙",
+                text: "Les poulpes et les créatures fantastiques"
+            },
+
+            {
+                icon: "🌸",
+                text: "Les couleurs rose, violet et bleu"
+            },
+
+            {
+                icon: "🌌",
+                text: "Les univers fantastiques et la science-fiction"
+            },
+
+            {
+                icon: "🐙",
+                text: "Mes femmes 💜"
+            },
+
+            {
+                icon: "🎨",
+                text: "Le dessin, la création et le développement"
+            },
+
+            {
+                icon: "💬",
+                text: "Passer du temps avec ma communauté"
+            },
+
+            {
+                icon: "🐙",
+                text: "Ma sœur Hylda et son amie Cita"
+            },
+
+            {
+                icon: "🐉",
+                text: "Natsu, évidemment"
+            }
+
+        ]
     },
 
-    {
-        icon: "🐙",
-        text: "Les poulpes et les créatures fantastiques"
-    },
 
     {
-        icon: "🦄",
-        text: "Les couleurs rose, violet et bleu"
-    },
+        type: "dislike",
 
-    {
-        icon: "🌌",
-        text: "Les univers fantastiques et la science-fiction"
-    },
+        icon: "🚫",
 
-    {
-        icon: "🐙",
-        text: "Mes femmes 💜"
-    },
+        label:
+            "Ce qui me déplaît",
 
-    {
-        icon: "🎨",
-        text: "Le dessin, la création et le développement"
-    },
+        title:
+            "Ce que je n’aime pas",
 
-    {
-        icon: "💬",
-        text: "Passer du temps avec ma communauté"
-    },
+        messages: [
+            "Même une Kraduk a ses limites !",
+            "Les spoilers ? Quelle horreur !",
+            "Promis, ici on reste bienveillants.",
+            "Les bugs en plein direct sont mes ennemis jurés !",
+            "La toxicité n’a pas sa place dans mon univers !",
+            "Et les plats épicés… très peu pour moi !"
+        ],
 
-    {
-        icon: "🐙",
-        text: "Ma sœur Hylda et son amie Cita"
-    },
+        items: [
 
-    {
-        icon: "🐉",
-        text: "Natsu, évidemment"
+            {
+                icon: "😡",
+                text: "La toxicité et le manque de respect"
+            },
+
+            {
+                icon: "🤐",
+                text: "Les spoilers sans avertissement"
+            },
+
+            {
+                icon: "💔",
+                text: "Les bugs qui arrivent en plein live !"
+            },
+
+            {
+                icon: "📢",
+                text: "Les personnes qui parlent uniquement pour rabaisser"
+            },
+
+            {
+                icon: "💔",
+                text: "Voir une communauté se disputer"
+            },
+
+            {
+                icon: "👻",
+                text: "Les jumpscares auxquels je ne suis jamais préparée"
+            },
+
+            {
+                icon: "🌶️",
+                text: "Les plats épicés"
+            }
+
+        ]
     }
 
 ];
 
 
-const dislikes = [
+/* =========================================================
+   MASCOT MESSAGE
+========================================================= */
 
-    {
-        icon: "😡",
-        text: "La toxicité et le manque de respect"
-    },
+/*
+ * Cette fonction sera reliée à ta mascotte globale.
+ * Pour l’instant, on déclenche un événement personnalisé.
+ */
 
-    {
-        icon: "🤐",
-        text: "Les spoilers sans avertissement"
-    },
+function speakWithMascot(
+    messages: string[]
+) {
 
-    {
-        icon: "💔",
-        text: "Les bugs qui arrivent en plein live !"
-    },
+    if (
+        messages.length === 0
+    ) {
 
-    {
-        icon: "🗣️",
-        text: "Les personnes qui parlent uniquement pour rabaisser"
-    },
+        return;
 
-    {
-        icon: "💔",
-        text: "Voir une communauté se disputer"
-    },
-
-    {
-        icon: "👻",
-        text: "Les jumpscares auxquels je ne suis jamais préparée"
-    }, 
-
-    {
-    icon: "🌶️",
-    text: "Les plats trop épicés"
-    }, 
-
-    {
-    icon: "⏰",
-    text: "Être en retard"
-    },
-
-    {
-    icon: "🥶",
-    text: "Avoir froid"
     }
-];
+
+
+    const randomIndex =
+        Math.floor(
+            Math.random() *
+            messages.length
+        );
+
+
+    const message =
+        messages[randomIndex];
+
+
+    window.dispatchEvent(
+        new CustomEvent(
+            "couaxia-mascot-message",
+            {
+                detail: {
+                    message
+                }
+            }
+        )
+    );
+
+}
 
 </script>
-
 
 <template>
 
@@ -153,34 +256,41 @@ const dislikes = [
             ============================================== -->
 
             <article
-                class="
-                    about-tastes-card
-                    about-tastes-card--likes
-                "
+                v-for="card in tasteCards"
+                :key="card.type"
+                class="about-tastes-card"
+                :class="[
+                    `about-tastes-card--${card.type}`
+                ]"
+                tabindex="0"
+                @mouseenter="speakWithMascot(card.messages)"
+                @focus="speakWithMascot(card.messages)"
+                @click="speakWithMascot(card.messages)"
             >
 
                 <header class="about-tastes-card__header">
 
                     <div
-                        class="
-                            about-tastes-card__symbol
-                            about-tastes-card__symbol--likes
-                        "
+                        class="about-tastes-card__symbol"
+                        :class="[
+                            `about-tastes-card__symbol--${card.type}`
+                        ]"
                         aria-hidden="true"
                     >
-                        ♥
+                        {{ card.icon }}
+                    
                     </div>
 
 
                     <div>
 
                         <p class="about-tastes-card__eyebrow">
-                            LES BONNES CHOSES
+                            {{ card.label }}
                         </p>
 
 
                         <h3 class="about-tastes-card__title">
-                            Ce que j’aime
+                             {{ card.title }}
                         </h3>
 
                     </div>
@@ -191,74 +301,7 @@ const dislikes = [
                 <ul class="about-tastes-card__list">
 
                     <li
-                        v-for="item in likes"
-                        :key="item.text"
-                        class="about-tastes-card__item"
-                    >
-
-                        <span
-                            class="about-tastes-card__icon"
-                            aria-hidden="true"
-                        >
-                            {{ item.icon }}
-                        </span>
-
-
-                        <span class="about-tastes-card__text">
-                            {{ item.text }}
-                        </span>
-
-                    </li>
-
-                </ul>
-
-            </article>
-
-
-            <!-- =============================================
-                 DISLIKES
-            ============================================== -->
-
-            <article
-                class="
-                    about-tastes-card
-                    about-tastes-card--dislikes
-                "
-            >
-
-                <header class="about-tastes-card__header">
-
-                    <div
-                        class="
-                            about-tastes-card__symbol
-                            about-tastes-card__symbol--dislikes
-                        "
-                        aria-hidden="true"
-                    >
-                        ✕
-                    </div>
-
-
-                    <div>
-
-                        <p class="about-tastes-card__eyebrow">
-                            UN PEU MOINS...
-                        </p>
-
-
-                        <h3 class="about-tastes-card__title">
-                            Ce que je n’aime pas
-                        </h3>
-
-                    </div>
-
-                </header>
-
-
-                <ul class="about-tastes-card__list">
-
-                    <li
-                        v-for="item in dislikes"
+                        v-for="item in card.items"
                         :key="item.text"
                         class="about-tastes-card__item"
                     >

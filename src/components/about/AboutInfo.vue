@@ -40,7 +40,7 @@ const informations: InfoCard[] = [
     {
         icon: "🎂",
         title: "Âge",
-        value: "126 ans"
+        value: "126 ans (26 ans humain)"
     },
 
     {
