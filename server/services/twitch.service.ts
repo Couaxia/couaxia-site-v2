@@ -176,6 +176,27 @@ interface TwitchVideosResponse {
 }
 
 /* =========================================================
+   TWITCH GAME
+========================================================= */
+
+export interface TwitchGame {
+
+    id: string;
+
+    name: string;
+
+    box_art_url: string;
+
+}
+
+
+interface TwitchGamesResponse {
+
+    data: TwitchGame[];
+
+}
+
+/* =========================================================
    CONFIG TWITCH
 ========================================================= */
 
@@ -1179,6 +1200,103 @@ export async function getTwitchVideos(
                 video.type
 
         })
+    );
+
+}
+
+/* =========================================================
+   GET TWITCH GAMES
+========================================================= */
+
+export async function getTwitchGames(
+    gameIds: string[]
+) {
+
+    /* =====================================================
+       CLEAN IDS
+    ===================================================== */
+
+    const ids =
+        [
+            ...new Set(
+                gameIds
+                    .map(
+                        id =>
+                            id.trim()
+                    )
+                    .filter(
+                        Boolean
+                    )
+            )
+        ];
+
+
+    if (
+        ids.length === 0
+    ) {
+
+        return [];
+
+    }
+
+
+    /*
+     * Twitch accepte plusieurs paramètres id.
+     *
+     * Exemple :
+     *
+     * /helix/games?id=123&id=456
+     */
+
+    const url =
+        new URL(
+            "https://api.twitch.tv/helix/games"
+        );
+
+
+    for (
+        const id of ids
+    ) {
+
+        url.searchParams.append(
+            "id",
+            id
+        );
+
+    }
+
+
+    const response =
+        await twitchFetch<TwitchGamesResponse>(
+            url.toString()
+        );
+
+
+    return response.data.map(
+        game => {
+
+            return {
+
+                id:
+                    game.id,
+
+                name:
+                    game.name,
+
+                boxArtUrl:
+                    game.box_art_url
+                        .replace(
+                            "{width}",
+                            "600"
+                        )
+                        .replace(
+                            "{height}",
+                            "800"
+                        )
+
+            };
+
+        }
     );
 
 }

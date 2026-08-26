@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getTwitchClips, getTwitchFollowers, getTwitchLive, getTwitchRecommendations, getTwitchVideos } from "../services/twitch.service.js";
+import { getTwitchClips, getTwitchFollowers, getTwitchLive, getTwitchRecommendations, getTwitchVideos, getTwitchGames } from "../services/twitch.service.js";
 /* =========================================================
    ROUTER
 ========================================================= */
@@ -201,6 +201,67 @@ router.get("/videos", async (req, res) => {
             .json({
             success: false,
             message: "Unable to retrieve Twitch videos",
+            error: message
+        });
+    }
+});
+/* =========================================================
+   GET /api/twitch/games
+========================================================= */
+router.get("/games", async (req, res) => {
+    try {
+        /* =============================================
+           IDS
+        ============================================== */
+        const rawIds = req.query.ids;
+        if (typeof rawIds !==
+            "string") {
+            res
+                .status(400)
+                .json({
+                success: false,
+                message: "Le paramètre ids est obligatoire."
+            });
+            return;
+        }
+        /* =============================================
+           SPLIT
+        ============================================== */
+        const gameIds = rawIds
+            .split(",")
+            .map(id => id.trim())
+            .filter(Boolean);
+        if (gameIds.length === 0) {
+            res
+                .status(400)
+                .json({
+                success: false,
+                message: "Aucun identifiant Twitch fourni."
+            });
+            return;
+        }
+        /* =============================================
+           TWITCH
+        ============================================== */
+        const games = await getTwitchGames(gameIds);
+        /* =============================================
+           RESPONSE
+        ============================================== */
+        res.json({
+            success: true,
+            data: games
+        });
+    }
+    catch (error) {
+        console.error("Twitch games error:", error);
+        const message = error instanceof Error
+            ? error.message
+            : "Erreur Twitch inconnue";
+        res
+            .status(500)
+            .json({
+            success: false,
+            message: "Impossible de récupérer les jeux Twitch.",
             error: message
         });
     }
