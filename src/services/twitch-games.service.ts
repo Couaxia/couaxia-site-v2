@@ -23,6 +23,14 @@ interface TwitchGamesApiResponse {
 
 
 /* =========================================================
+   API URL
+========================================================= */
+
+const apiUrl =
+    import.meta.env.VITE_API_URL;
+
+
+/* =========================================================
    GET TWITCH GAMES
 ========================================================= */
 
@@ -50,24 +58,75 @@ export async function getTwitchGamesByIds(
     }
 
 
+    if (!apiUrl) {
+
+        throw new Error(
+            "VITE_API_URL est manquante."
+        );
+
+    }
+
+
     const response =
         await fetch(
-            `/api/twitch/games?ids=${encodeURIComponent(
+            `${apiUrl}/api/twitch/games?ids=${encodeURIComponent(
                 cleanIds.join(",")
             )}`
         );
 
 
-    if (
-        !response.ok
-    ) {
+    /* =====================================================
+       HTTP ERROR
+    ===================================================== */
+
+    if (!response.ok) {
 
         throw new Error(
-            "Impossible de récupérer les informations Twitch des jeux."
+            `Erreur API Twitch : ${response.status}`
         );
 
     }
 
+
+    /* =====================================================
+       CONTENT TYPE
+    ===================================================== */
+
+    const contentType =
+        response.headers.get(
+            "content-type"
+        );
+
+
+    if (
+        !contentType?.includes(
+            "application/json"
+        )
+    ) {
+
+        const text =
+            await response.text();
+
+
+        console.error(
+            "Réponse API non JSON :",
+            text.slice(
+                0,
+                300
+            )
+        );
+
+
+        throw new Error(
+            "Le serveur Twitch n'a pas renvoyé du JSON."
+        );
+
+    }
+
+
+    /* =====================================================
+       JSON
+    ===================================================== */
 
     const result =
         await response.json() as
