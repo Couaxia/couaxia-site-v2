@@ -26,11 +26,49 @@ interface TwitchGamesApiResponse {
    API URL
 ========================================================= */
 
-const apiUrl =
+const rawApiUrl =
     import.meta.env.VITE_API_URL;
 
 
+/*
+ * On retire un éventuel "/" final.
+ *
+ * Exemple :
+ *
+ * https://api.monsite.fr/
+ *
+ * devient :
+ *
+ * https://api.monsite.fr
+ */
+
+const apiUrl =
+    rawApiUrl
+        ? rawApiUrl.replace(
+            /\/+$/,
+            ""
+        )
+        : "";
+
+
+
 /* =========================================================
+   DEBUG
+========================================================= */
+
+console.log(
+    "🌐 VITE_API_URL :",
+    rawApiUrl
+);
+
+
+console.log(
+    "🌐 API URL utilisée :",
+    apiUrl
+);
+
+
+/*====================================================
    GET TWITCH GAMES
 ========================================================= */
 
