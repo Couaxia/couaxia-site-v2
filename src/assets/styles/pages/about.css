@@ -1,0 +1,8118 @@
+/* =========================================================
+   ABOUT PAGE
+========================================================= */
+
+.about-page {
+    width: 100%;
+}
+
+
+/* =========================================================
+   ABOUT HERO
+========================================================= */
+
+.about-hero {
+    position: relative;
+
+    width: 100%;
+
+    overflow: hidden;
+
+    padding:
+        clamp(35px, 5vw, 70px);
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.10);
+
+    border-radius:
+        32px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(25, 8, 48, 0.92),
+            rgba(65, 14, 85, 0.78)
+        );
+
+    box-shadow:
+        0 18px 55px
+        rgba(0, 0, 0, 0.25);
+}
+
+
+/* =========================================================
+   CONTENT
+========================================================= */
+
+.about-hero__content {
+    position: relative;
+    z-index: 2;
+
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1.15fr)
+        minmax(280px, 0.85fr);
+
+    align-items: center;
+
+    gap:
+        clamp(30px, 5vw, 70px);
+}
+
+
+/* =========================================================
+   TEXT
+========================================================= */
+
+.about-hero__text {
+    position: relative;
+    z-index: 2;
+
+    min-width: 0;
+}
+
+
+/* =========================================================
+   OVERLINE
+========================================================= */
+
+.about-hero__overline {
+    display: flex;
+
+    align-items: center;
+
+    flex-wrap: wrap;
+
+    gap: 8px;
+
+    margin:
+        0
+        0
+        14px;
+
+    color:
+        #22f2ef;
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    font-size:
+        0.82rem;
+
+    font-weight:
+        900;
+
+    letter-spacing:
+        0.14em;
+
+    text-transform:
+        uppercase;
+}
+
+
+/* =========================================================
+   TITLE
+========================================================= */
+
+.about-hero__title {
+    margin:
+        0
+        0
+        24px;
+
+    max-width:
+        850px;
+
+    color:
+        #ffffff;
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    font-size:
+        clamp(
+            2.7rem,
+            5vw,
+            5rem
+        );
+
+    font-weight:
+        900;
+
+    line-height:
+        1.02;
+
+    letter-spacing:
+        -0.045em;
+}
+
+
+/* =========================================================
+   TITLE HIGHLIGHT
+========================================================= */
+
+.about-hero__title-highlight {
+    display: block;
+
+    color:
+        #f22292;
+
+    text-shadow:
+        0 0 18px
+        rgba(242, 34, 146, 0.25);
+}
+
+
+/* =========================================================
+   INTRODUCTION
+========================================================= */
+
+.about-hero__introductions {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 10px;
+
+    max-width:
+        760px;
+
+    margin-bottom:
+        28px;
+}
+
+
+.about-hero__introduction {
+    margin: 0;
+
+    color:
+        rgb(255, 255, 255);
+
+    font-size:
+        clamp(
+            0.95rem,
+            1.5vw,
+            1.05rem
+        );
+
+    font-weight:
+        700;
+
+    line-height:
+        1.80;
+}
+
+
+/* =========================================================
+   ACTIONS
+========================================================= */
+
+.about-hero__actions {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    align-items: center;
+
+    gap: 10px;
+}
+
+
+/* =========================================================
+   ACTION BUTTON
+========================================================= */
+
+.about-hero__action {
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 9px;
+
+    min-height:
+        44px;
+
+    padding:
+        9px
+        16px;
+
+    color:
+        #7200a8;
+
+    border:
+        1px solid
+        rgba(109, 0, 163, 0.40);
+
+    border-radius:
+        14px;
+
+    background:
+        rgba(255, 255, 255, 0.94);
+
+    box-shadow:
+        0 5px 15px
+        rgba(0, 0, 0, 0.12);
+
+    font-size:
+        0.84rem;
+
+    font-weight:
+        900;
+
+    text-decoration: none;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+}
+
+
+/* =========================================================
+   ACTION ICON
+========================================================= */
+
+.about-hero__action-icon {
+    display: block;
+
+    width:
+        21px;
+
+    height:
+        21px;
+
+    object-fit: contain;
+}
+
+
+.about-hero__action-emoji {
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size:
+        1.05rem;
+}
+
+
+/* =========================================================
+   ACTION HOVER
+========================================================= */
+
+.about-hero__action:hover {
+    color:
+        #7200a8;
+
+    border-color:
+        #22f2ef;
+
+    background:
+        #ffffff;
+
+    transform:
+        translateY(-3px);
+
+    box-shadow:
+        0 0 12px
+        rgba(34, 242, 239, 0.35),
+
+        0 0 28px
+        rgba(34, 242, 239, 0.22),
+
+        0 8px 20px
+        rgba(0, 0, 0, 0.16);
+}
+
+
+/* =========================================================
+   STORY BUTTON
+========================================================= */
+
+.about-hero__action--story {
+    border-color:
+        rgba(34, 242, 239, 0.55);
+}
+
+
+/* =========================================================
+   CHARACTER
+========================================================= */
+
+.about-hero__character-wrapper {
+    position: relative;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    min-height:
+        480px;
+}
+
+
+/* =========================================================
+   CHARACTER GLOW
+========================================================= */
+
+.about-hero__character-glow {
+    position: absolute;
+
+    top: 50%;
+    left: 50%;
+
+    width:
+        min(390px, 90%);
+
+    aspect-ratio:
+        1;
+
+    border-radius:
+        50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(242, 34, 146, 0.24) 0%,
+            rgba(109, 0, 163, 0.18) 42%,
+            rgba(34, 242, 239, 0.08) 62%,
+            transparent 72%
+        );
+
+    filter:
+        blur(8px);
+
+    transform:
+        translate(-50%, -50%);
+
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   CHARACTER IMAGE
+========================================================= */
+
+.about-hero__character {
+    position: relative;
+    z-index: 2;
+
+    display: block;
+
+    width:
+        min(100%, 420px);
+
+    max-height:
+        520px;
+
+    object-fit: contain;
+
+    object-position: center;
+
+    filter:
+        drop-shadow(
+            0 18px 25px
+            rgba(0, 0, 0, 0.25)
+        );
+}
+
+
+/* =========================================================
+   CHARACTER NAME
+========================================================= */
+
+.about-hero__character-name {
+    position: absolute;
+    z-index: 3;
+
+    right: 10px;
+    bottom: 18px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 2px;
+
+    padding:
+        10px
+        16px;
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.18);
+
+    border-radius:
+        14px;
+
+    background:
+        rgba(15, 5, 28, 0.78);
+
+    backdrop-filter:
+        blur(10px);
+
+    box-shadow:
+        0 8px 24px
+        rgba(0, 0, 0, 0.20);
+}
+
+
+.about-hero__character-name strong {
+    color:
+        #22f2ef;
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    font-size:
+        0.95rem;
+
+    font-weight:
+        900;
+}
+
+
+.about-hero__character-name span {
+    color:
+        rgba(255, 255, 255, 0.72);
+
+    font-size:
+        0.72rem;
+
+    font-weight:
+        700;
+}
+
+
+/* =========================================================
+   DECORATIONS
+========================================================= */
+
+.about-hero__decoration {
+    position: absolute;
+
+    border-radius:
+        50%;
+
+    pointer-events: none;
+
+    filter:
+        blur(1px);
+}
+
+
+.about-hero__decoration--one {
+    top:
+        -130px;
+
+    left:
+        -100px;
+
+    width:
+        330px;
+
+    height:
+        330px;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(242, 34, 146, 0.18),
+            transparent 70%
+        );
+}
+
+
+.about-hero__decoration--two {
+    right:
+        -120px;
+
+    bottom:
+        -160px;
+
+    width:
+        400px;
+
+    height:
+        400px;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(34, 242, 239, 0.13),
+            transparent 70%
+        );
+}
+
+
+/* =========================================================
+   LIGHT MODE
+========================================================= */
+
+html[data-theme="light"]
+.about-hero {
+    border-color:
+        rgba(109, 0, 163, 0.15);
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.92),
+            rgba(248, 233, 255, 0.90)
+        );
+
+    box-shadow:
+        0 18px 50px
+        rgba(109, 0, 163, 0.10);
+}
+
+
+html[data-theme="light"]
+.about-hero__overline {
+    color:
+        #008f9b;
+}
+
+
+html[data-theme="light"]
+.about-hero__title {
+    color:
+        #3d1555;
+}
+
+
+html[data-theme="light"]
+.about-hero__title-highlight {
+    color:
+        #b10072;
+
+    text-shadow:
+        0 0 18px
+        rgba(177, 0, 114, 0.15);
+}
+
+
+html[data-theme="light"]
+.about-hero__introduction {
+    color:
+        #654c70;
+}
+
+
+html[data-theme="light"]
+.about-hero__character-name {
+    border-color:
+        rgba(109, 0, 163, 0.16);
+
+    background:
+        rgba(255, 255, 255, 0.88);
+
+    box-shadow:
+        0 8px 24px
+        rgba(109, 0, 163, 0.12);
+}
+
+
+html[data-theme="light"]
+.about-hero__character-name strong {
+    color:
+        #7200a8;
+}
+
+
+html[data-theme="light"]
+.about-hero__character-name span {
+    color:
+        #654c70;
+}
+
+
+/* =========================================================
+   RESPONSIVE — TABLET
+========================================================= */
+
+@media (
+    max-width: 950px
+) {
+
+    .about-hero {
+        padding:
+            40px
+            30px;
+    }
+
+
+    .about-hero__content {
+        grid-template-columns:
+            1fr;
+
+        gap:
+            25px;
+    }
+
+
+    .about-hero__text {
+        text-align: center;
+    }
+
+
+    .about-hero__overline {
+        justify-content: center;
+    }
+
+
+    .about-hero__title {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+
+    .about-hero__introductions {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+
+    .about-hero__actions {
+        justify-content: center;
+    }
+
+
+    .about-hero__character-wrapper {
+        min-height:
+            400px;
+    }
+
+
+    .about-hero__character {
+        width:
+            min(100%, 360px);
+
+        max-height:
+            430px;
+    }
+
+
+    .about-hero__character-name {
+        right:
+            50%;
+
+        bottom:
+            0;
+
+        transform:
+            translateX(50%);
+    }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE — MOBILE
+========================================================= */
+
+@media (
+    max-width: 600px
+) {
+
+    .about-hero {
+        padding:
+            30px
+            18px;
+
+        border-radius:
+            24px;
+    }
+
+
+    .about-hero__title {
+        font-size:
+            clamp(
+                2.2rem,
+                12vw,
+                3.3rem
+            );
+    }
+
+
+    .about-hero__introduction {
+        font-size:
+            0.92rem;
+    }
+
+
+    .about-hero__actions {
+        display: grid;
+
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(0, 1fr)
+            );
+
+        width:
+            100%;
+    }
+
+
+    .about-hero__action {
+        width:
+            100%;
+
+        padding:
+            9px
+            10px;
+
+        font-size:
+            0.78rem;
+    }
+
+
+    .about-hero__action--story {
+        grid-column:
+            1 / -1;
+    }
+
+
+    .about-hero__character-wrapper {
+        min-height:
+            340px;
+    }
+
+
+    .about-hero__character {
+        width:
+            min(100%, 310px);
+
+        max-height:
+            360px;
+    }
+
+
+    .about-hero__character-name {
+        width:
+            max-content;
+
+        max-width:
+            calc(100% - 20px);
+
+        text-align:
+            center;
+    }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE — SMALL MOBILE
+========================================================= */
+
+@media (
+    max-width: 400px
+) {
+
+    .about-hero__actions {
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .about-hero__action--story {
+        grid-column:
+            auto;
+    }
+
+
+    .about-hero__character-wrapper {
+        min-height:
+            300px;
+    }
+
+}
+
+/* =========================================================
+   ABOUT INFO
+========================================================= */
+/* =========================================================
+   ABOUT INFO — BANNER
+========================================================= */
+
+.about-info__header.about-info__banner {
+    position: relative;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    width: 100%;
+
+    max-width: none;
+
+    min-height: 340px;
+
+    margin:
+        0
+        0
+        35px;
+
+    padding:
+        45px
+        clamp(25px, 5vw, 70px);
+
+    overflow: hidden;
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.14);
+
+    border-radius:
+        26px;
+
+    text-align: center;
+
+    isolation: isolate;
+}
+
+
+/* =========================================================
+   IMAGE
+========================================================= */
+
+.about-info__banner-image {
+    position: absolute;
+
+    z-index: -3;
+
+    inset: 0;
+
+    display: block;
+
+    width: 100%;
+
+    height: 100%;
+
+    object-fit: cover;
+
+    object-position: center;
+
+    transform:
+        scale(1.02);
+}
+
+
+/* =========================================================
+   DARK OVERLAY
+========================================================= */
+
+.about-info__banner-overlay {
+    position: absolute;
+
+    z-index: -2;
+
+    inset: 0;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(15, 5, 28, 0.48) 0%,
+            rgba(15, 5, 28, 0.62) 55%,
+            rgba(15, 5, 28, 0.82) 100%
+        );
+
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   CONTENT
+========================================================= */
+
+.about-info__banner-content {
+    position: relative;
+
+    z-index: 2;
+
+    width: 100%;
+
+    max-width: 900px;
+
+    margin: auto;
+
+    text-align: center;
+}
+
+
+/* =========================================================
+   EYEBROW
+========================================================= */
+
+.about-info__banner
+.about-info__eyebrow {
+    margin:
+        0
+        0
+        12px;
+
+    color:
+        #22f2ef;
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    font-size:
+        0.82rem;
+
+    font-weight:
+        900;
+
+    letter-spacing:
+        0.16em;
+
+    text-transform:
+        uppercase;
+
+    text-shadow:
+        0 2px 10px
+        rgba(0, 0, 0, 0.70);
+}
+
+
+/* =========================================================
+   TITLE
+========================================================= */
+
+.about-info__banner
+.about-info__title {
+    margin:
+        0
+        auto;
+
+    color:
+        #f22292;
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    font-size:
+        clamp(
+            2.6rem,
+            5vw,
+            4.5rem
+        );
+
+    font-weight:
+        900;
+
+    line-height:
+        1.05;
+
+    text-shadow:
+        0 3px 12px
+        rgba(0, 0, 0, 0.75);
+}
+
+
+/* =========================================================
+   DESCRIPTION
+========================================================= */
+
+.about-info__banner
+.about-info__description {
+    max-width: 720px;
+
+    margin:
+        22px
+        auto
+        0;
+
+    color:
+        #ffffff;
+
+    font-size:
+        1rem;
+
+    font-weight:
+        800;
+
+    line-height:
+        1.65;
+
+    text-shadow:
+        0 2px 8px
+        rgba(0, 0, 0, 0.90);
+}
+
+
+/* =========================================================
+   LIGHT MODE — BANNER TEXT
+========================================================= */
+
+html[data-theme="light"]
+.about-info__banner
+.about-info__eyebrow {
+    color:
+        #008f9b;
+}
+
+
+html[data-theme="light"]
+.about-info__banner
+.about-info__title {
+    color:
+        #3d1555;
+
+    text-shadow:
+        0 2px 10px
+        rgba(
+            255,
+            255,
+            255,
+            0.65
+        );
+}
+
+
+html[data-theme="light"]
+.about-info__banner
+.about-info__description {
+    color:
+        #3d1555;
+
+    text-shadow:
+        0 1px 6px
+        rgba(
+            255,
+            255,
+            255,
+            0.70
+        );
+}
+html[data-theme="light"]
+.about-info__banner-overlay {
+    background:
+        linear-gradient(
+            180deg,
+            rgba(255, 255, 255, 0.18) 0%,
+            rgba(255, 240, 250, 0.28) 50%,
+            rgba(255, 235, 248, 0.42) 100%
+        );
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (
+    max-width: 600px
+) {
+
+    .about-info__header.about-info__banner {
+        min-height: 280px;
+
+        padding:
+            35px
+            18px;
+
+        border-radius:
+            20px;
+    }
+
+
+    .about-info__banner
+    .about-info__title {
+        font-size:
+            clamp(
+                2.1rem,
+                11vw,
+                3rem
+            );
+    }
+
+
+    .about-info__banner
+    .about-info__description {
+        font-size:
+            0.88rem;
+    }
+
+}
+.about-info {
+    position: relative;
+
+    width: 100%;
+
+    margin-top:
+        clamp(35px, 5vw, 65px);
+
+    padding:
+        clamp(30px, 4vw, 50px);
+
+    overflow: hidden;
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.10);
+
+    border-radius:
+        28px;
+
+    background:
+        rgba(20, 7, 38, 0.68);
+
+    box-shadow:
+        0 16px 45px
+        rgba(0, 0, 0, 0.18);
+}
+
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.about-info__header {
+    max-width:
+        760px;
+
+    margin:
+        0
+        auto
+        35px;
+
+    text-align:
+        center;
+}
+
+
+/* =========================================================
+   EYEBROW
+========================================================= */
+
+.about-info__eyebrow {
+    margin:
+        0
+        0
+        10px;
+
+    color:
+        #22f2ef;
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    font-size:
+        0.8rem;
+
+    font-weight:
+        900;
+
+    letter-spacing:
+        0.16em;
+
+    text-transform:
+        uppercase;
+}
+
+
+/* =========================================================
+   TITLE
+========================================================= */
+
+.about-info__title {
+    margin:
+        0;
+
+     color:
+        #f22292;
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    font-size:
+        clamp(
+            2rem,
+            4vw,
+            3.4rem
+        );
+
+    font-weight:
+        900;
+
+    line-height:
+        1.08;
+}
+
+
+/* =========================================================
+   DESCRIPTION
+========================================================= */
+
+.about-info__description {
+    max-width:
+        650px;
+
+    margin:
+        15px
+        auto
+        0;
+
+    color:
+        rgb(255, 255, 255);
+
+    font-size:
+        1rem;
+
+    font-weight:
+        700;
+
+    line-height:
+        1.75;
+}
+
+
+/* =========================================================
+   ABOUT INFO — GRID
+========================================================= */
+
+.about-info__grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            3,
+            minmax(0, 1fr)
+        );
+
+    gap:
+        18px;
+
+    width: 100%;
+}
+
+
+/* =========================================================
+   ABOUT INFO — CARD
+========================================================= */
+
+.about-info-card {
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap:
+        8px;
+
+    min-height:
+        150px;
+
+    padding:
+        24px
+        20px;
+
+    text-align:
+        center;
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.10);
+
+    border-radius:
+        22px;
+
+    background:
+        rgba(255, 255, 255, 0.055);
+
+    box-shadow:
+        0 8px 22px
+        rgba(0, 0, 0, 0.10);
+
+    transition:
+        transform 0.22s ease,
+        border-color 0.22s ease,
+        background 0.22s ease,
+        box-shadow 0.22s ease;
+}
+
+
+/* =========================================================
+   CARD HOVER
+========================================================= */
+
+.about-info-card:hover {
+    transform:
+        translateY(-4px);
+
+    border-color:
+        rgba(34, 242, 239, 0.55);
+
+    background:
+        rgba(255, 255, 255, 0.075);
+
+    box-shadow:
+        0 0 12px
+        rgba(34, 242, 239, 0.15),
+
+        0 0 28px
+        rgba(34, 242, 239, 0.07),
+
+        0 12px 26px
+        rgba(0, 0, 0, 0.14);
+}
+
+
+/* =========================================================
+   ICON
+========================================================= */
+
+.about-info-icon {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    width:
+        52px;
+
+    height:
+        52px;
+
+    margin-bottom:
+        2px;
+
+    border:
+        1px solid
+        rgba(242, 34, 146, 0.28);
+
+    border-radius:
+        15px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(109, 0, 163, 0.25),
+            rgba(242, 34, 146, 0.12)
+        );
+
+    font-size:
+        1.45rem;
+
+    box-shadow:
+        0 6px 16px
+        rgba(109, 0, 163, 0.12);
+}
+
+
+/* =========================================================
+   TITLE
+========================================================= */
+
+.about-info-card h3 {
+    margin: 0;
+
+    color:
+        #f22292;
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    font-size:
+        1rem;
+
+    font-weight:
+        900;
+
+    line-height:
+        1.25;
+}
+
+
+/* =========================================================
+   VALUE
+========================================================= */
+
+.about-info-card p {
+    margin: 0;
+
+    max-width:
+        95%;
+
+    color:
+        rgba(255, 255, 255, 0.80);
+
+    font-size:
+        0.92rem;
+
+    font-weight:
+        700;
+
+    line-height:
+        1.5;
+}
+
+
+/* =========================================================
+   TAGS WRAPPER
+========================================================= */
+
+.about-tags {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap:
+        8px;
+
+    width: 100%;
+
+    margin-top:
+        5px;
+}
+
+
+/* =========================================================
+   TAG
+========================================================= */
+
+.about-tag {
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    min-height:
+        30px;
+
+    padding:
+        5px
+        10px;
+
+    color:
+        #ffffff;
+
+    border:
+        1px solid
+        rgba(242, 34, 146, 0.30);
+
+    border-radius:
+        999px;
+
+    background:
+        rgba(109, 0, 163, 0.22);
+
+    font-size:
+        0.75rem;
+
+    font-weight:
+        800;
+
+    line-height:
+        1.2;
+
+    cursor: default;
+
+    transition:
+        transform 0.18s ease,
+        border-color 0.18s ease,
+        background 0.18s ease,
+        box-shadow 0.18s ease;
+}
+
+
+/* =========================================================
+   TAG HOVER
+========================================================= */
+
+.about-tag:hover {
+    transform:
+        translateY(-2px);
+
+    border-color:
+        #22f2ef;
+
+    background:
+        rgba(109, 0, 163, 0.32);
+
+    box-shadow:
+        0 0 10px
+        rgba(34, 242, 239, 0.16);
+}
+
+
+/* =========================================================
+   BIG CONTENT CARDS
+========================================================= */
+
+.about-info-card:has(.about-tags) {
+    min-height:
+        185px;
+}
+
+
+/* =========================================================
+   FILMS CARD
+========================================================= */
+
+.about-info-card p {
+    text-wrap:
+        balance;
+}
+
+
+/* =========================================================
+   LIGHT MODE — CARD
+========================================================= */
+
+html[data-theme="light"]
+.about-info-card {
+    border-color:
+        rgba(109, 0, 163, 0.12);
+
+    background:
+        rgba(255, 255, 255, 0.72);
+
+    box-shadow:
+        0 8px 22px
+        rgba(109, 0, 163, 0.06);
+}
+
+
+html[data-theme="light"]
+.about-info-card:hover {
+    border-color:
+        #22f2ef;
+
+    background:
+        rgba(255, 255, 255, 0.95);
+
+    box-shadow:
+        0 0 12px
+        rgba(34, 242, 239, 0.22),
+
+        0 0 28px
+        rgba(34, 242, 239, 0.08),
+
+        0 12px 26px
+        rgba(109, 0, 163, 0.07);
+}
+
+
+/* =========================================================
+   LIGHT MODE — ICON
+========================================================= */
+
+html[data-theme="light"]
+.about-info-icon {
+    border-color:
+        rgba(109, 0, 163, 0.16);
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(109, 0, 163, 0.08),
+            rgba(242, 34, 146, 0.08)
+        );
+}
+
+
+/* =========================================================
+   LIGHT MODE — TITLE
+========================================================= */
+
+html[data-theme="light"]
+.about-info-card h3 {
+    color:
+        #f22292;
+}
+
+
+/* =========================================================
+   LIGHT MODE — VALUE
+========================================================= */
+
+html[data-theme="light"]
+.about-info-card p {
+    color:
+        #5f406d;
+}
+
+
+/* =========================================================
+   LIGHT MODE — TAGS
+========================================================= */
+
+html[data-theme="light"]
+.about-tag {
+    color:
+        #5f406d;
+
+    border-color:
+        rgba(109, 0, 163, 0.22);
+
+    background:
+        rgba(109, 0, 163, 0.08);
+}
+
+
+html[data-theme="light"]
+.about-tag:hover {
+    border-color:
+        #22f2ef;
+
+    background:
+        rgba(34, 242, 239, 0.08);
+
+    box-shadow:
+        0 0 10px
+        rgba(34, 242, 239, 0.14);
+}
+
+
+/* =========================================================
+   RESPONSIVE — TABLET
+========================================================= */
+
+@media (
+    max-width: 1000px
+) {
+
+    .about-info-grid {
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(0, 1fr)
+            );
+    }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE — MOBILE
+========================================================= */
+
+@media (
+    max-width: 650px
+) {
+
+    .about-info-grid {
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .about-info-card {
+        min-height:
+            135px;
+
+        padding:
+            20px
+            16px;
+    }
+
+
+    .about-info-card:has(.about-tags) {
+        min-height:
+            auto;
+    }
+
+}
+/* =========================================================
+   CARD CONTENT
+========================================================= */
+
+.about-info-card__content {
+    display: flex;
+
+    flex-direction: column;
+
+    gap:
+        3px;
+
+    min-width: 0;
+}
+
+
+/* =========================================================
+   LABEL
+========================================================= */
+
+.about-info-card__label {
+    color:
+        rgba(255, 255, 255, 0.52);
+
+    font-size:
+        0.72rem;
+
+    font-weight:
+        800;
+
+    letter-spacing:
+        0.08em;
+
+    text-transform:
+        uppercase;
+}
+
+
+/* =========================================================
+   VALUE
+========================================================= */
+
+.about-info-card__value {
+    overflow: hidden;
+
+    color:
+        #ffffff;
+
+    font-size:
+        0.95rem;
+
+    font-weight:
+        900;
+
+    line-height:
+        1.35;
+
+    text-overflow: ellipsis;
+}
+
+
+/* =========================================================
+   LIGHT MODE — SECTION
+========================================================= */
+
+html[data-theme="light"]
+.about-info {
+    border-color:
+        rgba(109, 0, 163, 0.14);
+
+    background:
+        rgba(255, 255, 255, 0.72);
+
+    box-shadow:
+        0 16px 45px
+        rgba(109, 0, 163, 0.08);
+}
+
+
+/* =========================================================
+   LIGHT MODE — HEADER
+========================================================= */
+
+html[data-theme="light"]
+.about-info__eyebrow {
+    color:
+        #008f9b;
+}
+
+
+html[data-theme="light"]
+.about-info__title {
+    color:
+        #3d1555;
+}
+
+
+html[data-theme="light"]
+.about-info__description {
+    color:
+        #654c70;
+}
+
+
+/* =========================================================
+   LIGHT MODE — CARDS
+========================================================= */
+
+html[data-theme="light"]
+.about-info-card {
+    border-color:
+        rgba(109, 0, 163, 0.14);
+
+    background:
+        rgba(255, 255, 255, 0.72);
+
+    box-shadow:
+        0 8px 22px
+        rgba(109, 0, 163, 0.07);
+}
+
+
+html[data-theme="light"]
+.about-info-card:hover {
+    border-color:
+        #22f2ef;
+
+    background:
+        rgba(255, 255, 255, 0.94);
+
+    box-shadow:
+        0 0 12px
+        rgba(34, 242, 239, 0.25),
+
+        0 0 28px
+        rgba(34, 242, 239, 0.12),
+
+        0 12px 28px
+        rgba(109, 0, 163, 0.08);
+}
+
+
+/* =========================================================
+   LIGHT MODE — ICON
+========================================================= */
+
+html[data-theme="light"]
+.about-info-card__icon {
+    border-color:
+        rgba(109, 0, 163, 0.18);
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(109, 0, 163, 0.09),
+            rgba(242, 34, 146, 0.09)
+        );
+
+    box-shadow:
+        0 6px 18px
+        rgba(109, 0, 163, 0.08);
+}
+
+
+/* =========================================================
+   LIGHT MODE — TEXT
+========================================================= */
+
+html[data-theme="light"]
+.about-info-card__label {
+    color:
+        #846c90;
+}
+
+
+html[data-theme="light"]
+.about-info-card__value {
+    color:
+        #4f315c;
+}
+
+
+/* =========================================================
+   RESPONSIVE — DESKTOP / TABLET
+========================================================= */
+
+@media (
+    max-width: 1100px
+) {
+
+    .about-info__grid {
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(0, 1fr)
+            );
+    }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE — TABLET
+========================================================= */
+
+@media (
+    max-width: 700px
+) {
+
+    .about-info {
+        padding:
+            30px
+            22px;
+    }
+
+
+    .about-info__header {
+        margin-bottom:
+            28px;
+    }
+
+
+    .about-info__grid {
+        gap:
+            12px;
+    }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE — MOBILE
+========================================================= */
+
+@media (
+    max-width: 520px
+) {
+
+    .about-info {
+        margin-top:
+            28px;
+
+        padding:
+            26px
+            16px;
+
+        border-radius:
+            22px;
+    }
+
+
+    .about-info__grid {
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .about-info-card {
+        padding:
+            16px;
+    }
+
+
+    .about-info-card__icon {
+        width:
+            44px;
+
+        height:
+            44px;
+
+        font-size:
+            1.2rem;
+    }
+
+
+    .about-info-card__value {
+        font-size:
+            0.9rem;
+    }
+
+}
+
+/* =========================================================
+   ABOUT TASTES
+========================================================= */
+
+.about-tastes {
+    position: relative;
+
+    width: 100%;
+
+    margin-top:
+        clamp(35px, 5vw, 65px);
+
+    padding:
+        clamp(30px, 4vw, 50px);
+
+    overflow: hidden;
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.10);
+
+    border-radius:
+        28px;
+
+    background:
+        rgba(20, 7, 38, 0.68);
+
+    box-shadow:
+        0 16px 45px
+        rgba(0, 0, 0, 0.18);
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.about-tastes__header {
+    max-width:
+        780px;
+
+    margin:
+        0
+        auto
+        36px;
+
+    text-align:
+        center;
+}
+
+
+/* =========================================================
+   EYEBROW
+========================================================= */
+
+.about-tastes__eyebrow {
+    margin:
+        0
+        0
+        10px;
+
+    color:
+        #22f2ef;
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    font-size:
+        0.8rem;
+
+    font-weight:
+        900;
+
+    letter-spacing:
+        0.16em;
+
+    text-transform:
+        uppercase;
+}
+
+
+/* =========================================================
+   TITLE
+========================================================= */
+
+.about-tastes__title {
+    margin: 0;
+
+     color:
+        #f22292;
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    font-size:
+        clamp(
+            2rem,
+            4vw,
+            3.4rem
+        );
+
+    font-weight:
+        900;
+
+    line-height:
+        1.08;
+}
+
+
+.about-tastes__title span {
+    color:
+        #f22292;
+}
+
+
+/* =========================================================
+   DESCRIPTION
+========================================================= */
+
+.about-tastes__description {
+    max-width:
+        650px;
+
+    margin:
+        15px
+        auto
+        0;
+
+    color:
+        rgb(255, 255, 255);
+
+    font-size:
+        1rem;
+
+    font-weight:
+        700;
+
+    line-height:
+        1.75;
+}
+
+
+/* =========================================================
+   GRID
+========================================================= */
+
+.about-tastes__grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0, 1fr)
+        );
+
+    gap:
+        20px;
+}
+
+
+/* =========================================================
+   CARD
+========================================================= */
+
+.about-tastes-card {
+    position: relative;
+
+    min-width: 0;
+
+    padding:
+        clamp(22px, 3vw, 30px);
+
+    overflow: hidden;
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.10);
+
+    border-radius:
+        22px;
+
+    background:
+        rgba(255, 255, 255, 0.05);
+
+    box-shadow:
+        0 10px 28px
+        rgba(0, 0, 0, 0.13);
+
+    transition:
+        transform 0.22s ease,
+        border-color 0.22s ease,
+        box-shadow 0.22s ease,
+        background 0.22s ease;
+}
+
+
+/* =========================================================
+   CARD — LIKES
+========================================================= */
+
+.about-tastes-card--likes {
+    border-color:
+        rgba(34, 242, 239, 0.20);
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(34, 242, 239, 0.07),
+            rgba(242, 34, 146, 0.06)
+        );
+}
+
+
+/* =========================================================
+   CARD — DISLIKES
+========================================================= */
+
+.about-tastes-card--dislikes {
+    border-color:
+        rgba(242, 34, 146, 0.20);
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(109, 0, 163, 0.10),
+            rgba(242, 34, 146, 0.06)
+        );
+}
+
+
+/* =========================================================
+   CARD HOVER
+========================================================= */
+
+.about-tastes-card:hover {
+    transform:
+        translateY(-4px);
+}
+
+
+.about-tastes-card--likes:hover {
+    border-color:
+        rgba(34, 242, 239, 0.65);
+
+    box-shadow:
+        0 0 12px
+        rgba(34, 242, 239, 0.16),
+
+        0 0 30px
+        rgba(34, 242, 239, 0.08),
+
+        0 14px 30px
+        rgba(0, 0, 0, 0.16);
+}
+
+
+.about-tastes-card--dislikes:hover {
+    border-color:
+        rgba(242, 34, 146, 0.60);
+
+    box-shadow:
+        0 0 12px
+        rgba(242, 34, 146, 0.16),
+
+        0 0 30px
+        rgba(242, 34, 146, 0.08),
+
+        0 14px 30px
+        rgba(0, 0, 0, 0.16);
+}
+
+
+/* =========================================================
+   CARD HEADER
+========================================================= */
+
+.about-tastes-card__header {
+    display: flex;
+
+    align-items: center;
+
+    gap:
+        15px;
+
+    margin-bottom:
+        24px;
+}
+
+
+/* =========================================================
+   SYMBOL
+========================================================= */
+
+.about-tastes-card__symbol {
+    flex:
+        0 0 auto;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    width:
+        52px;
+
+    height:
+        52px;
+
+    border-radius:
+        16px;
+
+    font-size:
+        1.45rem;
+
+    font-weight:
+        900;
+
+    transition:
+        transform 0.22s ease,
+        box-shadow 0.22s ease;
+}
+
+
+/* =========================================================
+   LIKE SYMBOL
+========================================================= */
+
+.about-tastes-card__symbol--likes {
+    color:
+        #22f2ef;
+
+    border:
+        1px solid
+        rgba(34, 242, 239, 0.35);
+
+    background:
+        rgba(34, 242, 239, 0.09);
+
+    box-shadow:
+        0 6px 18px
+        rgba(34, 242, 239, 0.08);
+}
+
+
+/* =========================================================
+   DISLIKE SYMBOL
+========================================================= */
+
+.about-tastes-card__symbol--dislikes {
+    color:
+        #f22292;
+
+    border:
+        1px solid
+        rgba(242, 34, 146, 0.35);
+
+    background:
+        rgba(242, 34, 146, 0.09);
+
+    box-shadow:
+        0 6px 18px
+        rgba(242, 34, 146, 0.08);
+}
+
+
+/* =========================================================
+   SYMBOL HOVER
+========================================================= */
+
+.about-tastes-card:hover
+.about-tastes-card__symbol {
+    transform:
+        scale(1.06);
+}
+
+
+.about-tastes-card--likes:hover
+.about-tastes-card__symbol {
+    box-shadow:
+        0 0 18px
+        rgba(34, 242, 239, 0.20);
+}
+
+
+.about-tastes-card--dislikes:hover
+.about-tastes-card__symbol {
+    box-shadow:
+        0 0 18px
+        rgba(242, 34, 146, 0.20);
+}
+
+
+/* =========================================================
+   CARD EYEBROW
+========================================================= */
+
+.about-tastes-card__eyebrow {
+    margin:
+        0
+        0
+        3px;
+
+    color:
+        rgba(255, 255, 255, 0.48);
+
+    font-size:
+        0.67rem;
+
+    font-weight:
+        900;
+
+    letter-spacing:
+        0.12em;
+
+    text-transform:
+        uppercase;
+}
+
+
+/* =========================================================
+   CARD TITLE
+========================================================= */
+
+.about-tastes-card__title {
+    margin: 0;
+
+    color:
+        #ffffff;
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    font-size:
+        clamp(
+            1.25rem,
+            2vw,
+            1.65rem
+        );
+
+    font-weight:
+        900;
+}
+
+
+/* =========================================================
+   LIST
+========================================================= */
+
+.about-tastes-card__list {
+    display: flex;
+
+    flex-direction: column;
+
+    gap:
+        10px;
+
+    margin: 0;
+
+    padding: 0;
+
+    list-style: none;
+}
+
+
+/* =========================================================
+   LIST ITEM
+========================================================= */
+
+.about-tastes-card__item {
+    display: flex;
+
+    align-items: center;
+
+    gap:
+        12px;
+
+    min-height:
+        52px;
+
+    padding:
+        10px
+        13px;
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.07);
+
+    border-radius:
+        14px;
+
+    background:
+        rgba(255, 255, 255, 0.035);
+
+    transition:
+        transform 0.2s ease,
+        border-color 0.2s ease,
+        background 0.2s ease;
+}
+
+
+/* =========================================================
+   LIST ITEM HOVER
+========================================================= */
+
+.about-tastes-card__item:hover {
+    transform:
+        translateX(4px);
+
+    background:
+        rgba(255, 255, 255, 0.06);
+}
+
+
+.about-tastes-card--likes
+.about-tastes-card__item:hover {
+    border-color:
+        rgba(34, 242, 239, 0.32);
+}
+
+
+.about-tastes-card--dislikes
+.about-tastes-card__item:hover {
+    border-color:
+        rgba(242, 34, 146, 0.32);
+}
+
+
+/* =========================================================
+   ITEM ICON
+========================================================= */
+
+.about-tastes-card__icon {
+    flex:
+        0 0 auto;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    width:
+        34px;
+
+    height:
+        34px;
+
+    border-radius:
+        10px;
+
+    background:
+        rgba(255, 255, 255, 0.06);
+
+    font-size:
+        1.05rem;
+}
+
+
+/* =========================================================
+   ITEM TEXT
+========================================================= */
+
+.about-tastes-card__text {
+    color:
+        rgba(255, 255, 255, 0.80);
+
+    font-size:
+        0.9rem;
+
+    font-weight:
+        700;
+
+    line-height:
+        1.4;
+}
+
+
+/* =========================================================
+   LIGHT MODE — SECTION
+========================================================= */
+
+html[data-theme="light"]
+.about-tastes {
+    border-color:
+        rgba(109, 0, 163, 0.14);
+
+    background:
+        rgba(255, 255, 255, 0.72);
+
+    box-shadow:
+        0 16px 45px
+        rgba(109, 0, 163, 0.08);
+}
+
+
+/* =========================================================
+   LIGHT MODE — HEADER
+========================================================= */
+
+html[data-theme="light"]
+.about-tastes__eyebrow {
+    color:
+        #008f9b;
+}
+
+
+html[data-theme="light"]
+.about-tastes__title {
+    color:
+        #3d1555;
+}
+
+
+html[data-theme="light"]
+.about-tastes__title span {
+    color:
+        #b10072;
+}
+
+
+html[data-theme="light"]
+.about-tastes__description {
+    color:
+        #654c70;
+}
+
+
+/* =========================================================
+   LIGHT MODE — CARDS
+========================================================= */
+
+html[data-theme="light"]
+.about-tastes-card {
+    box-shadow:
+        0 10px 28px
+        rgba(109, 0, 163, 0.07);
+}
+
+
+html[data-theme="light"]
+.about-tastes-card--likes {
+    border-color:
+        rgba(0, 143, 155, 0.18);
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(34, 242, 239, 0.06),
+            rgba(255, 255, 255, 0.82)
+        );
+}
+
+
+html[data-theme="light"]
+.about-tastes-card--dislikes {
+    border-color:
+        rgba(177, 0, 114, 0.16);
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(242, 34, 146, 0.05),
+            rgba(255, 255, 255, 0.82)
+        );
+}
+
+
+/* =========================================================
+   LIGHT MODE — CARD TEXT
+========================================================= */
+
+html[data-theme="light"]
+.about-tastes-card__eyebrow {
+    color:
+        #846c90;
+}
+
+
+html[data-theme="light"]
+.about-tastes-card__title {
+    color:
+        #4f315c;
+}
+
+
+/* =========================================================
+   LIGHT MODE — ITEMS
+========================================================= */
+
+html[data-theme="light"]
+.about-tastes-card__item {
+    border-color:
+        rgba(109, 0, 163, 0.09);
+
+    background:
+        rgba(255, 255, 255, 0.66);
+}
+
+
+html[data-theme="light"]
+.about-tastes-card__item:hover {
+    background:
+        rgba(255, 255, 255, 0.94);
+}
+
+
+html[data-theme="light"]
+.about-tastes-card__icon {
+    background:
+        rgba(109, 0, 163, 0.06);
+}
+
+
+html[data-theme="light"]
+.about-tastes-card__text {
+    color:
+        #654c70;
+}
+
+
+/* =========================================================
+   LIGHT MODE — HOVERS
+========================================================= */
+
+html[data-theme="light"]
+.about-tastes-card--likes:hover {
+    border-color:
+        #22f2ef;
+
+    box-shadow:
+        0 0 12px
+        rgba(34, 242, 239, 0.22),
+
+        0 0 28px
+        rgba(34, 242, 239, 0.10),
+
+        0 12px 28px
+        rgba(109, 0, 163, 0.07);
+}
+
+
+html[data-theme="light"]
+.about-tastes-card--dislikes:hover {
+    border-color:
+        rgba(242, 34, 146, 0.55);
+
+    box-shadow:
+        0 0 12px
+        rgba(242, 34, 146, 0.18),
+
+        0 0 28px
+        rgba(242, 34, 146, 0.08),
+
+        0 12px 28px
+        rgba(109, 0, 163, 0.07);
+}
+
+
+/* =========================================================
+   RESPONSIVE — TABLET
+========================================================= */
+
+@media (
+    max-width: 800px
+) {
+
+    .about-tastes__grid {
+        grid-template-columns:
+            1fr;
+    }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE — MOBILE
+========================================================= */
+
+@media (
+    max-width: 520px
+) {
+
+    .about-tastes {
+        margin-top:
+            28px;
+
+        padding:
+            26px
+            16px;
+
+        border-radius:
+            22px;
+    }
+
+
+    .about-tastes__header {
+        margin-bottom:
+            28px;
+    }
+
+
+    .about-tastes-card {
+        padding:
+            20px
+            16px;
+
+        border-radius:
+            18px;
+    }
+
+
+    .about-tastes-card__header {
+        gap:
+            12px;
+
+        margin-bottom:
+            20px;
+    }
+
+
+    .about-tastes-card__symbol {
+        width:
+            46px;
+
+        height:
+            46px;
+
+        border-radius:
+            13px;
+
+        font-size:
+            1.25rem;
+    }
+
+
+    .about-tastes-card__item {
+        min-height:
+            48px;
+
+        padding:
+            9px
+            11px;
+    }
+
+
+    .about-tastes-card__text {
+        font-size:
+            0.84rem;
+    }
+
+}
+
+/* =========================================================
+   ABOUT STORY
+========================================================= */
+
+.about-story {
+    position: relative;
+
+    width: 100%;
+
+    margin-top:
+        clamp(35px, 5vw, 65px);
+
+    padding:
+        clamp(30px, 4vw, 50px);
+
+    overflow: hidden;
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.10);
+
+    border-radius:
+        28px;
+
+    background:
+        rgba(20, 7, 38, 0.68);
+
+    box-shadow:
+        0 16px 45px
+        rgba(0, 0, 0, 0.18);
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.about-story__header {
+    max-width:
+        780px;
+
+    margin:
+        0
+        auto
+        42px;
+
+    text-align: center;
+}
+
+
+/* =========================================================
+   EYEBROW
+========================================================= */
+
+.about-story__eyebrow {
+    margin:
+        0
+        0
+        10px;
+
+    color:
+        #22f2ef;
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    font-size:
+        0.8rem;
+
+    font-weight:
+        900;
+
+    letter-spacing:
+        0.16em;
+
+    text-transform:
+        uppercase;
+}
+
+
+/* =========================================================
+   TITLE
+========================================================= */
+
+.about-story__title {
+    margin: 0;
+
+     color:
+        #f22292;
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    font-size:
+        clamp(
+            2rem,
+            4vw,
+            3.4rem
+        );
+
+    font-weight:
+        900;
+
+    line-height:
+        1.08;
+}
+
+
+/* =========================================================
+   DESCRIPTION
+========================================================= */
+
+.about-story__description {
+    max-width:
+        650px;
+
+    margin:
+        15px
+        auto
+        0;
+
+    color:
+        rgb(255, 255, 255);
+
+    font-size:
+        1rem;
+
+    font-weight:
+        700;
+
+    line-height:
+        1.75;
+}
+
+
+/* =========================================================
+   CONTENT
+========================================================= */
+
+.about-story__content {
+    display: grid;
+
+    grid-template-columns:
+        minmax(280px, 0.75fr)
+        minmax(0, 1.25fr);
+
+    align-items: center;
+
+    gap:
+        clamp(35px, 5vw, 70px);
+}
+
+
+/* =========================================================
+   VISUAL
+========================================================= */
+
+.about-story__visual {
+    position: relative;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    min-height:
+        560px;
+}
+
+
+/* =========================================================
+   IMAGE GLOW
+========================================================= */
+
+.about-story__glow {
+    position: absolute;
+
+    top: 50%;
+    left: 50%;
+
+    width:
+        min(430px, 100%);
+
+    aspect-ratio:
+        1;
+
+    border-radius:
+        50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(242, 34, 146, 0.22) 0%,
+            rgba(109, 0, 163, 0.16) 40%,
+            rgba(34, 242, 239, 0.08) 60%,
+            transparent 72%
+        );
+
+    filter:
+        blur(10px);
+
+    transform:
+        translate(-50%, -50%);
+
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   IMAGE
+========================================================= */
+
+.about-story__image {
+    position: relative;
+    z-index: 2;
+
+    display: block;
+
+    width:
+        min(100%, 410px);
+
+    max-height:
+        570px;
+
+    object-fit: contain;
+
+    object-position: center;
+
+    filter:
+        drop-shadow(
+            0 18px 30px
+            rgba(0, 0, 0, 0.28)
+        );
+}
+
+
+/* =========================================================
+   TEXT
+========================================================= */
+
+.about-story__text {
+    display: flex;
+
+    flex-direction: column;
+
+    gap:
+        14px;
+
+    min-width: 0;
+}
+
+
+/* =========================================================
+   STORY BLOCK
+========================================================= */
+
+.about-story__block {
+    display: grid;
+
+    grid-template-columns:
+        52px
+        minmax(0, 1fr);
+
+    gap:
+        16px;
+
+    padding:
+        20px;
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.08);
+
+    border-radius:
+        18px;
+
+    background:
+        rgba(255, 255, 255, 0.04);
+
+    transition:
+        transform 0.22s ease,
+        border-color 0.22s ease,
+        background 0.22s ease,
+        box-shadow 0.22s ease;
+}
+
+
+/* =========================================================
+   STORY BLOCK HOVER
+========================================================= */
+
+.about-story__block:hover {
+    transform:
+        translateX(5px);
+
+    border-color:
+        rgba(34, 242, 239, 0.45);
+
+    background:
+        rgba(255, 255, 255, 0.06);
+
+    box-shadow:
+        0 0 12px
+        rgba(34, 242, 239, 0.12),
+
+        0 0 28px
+        rgba(34, 242, 239, 0.06);
+}
+
+
+/* =========================================================
+   NUMBER
+========================================================= */
+
+.about-story__number {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    width:
+        48px;
+
+    height:
+        48px;
+
+    color:
+        #22f2ef;
+
+    border:
+        1px solid
+        rgba(34, 242, 239, 0.30);
+
+    border-radius:
+        14px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(34, 242, 239, 0.10),
+            rgba(109, 0, 163, 0.15)
+        );
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    font-size:
+        0.85rem;
+
+    font-weight:
+        900;
+
+    box-shadow:
+        0 6px 18px
+        rgba(34, 242, 239, 0.06);
+
+    transition:
+        transform 0.22s ease,
+        box-shadow 0.22s ease;
+}
+
+
+.about-story__block:hover
+.about-story__number {
+    transform:
+        scale(1.06);
+
+    box-shadow:
+        0 0 15px
+        rgba(34, 242, 239, 0.18);
+}
+
+
+/* =========================================================
+   SUBTITLE
+========================================================= */
+
+.about-story__subtitle {
+    margin:
+        0
+        0
+        8px;
+
+    color:
+        #ffffff;
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    font-size:
+        clamp(
+            1rem,
+            1.5vw,
+            1.2rem
+        );
+
+    font-weight:
+        900;
+
+    line-height:
+        1.3;
+}
+
+
+/* =========================================================
+   PARAGRAPHS
+========================================================= */
+
+.about-story__block p {
+    margin:
+        0;
+
+    color:
+        rgba(255, 255, 255, 0.70);
+
+    font-size:
+        0.9rem;
+
+    font-weight:
+        600;
+
+    line-height:
+        1.65;
+}
+
+
+.about-story__block p + p {
+    margin-top:
+        8px;
+}
+
+
+/* =========================================================
+   STRONG TEXT
+========================================================= */
+
+.about-story__block strong {
+    color:
+        #f22292;
+
+    font-weight:
+        900;
+}
+
+
+/* =========================================================
+   ACTIONS
+========================================================= */
+
+.about-story__actions {
+    display: flex;
+
+    justify-content:
+        flex-start;
+
+    margin-top:
+        8px;
+}
+
+
+/* =========================================================
+   BUTTON
+========================================================= */
+
+.about-story__button {
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap:
+        10px;
+
+    min-height:
+        48px;
+
+    padding:
+        10px
+        20px;
+
+    color:
+        #7200a8;
+
+    border:
+        1px solid
+        rgba(109, 0, 163, 0.40);
+
+    border-radius:
+        14px;
+
+    background:
+        rgba(255, 255, 255, 0.94);
+
+    box-shadow:
+        0 6px 18px
+        rgba(0, 0, 0, 0.12);
+
+    font-size:
+        0.86rem;
+
+    font-weight:
+        900;
+
+    text-decoration: none;
+
+    transition:
+        transform 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+}
+
+
+/* =========================================================
+   BUTTON HOVER
+========================================================= */
+
+.about-story__button:hover {
+    color:
+        #7200a8;
+
+    border-color:
+        #22f2ef;
+
+    background:
+        #ffffff;
+
+    transform:
+        translateY(-3px);
+
+    box-shadow:
+        0 0 12px
+        rgba(34, 242, 239, 0.35),
+
+        0 0 28px
+        rgba(34, 242, 239, 0.20),
+
+        0 8px 20px
+        rgba(0, 0, 0, 0.14);
+}
+
+
+/* =========================================================
+   BUTTON ICON
+========================================================= */
+
+.about-story__button-icon {
+    font-size:
+        1.05rem;
+}
+
+
+/* =========================================================
+   BUTTON ARROW
+========================================================= */
+
+.about-story__button-arrow {
+    font-size:
+        1rem;
+
+    transition:
+        transform 0.2s ease;
+}
+
+
+.about-story__button:hover
+.about-story__button-arrow {
+    transform:
+        translateX(4px);
+}
+
+
+/* =========================================================
+   LIGHT MODE — SECTION
+========================================================= */
+
+html[data-theme="light"]
+.about-story {
+    border-color:
+        rgba(109, 0, 163, 0.14);
+
+    background:
+        rgba(255, 255, 255, 0.72);
+
+    box-shadow:
+        0 16px 45px
+        rgba(109, 0, 163, 0.08);
+}
+
+
+/* =========================================================
+   LIGHT MODE — HEADER
+========================================================= */
+
+html[data-theme="light"]
+.about-story__eyebrow {
+    color:
+        #008f9b;
+}
+
+
+html[data-theme="light"]
+.about-story__title {
+    color:
+        #3d1555;
+}
+
+
+html[data-theme="light"]
+.about-story__description {
+    color:
+        #654c70;
+}
+
+
+/* =========================================================
+   LIGHT MODE — BLOCK
+========================================================= */
+
+html[data-theme="light"]
+.about-story__block {
+    border-color:
+        rgba(109, 0, 163, 0.11);
+
+    background:
+        rgba(255, 255, 255, 0.64);
+}
+
+
+html[data-theme="light"]
+.about-story__block:hover {
+    border-color:
+        #22f2ef;
+
+    background:
+        rgba(255, 255, 255, 0.94);
+
+    box-shadow:
+        0 0 12px
+        rgba(34, 242, 239, 0.22),
+
+        0 0 28px
+        rgba(34, 242, 239, 0.10),
+
+        0 10px 24px
+        rgba(109, 0, 163, 0.07);
+}
+
+
+/* =========================================================
+   LIGHT MODE — NUMBER
+========================================================= */
+
+html[data-theme="light"]
+.about-story__number {
+    color:
+        #008f9b;
+
+    border-color:
+        rgba(0, 143, 155, 0.22);
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(34, 242, 239, 0.09),
+            rgba(109, 0, 163, 0.06)
+        );
+}
+
+
+/* =========================================================
+   LIGHT MODE — TEXT
+========================================================= */
+
+html[data-theme="light"]
+.about-story__subtitle {
+    color:
+        #4f315c;
+}
+
+
+html[data-theme="light"]
+.about-story__block p {
+    color:
+        #654c70;
+}
+
+
+html[data-theme="light"]
+.about-story__block strong {
+    color:
+        #b10072;
+}
+
+
+/* =========================================================
+   RESPONSIVE — TABLET
+========================================================= */
+
+@media (
+    max-width: 950px
+) {
+
+    .about-story__content {
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .about-story__visual {
+        min-height:
+            420px;
+    }
+
+
+    .about-story__image {
+        width:
+            min(100%, 350px);
+
+        max-height:
+            430px;
+    }
+
+
+    .about-story__actions {
+        justify-content:
+            center;
+    }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE — MOBILE
+========================================================= */
+
+@media (
+    max-width: 600px
+) {
+
+    .about-story {
+        margin-top:
+            28px;
+
+        padding:
+            26px
+            16px;
+
+        border-radius:
+            22px;
+    }
+
+
+    .about-story__header {
+        margin-bottom:
+            30px;
+    }
+
+
+    .about-story__visual {
+        min-height:
+            330px;
+    }
+
+
+    .about-story__image {
+        width:
+            min(100%, 290px);
+
+        max-height:
+            340px;
+    }
+
+
+    .about-story__block {
+        grid-template-columns:
+            44px
+            minmax(0, 1fr);
+
+        gap:
+            12px;
+
+        padding:
+            16px;
+    }
+
+
+    .about-story__number {
+        width:
+            42px;
+
+        height:
+            42px;
+
+        border-radius:
+            12px;
+
+        font-size:
+            0.75rem;
+    }
+
+
+    .about-story__block p {
+        font-size:
+            0.84rem;
+    }
+
+
+    .about-story__button {
+        width:
+            100%;
+    }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE — SMALL MOBILE
+========================================================= */
+
+@media (
+    max-width: 400px
+) {
+
+    .about-story__block {
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .about-story__number {
+        width:
+            40px;
+
+        height:
+            40px;
+    }
+
+}
+
+/* =========================================================
+   ABOUT REFERENCES
+========================================================= */
+
+.about-references {
+    position: relative;
+
+    width: 100%;
+
+    margin-top:
+        clamp(35px, 5vw, 65px);
+
+    padding:
+        clamp(30px, 4vw, 50px);
+
+    overflow: hidden;
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.10);
+
+    border-radius:
+        28px;
+
+    background:
+        rgba(20, 7, 38, 0.68);
+
+    box-shadow:
+        0 16px 45px
+        rgba(0, 0, 0, 0.18);
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.about-references__header {
+    max-width:
+        780px;
+
+    margin:
+        0
+        auto
+        40px;
+
+    text-align:
+        center;
+}
+
+
+/* =========================================================
+   EYEBROW
+========================================================= */
+
+.about-references__eyebrow {
+    margin:
+        0
+        0
+        10px;
+
+    color:
+        #22f2ef;
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    font-size:
+        0.8rem;
+
+    font-weight:
+        900;
+
+    letter-spacing:
+        0.16em;
+
+    text-transform:
+        uppercase;
+}
+
+
+/* =========================================================
+   TITLE
+========================================================= */
+
+.about-references__title {
+    margin: 0;
+
+     color:
+        #f22292;
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    font-size:
+        clamp(
+            2rem,
+            4vw,
+            3.4rem
+        );
+
+    font-weight:
+        900;
+
+    line-height:
+        1.08;
+}
+
+
+/* =========================================================
+   DESCRIPTION
+========================================================= */
+
+.about-references__description {
+    max-width:
+        680px;
+
+    margin:
+        15px
+        auto
+        0;
+
+    color:
+        rgb(255, 255, 255);
+
+    font-size:
+        1rem;
+
+    font-weight:
+        700;
+
+    line-height:
+        1.75;
+}
+
+
+/* =========================================================
+   REFERENCES GRID
+========================================================= */
+
+.about-references__grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0, 1fr)
+        );
+
+    gap:
+        20px;
+}
+
+
+/* =========================================================
+   REFERENCE CARD
+========================================================= */
+
+.about-reference-card {
+    position: relative;
+
+    display: flex;
+
+    flex-direction: column;
+
+    min-width: 0;
+
+    margin: 0;
+
+    overflow: hidden;
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.10);
+
+    border-radius:
+        22px;
+
+    background:
+        rgba(255, 255, 255, 0.045);
+
+    box-shadow:
+        0 10px 28px
+        rgba(0, 0, 0, 0.14);
+
+    transition:
+        transform 0.25s ease,
+        border-color 0.25s ease,
+        box-shadow 0.25s ease,
+        background 0.25s ease;
+}
+
+
+/* =========================================================
+   LARGE REFERENCE
+========================================================= */
+
+.about-reference-card--large {
+    grid-column:
+        1 / -1;
+}
+
+
+/* =========================================================
+   CARD HOVER
+========================================================= */
+
+.about-reference-card:hover {
+    transform:
+        translateY(-5px);
+
+    border-color:
+        rgba(34, 242, 239, 0.60);
+
+    background:
+        rgba(255, 255, 255, 0.06);
+
+    box-shadow:
+        0 0 12px
+        rgba(34, 242, 239, 0.16),
+
+        0 0 30px
+        rgba(34, 242, 239, 0.08),
+
+        0 16px 34px
+        rgba(0, 0, 0, 0.18);
+}
+
+
+/* =========================================================
+   REFERENCE CARD — VISUAL
+========================================================= */
+
+.about-reference-card__visual {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    width: 100%;
+
+    height: 520px;
+
+    padding:
+        20px;
+
+    overflow: hidden;
+
+    background:
+        rgba(255, 255, 255, 0.03);
+}
+
+
+/* =========================================================
+   LARGE VISUAL
+========================================================= */
+
+.about-reference-card--large
+.about-reference-card__visual {
+    min-height:
+        540px;
+}
+
+
+
+/* =========================================================
+   REFERENCE CARD — IMAGE
+========================================================= */
+
+.about-reference-card__image {
+    display: block;
+
+    width: 100%;
+
+    height: 100%;
+
+    object-fit: contain;
+
+    object-position: center;
+}
+
+
+/* =========================================================
+   LARGE IMAGE
+========================================================= */
+
+.about-reference-card--large
+.about-reference-card__image {
+    max-height:
+        650px;
+}
+
+
+/* =========================================================
+   IMAGE HOVER
+========================================================= */
+
+.about-reference-card:hover
+.about-reference-card__image {
+    transform:
+        scale(1.02);
+
+    filter:
+        drop-shadow(
+            0 10px 18px
+            rgba(0, 0, 0, 0.16)
+        );
+}
+
+
+/* =========================================================
+   CAPTION
+========================================================= */
+
+.about-reference-card__caption {
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: center;
+
+    gap:
+        8px;
+
+    min-height:
+        110px;
+
+    padding:
+        20px;
+
+    border-top:
+        1px solid
+        rgba(255, 255, 255, 0.08);
+}
+
+
+/* =========================================================
+   CARD TITLE
+========================================================= */
+
+.about-reference-card__title {
+    color:
+        #ffffff;
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    font-size:
+        1.2rem;
+
+    font-weight:
+        900;
+
+    line-height:
+        1.35;
+}
+
+
+/* =========================================================
+   CARD DESCRIPTION
+========================================================= */
+
+.about-reference-card__description {
+     color:
+        #f22292;
+
+    font-size:
+        1rem;
+
+    font-weight:
+        700;
+
+    line-height:
+        1.60;
+}
+
+
+/* =========================================================
+   DECORATIVE GLOW
+========================================================= */
+
+.about-reference-card__visual::before {
+    content: "";
+
+    position: absolute;
+
+    top:
+        50%;
+
+    left:
+        50%;
+
+    width:
+        60%;
+
+    aspect-ratio:
+        1;
+
+    border-radius:
+        50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(242, 34, 146, 0.10),
+            rgba(109, 0, 163, 0.06) 45%,
+            transparent 70%
+        );
+
+    filter:
+        blur(20px);
+
+    transform:
+        translate(-50%, -50%);
+
+    pointer-events:
+        none;
+}
+
+
+/* =========================================================
+   IMAGE ABOVE GLOW
+========================================================= */
+
+.about-reference-card__image {
+    position: relative;
+
+    z-index: 1;
+}
+
+
+/* =========================================================
+   LIGHT MODE — SECTION
+========================================================= */
+
+html[data-theme="light"]
+.about-references {
+    border-color:
+        rgba(109, 0, 163, 0.14);
+
+    background:
+        rgba(255, 255, 255, 0.72);
+
+    box-shadow:
+        0 16px 45px
+        rgba(109, 0, 163, 0.08);
+}
+
+
+/* =========================================================
+   LIGHT MODE — HEADER
+========================================================= */
+
+html[data-theme="light"]
+.about-references__eyebrow {
+    color:
+        #008f9b;
+}
+
+
+html[data-theme="light"]
+.about-references__title {
+    color:
+        #3d1555;
+}
+
+
+html[data-theme="light"]
+.about-references__description {
+    color:
+        #654c70;
+}
+
+
+/* =========================================================
+   LIGHT MODE — CARDS
+========================================================= */
+
+html[data-theme="light"]
+.about-reference-card {
+    border-color:
+        rgba(109, 0, 163, 0.13);
+
+    background:
+        rgba(255, 255, 255, 0.72);
+
+    box-shadow:
+        0 10px 28px
+        rgba(109, 0, 163, 0.07);
+}
+
+
+html[data-theme="light"]
+.about-reference-card:hover {
+    border-color:
+        #22f2ef;
+
+    background:
+        rgba(255, 255, 255, 0.94);
+
+    box-shadow:
+        0 0 12px
+        rgba(34, 242, 239, 0.22),
+
+        0 0 30px
+        rgba(34, 242, 239, 0.10),
+
+        0 14px 30px
+        rgba(109, 0, 163, 0.08);
+}
+
+
+/* =========================================================
+   LIGHT MODE — VISUAL
+========================================================= */
+
+html[data-theme="light"]
+.about-reference-card__visual {
+    background:
+        linear-gradient(
+            145deg,
+            rgba(109, 0, 163, 0.045),
+            rgba(242, 34, 146, 0.035),
+            rgba(34, 242, 239, 0.035)
+        );
+}
+
+
+/* =========================================================
+   LIGHT MODE — CAPTION
+========================================================= */
+
+html[data-theme="light"]
+.about-reference-card__caption {
+    border-top-color:
+        rgba(109, 0, 163, 0.10);
+
+    background:
+        rgba(255, 255, 255, 0.75);
+}
+
+
+html[data-theme="light"]
+.about-reference-card__title {
+    color:
+        #4f315c;
+}
+
+
+html[data-theme="light"]
+.about-reference-card__description {
+    color:
+        #735f7d;
+}
+
+
+/* =========================================================
+   RESPONSIVE — TABLET
+========================================================= */
+
+@media (
+    max-width: 850px
+) {
+
+    .about-references__grid {
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .about-reference-card--large {
+        grid-column:
+            auto;
+    }
+
+
+    .about-reference-card__visual,
+    .about-reference-card--large
+    .about-reference-card__visual {
+        min-height:
+            400px;
+    }
+
+
+    .about-reference-card__image,
+    .about-reference-card--large
+    .about-reference-card__image {
+        max-height:
+            500px;
+    }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE — MOBILE
+========================================================= */
+
+@media (
+    max-width: 520px
+) {
+
+    .about-references {
+        margin-top:
+            28px;
+
+        padding:
+            26px
+            16px;
+
+        border-radius:
+            22px;
+    }
+
+
+    .about-references__header {
+        margin-bottom:
+            28px;
+    }
+
+
+    .about-references__grid {
+        gap:
+            14px;
+    }
+
+
+    .about-reference-card {
+        border-radius:
+            18px;
+    }
+
+
+    .about-reference-card__visual,
+    .about-reference-card--large
+    .about-reference-card__visual {
+        min-height:
+            280px;
+
+        padding:
+            12px;
+    }
+
+
+    .about-reference-card__image,
+    .about-reference-card--large
+    .about-reference-card__image {
+        max-height:
+            380px;
+    }
+
+
+    .about-reference-card__caption {
+        padding:
+            15px
+            16px;
+    }
+
+
+    .about-reference-card__title {
+        font-size:
+            0.92rem;
+    }
+
+
+    .about-reference-card__description {
+        font-size:
+            0.78rem;
+    }
+
+}
+/* =========================================================
+   ABOUT PALETTE
+========================================================= */
+
+.about-palette {
+    position: relative;
+
+    width: 100%;
+
+    margin-top:
+        clamp(35px, 5vw, 65px);
+
+    padding:
+        clamp(30px, 4vw, 50px);
+
+    overflow: hidden;
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.10);
+
+    border-radius:
+        28px;
+
+    background:
+        rgba(20, 7, 38, 0.68);
+
+    box-shadow:
+        0 16px 45px
+        rgba(0, 0, 0, 0.18);
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.about-palette__header {
+    max-width:
+        780px;
+
+    margin:
+        0
+        auto
+        40px;
+
+    text-align:
+        center;
+}
+
+
+.about-palette__eyebrow {
+    margin:
+        0
+        0
+        10px;
+
+    color:
+        #22f2ef;
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    font-size:
+        0.8rem;
+
+    font-weight:
+        900;
+
+    letter-spacing:
+        0.16em;
+
+    text-transform:
+        uppercase;
+}
+
+
+.about-palette__title {
+    margin: 0;
+
+     color:
+        #f22292;
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    font-size:
+        clamp(
+            2rem,
+            4vw,
+            3.4rem
+        );
+
+    font-weight:
+        900;
+
+    line-height:
+        1.08;
+}
+
+
+.about-palette__description {
+    max-width:
+        680px;
+
+    margin:
+        15px
+        auto
+        0;
+
+    color:
+        rgb(255, 255, 255);
+
+    font-size:
+        1rem;
+
+    font-weight:
+        700;
+
+    line-height:
+        1.75;
+}
+
+
+/* =========================================================
+   PALETTE LAYOUT
+   Les couleurs entourent le personnage
+========================================================= */
+
+.about-palette__layout {
+    position: relative;
+
+    width: 100%;
+
+    max-width:
+        1250px;
+
+    min-height:
+        760px;
+
+    margin:
+        0 auto;
+}
+
+
+/* =========================================================
+   CHARACTER
+========================================================= */
+
+.about-palette__character {
+    position: absolute;
+
+    z-index: 2;
+
+    top:
+        50%;
+
+    left:
+        50%;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    width:
+        min(42%, 500px);
+
+    height:
+        700px;
+
+    transform:
+        translate(-50%, -50%);
+}
+
+
+/* =========================================================
+   CHARACTER IMAGE
+========================================================= */
+
+.about-palette__character-image {
+    position: relative;
+
+    z-index: 2;
+
+    display: block;
+
+    width:
+        100%;
+
+    height:
+        100%;
+
+    object-fit:
+        contain;
+
+    filter:
+        drop-shadow(
+            0 20px 35px
+            rgba(0, 0, 0, 0.30)
+        );
+}
+
+
+/* =========================================================
+   CHARACTER GLOW
+========================================================= */
+
+.about-palette__character-glow {
+    position: absolute;
+
+    z-index: 1;
+
+    top:
+        50%;
+
+    left:
+        50%;
+
+    width:
+        520px;
+
+    height:
+        620px;
+
+    border-radius:
+        50%;
+
+    background:
+        radial-gradient(
+            ellipse,
+            rgba(242, 34, 146, 0.18) 0%,
+            rgba(109, 0, 163, 0.13) 42%,
+            rgba(34, 242, 239, 0.06) 62%,
+            transparent 76%
+        );
+
+    filter:
+        blur(22px);
+
+    transform:
+        translate(-50%, -50%);
+
+    pointer-events:
+        none;
+}
+
+
+/* =========================================================
+   COLOR CONTAINERS
+========================================================= */
+
+.about-palette__colors {
+    position:
+        static;
+}
+
+
+/* =========================================================
+   COLOR CARD
+========================================================= */
+
+.about-palette__color-card {
+    position: absolute;
+
+    z-index: 4;
+
+    display: flex;
+
+    align-items: center;
+
+    gap:
+        13px;
+
+    width:
+        190px;
+
+    min-height:
+        74px;
+
+    padding:
+        10px
+        14px;
+
+    color:
+        #ffffff;
+
+    text-align:
+        left;
+
+    border:
+        1px solid
+        rgba(186, 88, 255, 0.30);
+
+    border-radius:
+        18px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(64, 24, 83, 0.94),
+            rgba(38, 17, 55, 0.96)
+        );
+
+    box-shadow:
+        0 10px 24px
+        rgba(0, 0, 0, 0.22),
+
+        inset 0 1px 0
+        rgba(255, 255, 255, 0.06);
+
+    cursor:
+        pointer;
+
+    transition:
+        transform 0.22s ease,
+        border-color 0.22s ease,
+        box-shadow 0.22s ease,
+        background 0.22s ease;
+}
+
+
+/* =========================================================
+   LEFT SIDE
+========================================================= */
+
+.about-palette__colors--left
+.about-palette__color-card:nth-child(1) {
+    top:
+        3%;
+
+    left:
+        7%;
+}
+
+
+.about-palette__colors--left
+.about-palette__color-card:nth-child(2) {
+    top:
+        20%;
+
+    left:
+        2%;
+}
+
+
+.about-palette__colors--left
+.about-palette__color-card:nth-child(3) {
+    top:
+        38%;
+
+    left:
+        6%;
+}
+
+
+.about-palette__colors--left
+.about-palette__color-card:nth-child(4) {
+    top:
+        56%;
+
+    left:
+        2%;
+}
+
+
+.about-palette__colors--left
+.about-palette__color-card:nth-child(5) {
+    top:
+        73%;
+
+    left:
+        7%;
+}
+
+
+.about-palette__colors--left
+.about-palette__color-card:nth-child(6) {
+    top:
+        88%;
+
+    left:
+        18%;
+}
+
+
+/* =========================================================
+   RIGHT SIDE
+========================================================= */
+
+.about-palette__colors--right
+.about-palette__color-card:nth-child(1) {
+    top:
+        3%;
+
+    right:
+        7%;
+}
+
+
+.about-palette__colors--right
+.about-palette__color-card:nth-child(2) {
+    top:
+        20%;
+
+    right:
+        2%;
+}
+
+
+.about-palette__colors--right
+.about-palette__color-card:nth-child(3) {
+    top:
+        38%;
+
+    right:
+        6%;
+}
+
+
+.about-palette__colors--right
+.about-palette__color-card:nth-child(4) {
+    top:
+        56%;
+
+    right:
+        2%;
+}
+
+
+.about-palette__colors--right
+.about-palette__color-card:nth-child(5) {
+    top:
+        73%;
+
+    right:
+        7%;
+}
+
+
+.about-palette__colors--right
+.about-palette__color-card:nth-child(6) {
+    top:
+        88%;
+
+    right:
+        18%;
+}
+
+
+/* =========================================================
+   COLOR CARD HOVER
+========================================================= */
+
+.about-palette__color-card:hover {
+    border-color:
+        #22f2ef;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(79, 29, 101, 0.98),
+            rgba(47, 20, 66, 0.98)
+        );
+
+    transform:
+        translateY(-4px);
+
+    box-shadow:
+        0 0 12px
+        rgba(34, 242, 239, 0.28),
+
+        0 0 28px
+        rgba(34, 242, 239, 0.13),
+
+        0 14px 30px
+        rgba(0, 0, 0, 0.24);
+}
+
+
+/* =========================================================
+   SWATCH
+========================================================= */
+
+.about-palette__swatch {
+    flex:
+        0 0 auto;
+
+    display: block;
+
+    width:
+        52px;
+
+    height:
+        52px;
+
+    border:
+        2px solid
+        rgba(255, 255, 255, 0.32);
+
+    border-radius:
+        50%;
+
+    box-shadow:
+        0 5px 14px
+        rgba(0, 0, 0, 0.28),
+
+        inset 0 0 0 1px
+        rgba(255, 255, 255, 0.12);
+}
+
+
+/* =========================================================
+   COLOR INFORMATION
+========================================================= */
+
+.about-palette__color-info {
+    display: flex;
+
+    flex: 1;
+
+    flex-direction: column;
+
+    gap:
+        3px;
+
+    min-width: 0;
+}
+
+
+.about-palette__color-info strong {
+    color:
+        #ffffff;
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    font-size:
+        0.88rem;
+
+    font-weight:
+        900;
+}
+
+
+.about-palette__color-info small {
+    color:
+        rgba(255, 255, 255, 0.68);
+
+    font-size:
+        0.74rem;
+
+    font-weight:
+        700;
+
+    line-height:
+        1.3;
+}
+
+
+/* =========================================================
+   COPIED
+========================================================= */
+
+.about-palette__copied {
+    position: absolute;
+
+    top:
+        -9px;
+
+    right:
+        8px;
+
+    padding:
+        4px
+        8px;
+
+    color:
+        #102c31;
+
+    border:
+        1px solid
+        #22f2ef;
+
+    border-radius:
+        999px;
+
+    background:
+        #22f2ef;
+
+    font-size:
+        0.62rem;
+
+    font-weight:
+        900;
+
+    box-shadow:
+        0 0 12px
+        rgba(34, 242, 239, 0.35);
+}
+
+
+.about-palette__color-card--copied {
+    border-color:
+        #22f2ef;
+
+    box-shadow:
+        0 0 14px
+        rgba(34, 242, 239, 0.30),
+
+        0 0 30px
+        rgba(34, 242, 239, 0.12);
+}
+
+/* =========================================================
+   CHARACTER
+========================================================= */
+
+.about-palette__character {
+    position: relative;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    min-height:
+        680px;
+}
+
+
+/* =========================================================
+   CHARACTER GLOW
+========================================================= */
+
+.about-palette__character-glow {
+    position: absolute;
+
+    top: 50%;
+    left: 50%;
+
+    width:
+        min(520px, 95%);
+
+    aspect-ratio:
+        1;
+
+    border-radius:
+        50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(242, 34, 146, 0.20) 0%,
+            rgba(109, 0, 163, 0.14) 40%,
+            rgba(34, 242, 239, 0.07) 60%,
+            transparent 74%
+        );
+
+    filter:
+        blur(18px);
+
+    transform:
+        translate(-50%, -50%);
+
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   CHARACTER IMAGE
+========================================================= */
+
+.about-palette__character-image {
+    position: relative;
+
+    z-index: 2;
+
+    display: block;
+
+    width:
+        min(100%, 520px);
+
+    max-height:
+        680px;
+
+    object-fit:
+        contain;
+
+    object-position:
+        center;
+
+    filter:
+        drop-shadow(
+            0 20px 35px
+            rgba(0, 0, 0, 0.25)
+        );
+}
+
+
+/* =========================================================
+   ACTIONS
+========================================================= */
+
+.about-palette__actions {
+    display: flex;
+
+    justify-content: center;
+
+    margin-top:
+        30px;
+}
+
+
+/* =========================================================
+   LINK
+========================================================= */
+
+.about-palette__link {
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    min-height:
+        48px;
+
+    padding:
+        10px
+        20px;
+
+    color:
+        #7200a8;
+
+    border:
+        1px solid
+        rgba(109, 0, 163, 0.40);
+
+    border-radius:
+        14px;
+
+    background:
+        rgba(255, 255, 255, 0.94);
+
+    box-shadow:
+        0 6px 18px
+        rgba(0, 0, 0, 0.11);
+
+    font-size:
+        0.86rem;
+
+    font-weight:
+        900;
+
+    text-decoration: none;
+
+    transition:
+        transform 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+.about-palette__link:hover {
+    color:
+        #7200a8;
+
+    border-color:
+        #22f2ef;
+
+    background:
+        #ffffff;
+
+    transform:
+        translateY(-3px);
+
+    box-shadow:
+        0 0 12px
+        rgba(34, 242, 239, 0.35),
+
+        0 0 28px
+        rgba(34, 242, 239, 0.18),
+
+        0 9px 22px
+        rgba(0, 0, 0, 0.12);
+}
+
+/* =========================================================
+   FIX — PALETTE CHARACTER POSITION
+========================================================= */
+
+.about-palette__layout {
+    position: relative;
+
+    width: 100%;
+
+    max-width: 1250px;
+
+    min-height: 820px;
+
+    margin:
+        45px
+        auto
+        0;
+}
+
+
+/* =========================================================
+   CHARACTER
+========================================================= */
+
+.about-palette__character {
+    position: absolute;
+
+    z-index: 2;
+
+    top: 50%;
+    left: 50%;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    width:
+        min(
+            42%,
+            500px
+        );
+
+    height:
+        650px;
+
+    transform:
+        translate(
+            -50%,
+            -50%
+        );
+}
+
+
+/* =========================================================
+   CHARACTER IMAGE
+========================================================= */
+
+.about-palette__character-image {
+    position: relative;
+
+    z-index: 2;
+
+    display: block;
+
+    width: 100%;
+
+    height: 100%;
+
+    max-height: 650px;
+
+    object-fit: contain;
+
+    object-position: center;
+
+    filter:
+        drop-shadow(
+            0 20px 35px
+            rgba(
+                0,
+                0,
+                0,
+                0.30
+            )
+        );
+}
+/* =========================================================
+   LIGHT MODE — SECTION
+========================================================= */
+
+html[data-theme="light"]
+.about-palette {
+    border-color:
+        rgba(109, 0, 163, 0.14);
+
+    background:
+        rgba(255, 255, 255, 0.72);
+
+    box-shadow:
+        0 16px 45px
+        rgba(109, 0, 163, 0.08);
+}
+
+
+/* =========================================================
+   LIGHT MODE — HEADER
+========================================================= */
+
+html[data-theme="light"]
+.about-palette__eyebrow {
+    color:
+        #008f9b;
+}
+
+
+html[data-theme="light"]
+.about-palette__title {
+    color:
+        #3d1555;
+}
+
+
+html[data-theme="light"]
+.about-palette__description {
+    color:
+        #654c70;
+}
+
+
+/* =========================================================
+   LIGHT MODE — CARDS
+========================================================= */
+
+html[data-theme="light"]
+.about-palette__color-card {
+    color:
+        #4f315c;
+
+    border-color:
+        rgba(109, 0, 163, 0.12);
+
+    background:
+        rgba(255, 255, 255, 0.90);
+
+    box-shadow:
+        0 10px 24px
+        rgba(109, 0, 163, 0.10);
+}
+
+
+
+html[data-theme="light"]
+.about-palette__color-card:hover {
+    border-color:
+        #22f2ef;
+
+    background:
+        #ffffff;
+
+    box-shadow:
+        0 0 12px
+        rgba(34, 242, 239, 0.25),
+
+        0 0 28px
+        rgba(34, 242, 239, 0.11),
+
+        0 12px 28px
+        rgba(109, 0, 163, 0.08);
+}
+
+
+/* =========================================================
+   LIGHT MODE — TEXT
+========================================================= */
+
+html[data-theme="light"]
+.about-palette__color-info strong {
+    color:
+        #4f315c;
+}
+
+
+html[data-theme="light"]
+.about-palette__color-info small {
+    color:
+        #735f7d;
+}
+
+
+/* =========================================================
+   RESPONSIVE — LARGE TABLET
+========================================================= */
+
+@media (
+    max-width: 1100px
+) {
+
+    .about-palette__layout {
+        grid-template-columns:
+            minmax(170px, 0.8fr)
+            minmax(280px, 1.25fr)
+            minmax(170px, 0.8fr);
+
+        gap:
+            20px;
+    }
+
+
+    .about-palette__color-card {
+        padding:
+            9px
+            10px;
+    }
+
+
+    .about-palette__swatch {
+        width:
+            46px;
+
+        height:
+            46px;
+    }
+
+
+    .about-palette__color-info strong {
+        font-size:
+            0.78rem;
+    }
+
+
+    .about-palette__color-info small {
+        font-size:
+            0.68rem;
+    }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE — TABLET
+========================================================= */
+
+@media (
+    max-width: 850px
+) {
+
+    .about-palette__layout {
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(0, 1fr)
+            );
+
+        min-height:
+            auto;
+    }
+
+
+    .about-palette__character {
+        grid-column:
+            1 / -1;
+
+        grid-row:
+            1;
+
+        min-height:
+            500px;
+    }
+
+
+    .about-palette__colors {
+        min-height:
+            auto;
+
+        gap:
+            12px;
+    }
+
+
+    .about-palette__colors--left {
+        grid-column:
+            1;
+
+        grid-row:
+            2;
+    }
+
+
+    .about-palette__colors--right {
+        grid-column:
+            2;
+
+        grid-row:
+            2;
+    }
+
+
+    .about-palette__character-image {
+        width:
+            min(100%, 390px);
+
+        max-height:
+            500px;
+    }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE — MOBILE
+========================================================= */
+
+@media (
+    max-width: 600px
+) {
+
+    .about-palette {
+        margin-top:
+            28px;
+
+        padding:
+            26px
+            16px;
+
+        border-radius:
+            22px;
+    }
+
+
+    .about-palette__header {
+        margin-bottom:
+            28px;
+    }
+
+
+    .about-palette__layout {
+        grid-template-columns:
+            1fr;
+
+        gap:
+            14px;
+    }
+
+
+    .about-palette__character {
+        grid-column:
+            auto;
+
+        grid-row:
+            auto;
+
+        min-height:
+            390px;
+    }
+
+
+    .about-palette__colors--left,
+    .about-palette__colors--right {
+        grid-column:
+            auto;
+
+        grid-row:
+            auto;
+    }
+
+
+    .about-palette__colors {
+        gap:
+            10px;
+    }
+
+
+    .about-palette__character-image {
+        width:
+            min(100%, 310px);
+
+        max-height:
+            390px;
+    }
+
+
+    .about-palette__color-card {
+        min-height:
+            68px;
+
+        padding:
+            9px
+            11px;
+    }
+
+
+    .about-palette__swatch {
+        width:
+            44px;
+
+        height:
+            44px;
+    }
+
+
+    .about-palette__link {
+        width:
+            100%;
+    }
+
+}
+
+/* =========================================================
+   ABOUT JOURNEY
+========================================================= */
+
+.about-journey {
+    position: relative;
+
+    width: 100%;
+
+    margin-top:
+        clamp(35px, 5vw, 65px);
+
+    padding:
+        clamp(30px, 4vw, 50px);
+
+    overflow: hidden;
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.10);
+
+    border-radius:
+        28px;
+
+    background:
+        rgba(20, 7, 38, 0.68);
+
+    box-shadow:
+        0 16px 45px
+        rgba(0, 0, 0, 0.18);
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.about-journey__header {
+    max-width:
+        780px;
+
+    margin:
+        0
+        auto
+        42px;
+
+    text-align: center;
+}
+
+
+.about-journey__eyebrow {
+    margin:
+        0
+        0
+        10px;
+
+    color:
+        #22f2ef;
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    font-size:
+        0.8rem;
+
+    font-weight:
+        900;
+
+    letter-spacing:
+        0.16em;
+
+    text-transform:
+        uppercase;
+}
+
+
+.about-journey__title {
+    margin: 0;
+
+     color:
+        #f22292;
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    font-size:
+        clamp(
+            2rem,
+            4vw,
+            3.4rem
+        );
+
+    font-weight:
+        900;
+
+    line-height:
+        1.08;
+}
+
+
+.about-journey__description {
+    max-width:
+        680px;
+
+    margin:
+        15px
+        auto
+        0;
+
+    color:
+        rgb(255, 255, 255);
+
+    font-size:
+        1rem;
+
+    font-weight:
+        700;
+
+    line-height:
+        1.75;
+}
+
+
+/* =========================================================
+   TIMELINE
+========================================================= */
+
+.about-journey__timeline {
+    display: flex;
+
+    flex-direction: column;
+
+    gap:
+        0;
+
+    max-width:
+        950px;
+
+    margin:
+        0
+        auto;
+}
+
+
+/* =========================================================
+   STEP
+========================================================= */
+
+.about-journey__step {
+    display: grid;
+
+    grid-template-columns:
+        72px
+        minmax(0, 1fr);
+
+    gap:
+        20px;
+
+    min-width: 0;
+}
+
+
+/* =========================================================
+   TRACK
+========================================================= */
+
+.about-journey__track {
+    position: relative;
+
+    display: flex;
+
+    align-items: center;
+
+    flex-direction: column;
+}
+
+
+/* =========================================================
+   MARKER
+========================================================= */
+
+.about-journey__marker {
+    position: relative;
+
+    z-index: 2;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    flex:
+        0 0 auto;
+
+    width:
+        52px;
+
+    height:
+        52px;
+
+    border:
+        1px solid
+        rgba(34, 242, 239, 0.35);
+
+    border-radius:
+        16px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(34, 242, 239, 0.10),
+            rgba(109, 0, 163, 0.20)
+        );
+
+    box-shadow:
+        0 0 16px
+        rgba(34, 242, 239, 0.10);
+
+    font-size:
+        1.25rem;
+
+    transition:
+        transform 0.22s ease,
+        border-color 0.22s ease,
+        box-shadow 0.22s ease;
+}
+
+
+/* =========================================================
+   MARKER — EVENT
+========================================================= */
+
+.about-journey__marker--event {
+    border-color:
+        rgba(242, 34, 146, 0.38);
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(109, 0, 163, 0.28),
+            rgba(242, 34, 146, 0.14)
+        );
+}
+
+
+/* =========================================================
+   MARKER — FOLLOWERS
+========================================================= */
+
+.about-journey__marker--followers {
+    color:
+        #22f2ef;
+
+    border-color:
+        rgba(34, 242, 239, 0.45);
+
+    background:
+        rgba(34, 242, 239, 0.08);
+}
+
+
+/* =========================================================
+   MARKER — GOAL
+========================================================= */
+
+.about-journey__marker--goal {
+    color:
+        #ffffff;
+
+    border-color:
+        #22f2ef;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(109, 0, 163, 0.85),
+            rgba(242, 34, 146, 0.75)
+        );
+
+    box-shadow:
+        0 0 14px
+        rgba(34, 242, 239, 0.30),
+
+        0 0 30px
+        rgba(34, 242, 239, 0.16);
+
+    animation:
+        aboutJourneyGoalPulse
+        2.4s
+        ease-in-out
+        infinite;
+}
+
+
+/* =========================================================
+   TIMELINE LINE
+========================================================= */
+
+.about-journey__line {
+    width:
+        2px;
+
+    flex:
+        1;
+
+    min-height:
+        70px;
+
+    background:
+        linear-gradient(
+            to bottom,
+            rgba(34, 242, 239, 0.50),
+            rgba(109, 0, 163, 0.45),
+            rgba(242, 34, 146, 0.30)
+        );
+}
+
+
+/* =========================================================
+   CARD
+========================================================= */
+
+.about-journey__card {
+    position: relative;
+
+    margin-bottom:
+        22px;
+
+    padding:
+        20px
+        22px;
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.09);
+
+    border-radius:
+        18px;
+
+    background:
+        rgba(255, 255, 255, 0.04);
+
+    box-shadow:
+        0 8px 24px
+        rgba(0, 0, 0, 0.11);
+
+    transition:
+        transform 0.22s ease,
+        border-color 0.22s ease,
+        background 0.22s ease,
+        box-shadow 0.22s ease;
+}
+
+
+/* =========================================================
+   CARD HOVER
+========================================================= */
+
+.about-journey__step:hover
+.about-journey__card {
+    transform:
+        translateX(5px);
+
+    border-color:
+        rgba(34, 242, 239, 0.45);
+
+    background:
+        rgba(255, 255, 255, 0.06);
+
+    box-shadow:
+        0 0 12px
+        rgba(34, 242, 239, 0.12),
+
+        0 0 28px
+        rgba(34, 242, 239, 0.06),
+
+        0 10px 26px
+        rgba(0, 0, 0, 0.14);
+}
+
+
+.about-journey__step:hover
+.about-journey__marker {
+    transform:
+        scale(1.07);
+
+    border-color:
+        #22f2ef;
+
+    box-shadow:
+        0 0 18px
+        rgba(34, 242, 239, 0.22);
+}
+
+
+/* =========================================================
+   GOAL CARD
+========================================================= */
+
+.about-journey__step--goal
+.about-journey__card {
+    border-color:
+        rgba(34, 242, 239, 0.42);
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(34, 242, 239, 0.055),
+            rgba(109, 0, 163, 0.10),
+            rgba(242, 34, 146, 0.06)
+        );
+
+    box-shadow:
+        0 0 14px
+        rgba(34, 242, 239, 0.10),
+
+        0 10px 26px
+        rgba(0, 0, 0, 0.12);
+}
+
+
+/* =========================================================
+   CARD HEADER
+========================================================= */
+
+.about-journey__card-header {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    flex-wrap: wrap;
+
+    gap:
+        10px;
+
+    margin-bottom:
+        8px;
+}
+
+
+/* =========================================================
+   DATE
+========================================================= */
+
+.about-journey__date {
+    color:
+        #22f2ef;
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    font-size:
+        0.77rem;
+
+    font-weight:
+        900;
+
+    letter-spacing:
+        0.06em;
+
+    text-transform:
+        uppercase;
+}
+
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+.about-journey__status {
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    min-height:
+        26px;
+
+    padding:
+        4px
+        9px;
+
+    border-radius:
+        999px;
+
+    font-size:
+        0.65rem;
+
+    font-weight:
+        900;
+
+    letter-spacing:
+        0.05em;
+
+    text-transform:
+        uppercase;
+}
+
+
+/* =========================================================
+   EVENT STATUS
+========================================================= */
+
+.about-journey__status--event {
+    color:
+        #f7b9dc;
+
+    border:
+        1px solid
+        rgba(242, 34, 146, 0.30);
+
+    background:
+        rgba(242, 34, 146, 0.08);
+}
+
+
+/* =========================================================
+   REACHED STATUS
+========================================================= */
+
+.about-journey__status--reached {
+    color:
+        #22f2ef;
+
+    border:
+        1px solid
+        rgba(34, 242, 239, 0.28);
+
+    background:
+        rgba(34, 242, 239, 0.07);
+}
+
+
+/* =========================================================
+   GOAL STATUS
+========================================================= */
+
+.about-journey__status--goal {
+    color:
+        #ffffff;
+
+    border:
+        1px solid
+        rgba(34, 242, 239, 0.60);
+
+    background:
+        linear-gradient(
+            135deg,
+            #6d00a3,
+            #f22292
+        );
+
+    box-shadow:
+        0 0 12px
+        rgba(34, 242, 239, 0.15);
+}
+
+
+/* =========================================================
+   STEP TITLE
+========================================================= */
+
+.about-journey__step-title {
+    margin:
+        0
+        0
+        8px;
+
+     color:
+        #f22292;
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    font-size:
+        clamp(
+            1.05rem,
+            1.8vw,
+            1.3rem
+        );
+
+    font-weight:
+        900;
+
+    line-height:
+        1.3;
+}
+
+
+/* =========================================================
+   STEP DESCRIPTION
+========================================================= */
+
+.about-journey__step-description {
+    margin: 0;
+
+    color:
+        rgb(255, 255, 255);
+
+    font-size:
+        0.90rem;
+
+    font-weight:
+        650;
+
+    line-height:
+        1.7;
+}
+
+
+/* =========================================================
+   ENDING
+========================================================= */
+
+.about-journey__ending {
+    display: flex;
+
+    align-items: center;
+
+    gap:
+        16px;
+
+    max-width:
+        720px;
+
+    margin:
+        30px
+        auto
+        0;
+
+    padding:
+        18px
+        20px;
+
+    border:
+        1px solid
+        rgba(242, 34, 146, 0.18);
+
+    border-radius:
+        18px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(109, 0, 163, 0.10),
+            rgba(242, 34, 146, 0.06)
+        );
+
+    text-align: left;
+}
+
+
+/* =========================================================
+   ENDING ICON
+========================================================= */
+
+.about-journey__ending-icon {
+    flex:
+        0 0 auto;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    width:
+        48px;
+
+    height:
+        48px;
+
+    border-radius:
+        14px;
+
+    background:
+        rgba(242, 34, 146, 0.08);
+
+    font-size:
+        1.4rem;
+}
+
+
+/* =========================================================
+   ENDING TEXT
+========================================================= */
+
+.about-journey__ending strong {
+    display: block;
+
+    margin-bottom:
+        4px;
+
+    color:
+        #ffffff;
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    font-size:
+        1rem;
+}
+
+
+.about-journey__ending p {
+    margin: 0;
+
+    color:
+        rgba(255, 255, 255, 0.63);
+
+    font-size:
+        0.83rem;
+
+    font-weight:
+        600;
+
+    line-height:
+        1.55;
+}
+
+
+/* =========================================================
+   GOAL ANIMATION
+========================================================= */
+
+@keyframes aboutJourneyGoalPulse {
+
+    0%,
+    100% {
+        box-shadow:
+            0 0 14px
+            rgba(34, 242, 239, 0.25),
+
+            0 0 28px
+            rgba(34, 242, 239, 0.12);
+    }
+
+
+    50% {
+        box-shadow:
+            0 0 20px
+            rgba(34, 242, 239, 0.50),
+
+            0 0 42px
+            rgba(34, 242, 239, 0.22);
+    }
+
+}
+
+
+/* =========================================================
+   LIGHT MODE — SECTION
+========================================================= */
+
+html[data-theme="light"]
+.about-journey {
+    border-color:
+        rgba(109, 0, 163, 0.14);
+
+    background:
+        rgba(255, 255, 255, 0.72);
+
+    box-shadow:
+        0 16px 45px
+        rgba(109, 0, 163, 0.08);
+}
+
+
+/* =========================================================
+   LIGHT MODE — HEADER
+========================================================= */
+
+html[data-theme="light"]
+.about-journey__eyebrow {
+    color:
+        #008f9b;
+}
+
+
+html[data-theme="light"]
+.about-journey__title {
+    color:
+        #3d1555;
+}
+
+
+html[data-theme="light"]
+.about-journey__description {
+    color:
+        #654c70;
+}
+
+
+/* =========================================================
+   LIGHT MODE — CARDS
+========================================================= */
+
+html[data-theme="light"]
+.about-journey__card {
+    border-color:
+        rgba(109, 0, 163, 0.11);
+
+    background:
+        rgba(255, 255, 255, 0.68);
+
+    box-shadow:
+        0 8px 24px
+        rgba(109, 0, 163, 0.06);
+}
+
+
+html[data-theme="light"]
+.about-journey__step:hover
+.about-journey__card {
+    border-color:
+        #22f2ef;
+
+    background:
+        rgba(255, 255, 255, 0.96);
+
+    box-shadow:
+        0 0 12px
+        rgba(34, 242, 239, 0.22),
+
+        0 0 28px
+        rgba(34, 242, 239, 0.09),
+
+        0 10px 26px
+        rgba(109, 0, 163, 0.07);
+}
+
+
+/* =========================================================
+   LIGHT MODE — GOAL
+========================================================= */
+
+html[data-theme="light"]
+.about-journey__step--goal
+.about-journey__card {
+    border-color:
+        rgba(0, 143, 155, 0.28);
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(34, 242, 239, 0.06),
+            rgba(255, 255, 255, 0.88),
+            rgba(242, 34, 146, 0.04)
+        );
+}
+
+
+/* =========================================================
+   LIGHT MODE — TEXT
+========================================================= */
+
+html[data-theme="light"]
+.about-journey__step-title {
+    color:
+        #4f315c;
+}
+
+
+html[data-theme="light"]
+.about-journey__step-description {
+    color:
+        #654c70;
+}
+
+
+html[data-theme="light"]
+.about-journey__date {
+    color:
+        #008f9b;
+}
+
+
+/* =========================================================
+   LIGHT MODE — ENDING
+========================================================= */
+
+html[data-theme="light"]
+.about-journey__ending {
+    border-color:
+        rgba(177, 0, 114, 0.13);
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(109, 0, 163, 0.04),
+            rgba(242, 34, 146, 0.035)
+        );
+}
+
+
+html[data-theme="light"]
+.about-journey__ending strong {
+    color:
+        #4f315c;
+}
+
+
+html[data-theme="light"]
+.about-journey__ending p {
+    color:
+        #654c70;
+}
+
+
+/* =========================================================
+   RESPONSIVE — MOBILE / TABLET
+========================================================= */
+
+@media (
+    max-width: 700px
+) {
+
+    .about-journey__step {
+        grid-template-columns:
+            56px
+            minmax(0, 1fr);
+
+        gap:
+            13px;
+    }
+
+
+    .about-journey__marker {
+        width:
+            44px;
+
+        height:
+            44px;
+
+        border-radius:
+            13px;
+
+        font-size:
+            1.05rem;
+    }
+
+
+    .about-journey__card {
+        padding:
+            17px;
+    }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE — MOBILE
+========================================================= */
+
+@media (
+    max-width: 520px
+) {
+
+    .about-journey {
+        margin-top:
+            28px;
+
+        padding:
+            26px
+            16px;
+
+        border-radius:
+            22px;
+    }
+
+
+    .about-journey__header {
+        margin-bottom:
+            30px;
+    }
+
+
+    .about-journey__step {
+        grid-template-columns:
+            44px
+            minmax(0, 1fr);
+
+        gap:
+            10px;
+    }
+
+
+    .about-journey__marker {
+        width:
+            38px;
+
+        height:
+            38px;
+
+        border-radius:
+            11px;
+
+        font-size:
+            0.92rem;
+    }
+
+
+    .about-journey__line {
+        min-height:
+            60px;
+    }
+
+
+    .about-journey__card {
+        margin-bottom:
+            16px;
+
+        padding:
+            15px;
+
+        border-radius:
+            15px;
+    }
+
+
+    .about-journey__card-header {
+        align-items:
+            flex-start;
+
+        flex-direction:
+            column;
+
+        gap:
+            7px;
+    }
+
+
+    .about-journey__step-description {
+        font-size:
+            0.82rem;
+    }
+
+
+    .about-journey__ending {
+        align-items:
+            flex-start;
+
+        padding:
+            16px;
+    }
+
+}
+
+/* =========================================================
+   ABOUT PREFERENCES
+========================================================= */
+
+.about-preferences {
+    position: relative;
+
+    width: 100%;
+
+    margin-top:
+        clamp(35px, 5vw, 65px);
+
+    padding:
+        clamp(30px, 4vw, 50px);
+
+    overflow: hidden;
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.10);
+
+    border-radius:
+        28px;
+
+    background:
+        rgba(20, 7, 38, 0.68);
+
+    box-shadow:
+        0 16px 45px
+        rgba(0, 0, 0, 0.18);
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.about-preferences__header {
+    max-width:
+        780px;
+
+    margin:
+        0
+        auto
+        38px;
+
+    text-align:
+        center;
+}
+
+
+/* =========================================================
+   EYEBROW
+========================================================= */
+
+.about-preferences__eyebrow {
+    margin:
+        0
+        0
+        10px;
+
+    color:
+        #22f2ef;
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    font-size:
+        0.8rem;
+
+    font-weight:
+        900;
+
+    letter-spacing:
+        0.16em;
+
+    text-transform:
+        uppercase;
+}
+
+
+/* =========================================================
+   TITLE
+========================================================= */
+
+.about-preferences__title {
+    margin: 0;
+
+    color:
+        #ffffff;
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    font-size:
+        clamp(
+            2rem,
+            4vw,
+            3.4rem
+        );
+
+    font-weight:
+        900;
+
+    line-height:
+        1.08;
+}
+
+
+.about-preferences__title span {
+    color:
+        #f22292;
+}
+
+
+/* =========================================================
+   DESCRIPTION
+========================================================= */
+
+.about-preferences__description {
+    max-width:
+        660px;
+
+    margin:
+        15px
+        auto
+        0;
+
+    color:
+        rgb(255, 255, 255);
+
+    font-size:
+        1rem;
+
+    font-weight:
+        700;
+
+    line-height:
+        1.75;
+}
+
+
+/* =========================================================
+   GRID
+========================================================= */
+
+.about-preferences__grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            3,
+            minmax(0, 1fr)
+        );
+
+    gap:
+        18px;
+}
+
+
+/* =========================================================
+   CARD
+========================================================= */
+
+.about-preference-card {
+    position: relative;
+
+    display: flex;
+
+    flex-direction: column;
+
+    min-width: 0;
+
+    padding:
+        24px;
+
+    overflow: hidden;
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.10);
+
+    border-radius:
+        20px;
+
+    background:
+        rgba(255, 255, 255, 0.045);
+
+    box-shadow:
+        0 9px 24px
+        rgba(0, 0, 0, 0.12);
+
+    transition:
+        transform 0.22s ease,
+        border-color 0.22s ease,
+        background 0.22s ease,
+        box-shadow 0.22s ease;
+}
+
+
+/* =========================================================
+   CARD HOVER
+========================================================= */
+
+.about-preference-card:hover {
+    transform:
+        translateY(-5px);
+
+    border-color:
+        rgba(34, 242, 239, 0.60);
+
+    background:
+        rgba(255, 255, 255, 0.065);
+
+    box-shadow:
+        0 0 12px
+        rgba(34, 242, 239, 0.16),
+
+        0 0 28px
+        rgba(34, 242, 239, 0.08),
+
+        0 14px 30px
+        rgba(0, 0, 0, 0.16);
+}
+
+
+/* =========================================================
+   CARD HEADER
+========================================================= */
+
+.about-preference-card__header {
+    display: flex;
+
+    align-items: center;
+
+    gap:
+        14px;
+
+    margin-bottom:
+        20px;
+}
+
+
+/* =========================================================
+   ICON
+========================================================= */
+
+.about-preference-card__icon {
+    flex:
+        0 0 auto;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    width:
+        50px;
+
+    height:
+        50px;
+
+    border:
+        1px solid
+        rgba(242, 34, 146, 0.28);
+
+    border-radius:
+        15px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(109, 0, 163, 0.26),
+            rgba(242, 34, 146, 0.13)
+        );
+
+    box-shadow:
+        0 6px 18px
+        rgba(109, 0, 163, 0.12);
+
+    font-size:
+        1.35rem;
+
+    transition:
+        transform 0.22s ease,
+        border-color 0.22s ease,
+        box-shadow 0.22s ease;
+}
+
+
+.about-preference-card:hover
+.about-preference-card__icon {
+    transform:
+        scale(1.06);
+
+    border-color:
+        rgba(34, 242, 239, 0.55);
+
+    box-shadow:
+        0 0 16px
+        rgba(34, 242, 239, 0.18);
+}
+
+
+/* =========================================================
+   CARD TITLE
+========================================================= */
+
+.about-preference-card__title {
+    margin: 0;
+
+    color:
+        #ffffff;
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    font-size:
+        1.15rem;
+
+    font-weight:
+        900;
+
+    line-height:
+        1.3;
+}
+
+
+/* =========================================================
+   LIST
+========================================================= */
+
+.about-preference-card__list {
+    display: flex;
+
+    flex-direction: column;
+
+    gap:
+        9px;
+
+    margin: 0;
+
+    padding: 0;
+
+    list-style: none;
+}
+
+
+/* =========================================================
+   LIST ITEM
+========================================================= */
+
+.about-preference-card__item {
+    display: flex;
+
+    align-items: flex-start;
+
+    gap:
+        10px;
+
+    min-height:
+        42px;
+
+    padding:
+        9px
+        11px;
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.07);
+
+    border-radius:
+        12px;
+
+    background:
+        rgba(255, 255, 255, 0.03);
+
+    color:
+        rgba(255, 255, 255, 0.76);
+
+    font-size:
+        0.88rem;
+
+    font-weight:
+        700;
+
+    line-height:
+        1.45;
+
+    transition:
+        transform 0.2s ease,
+        border-color 0.2s ease,
+        background 0.2s ease;
+}
+
+
+/* =========================================================
+   LIST ITEM HOVER
+========================================================= */
+
+.about-preference-card__item:hover {
+    transform:
+        translateX(4px);
+
+    border-color:
+        rgba(34, 242, 239, 0.28);
+
+    background:
+        rgba(255, 255, 255, 0.055);
+}
+
+
+/* =========================================================
+   BULLET
+========================================================= */
+
+.about-preference-card__bullet {
+    flex:
+        0 0 auto;
+
+    width:
+        8px;
+
+    height:
+        8px;
+
+    margin-top:
+        6px;
+
+    border-radius:
+        50%;
+
+    background:
+        #22f2ef;
+
+    box-shadow:
+        0 0 8px
+        rgba(34, 242, 239, 0.40);
+}
+
+
+/* =========================================================
+   LIGHT MODE — SECTION
+========================================================= */
+
+html[data-theme="light"]
+.about-preferences {
+    border-color:
+        rgba(109, 0, 163, 0.14);
+
+    background:
+        rgba(255, 255, 255, 0.72);
+
+    box-shadow:
+        0 16px 45px
+        rgba(109, 0, 163, 0.08);
+}
+
+
+/* =========================================================
+   LIGHT MODE — HEADER
+========================================================= */
+
+html[data-theme="light"]
+.about-preferences__eyebrow {
+    color:
+        #008f9b;
+}
+
+
+html[data-theme="light"]
+.about-preferences__title {
+    color:
+        #3d1555;
+}
+
+
+html[data-theme="light"]
+.about-preferences__title span {
+    color:
+        #b10072;
+}
+
+
+html[data-theme="light"]
+.about-preferences__description {
+    color:
+        #654c70;
+}
+
+
+/* =========================================================
+   LIGHT MODE — CARDS
+========================================================= */
+
+html[data-theme="light"]
+.about-preference-card {
+    border-color:
+        rgba(109, 0, 163, 0.12);
+
+    background:
+        rgba(255, 255, 255, 0.72);
+
+    box-shadow:
+        0 9px 24px
+        rgba(109, 0, 163, 0.06);
+}
+
+
+html[data-theme="light"]
+.about-preference-card:hover {
+    border-color:
+        #22f2ef;
+
+    background:
+        rgba(255, 255, 255, 0.96);
+
+    box-shadow:
+        0 0 12px
+        rgba(34, 242, 239, 0.22),
+
+        0 0 28px
+        rgba(34, 242, 239, 0.09),
+
+        0 14px 30px
+        rgba(109, 0, 163, 0.07);
+}
+
+
+/* =========================================================
+   LIGHT MODE — ICON
+========================================================= */
+
+html[data-theme="light"]
+.about-preference-card__icon {
+    border-color:
+        rgba(109, 0, 163, 0.16);
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(109, 0, 163, 0.08),
+            rgba(242, 34, 146, 0.07)
+        );
+
+    box-shadow:
+        0 6px 18px
+        rgba(109, 0, 163, 0.07);
+}
+
+
+/* =========================================================
+   LIGHT MODE — TITLE
+========================================================= */
+
+html[data-theme="light"]
+.about-preference-card__title {
+    color:
+        #4f315c;
+}
+
+
+/* =========================================================
+   LIGHT MODE — ITEMS
+========================================================= */
+
+html[data-theme="light"]
+.about-preference-card__item {
+    color:
+        #654c70;
+
+    border-color:
+        rgba(109, 0, 163, 0.08);
+
+    background:
+        rgba(255, 255, 255, 0.65);
+}
+
+
+html[data-theme="light"]
+.about-preference-card__item:hover {
+    border-color:
+        rgba(0, 143, 155, 0.25);
+
+    background:
+        rgba(255, 255, 255, 0.96);
+}
+
+
+/* =========================================================
+   LIGHT MODE — BULLET
+========================================================= */
+
+html[data-theme="light"]
+.about-preference-card__bullet {
+    background:
+        #008f9b;
+
+    box-shadow:
+        0 0 7px
+        rgba(0, 143, 155, 0.30);
+}
+
+
+/* =========================================================
+   RESPONSIVE — TABLET
+========================================================= */
+
+@media (
+    max-width: 1000px
+) {
+
+    .about-preferences__grid {
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(0, 1fr)
+            );
+    }
+
+
+    .about-preference-card:last-child {
+        grid-column:
+            1 / -1;
+    }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE — MOBILE
+========================================================= */
+
+@media (
+    max-width: 650px
+) {
+
+    .about-preferences__grid {
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .about-preference-card:last-child {
+        grid-column:
+            auto;
+    }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE — SMALL MOBILE
+========================================================= */
+
+@media (
+    max-width: 520px
+) {
+
+    .about-preferences {
+        margin-top:
+            28px;
+
+        padding:
+            26px
+            16px;
+
+        border-radius:
+            22px;
+    }
+
+
+    .about-preferences__header {
+        margin-bottom:
+            28px;
+    }
+
+
+    .about-preference-card {
+        padding:
+            18px
+            15px;
+
+        border-radius:
+            17px;
+    }
+
+
+    .about-preference-card__header {
+        gap:
+            11px;
+
+        margin-bottom:
+            16px;
+    }
+
+
+    .about-preference-card__icon {
+        width:
+            44px;
+
+        height:
+            44px;
+
+        border-radius:
+            13px;
+
+        font-size:
+            1.2rem;
+    }
+
+
+    .about-preference-card__title {
+        font-size:
+            1rem;
+    }
+
+
+    .about-preference-card__item {
+        min-height:
+            38px;
+
+        padding:
+            8px
+            10px;
+
+        font-size:
+            0.83rem;
+    }
+
+}
+
+/* =========================================================
+   ABOUT FINAL
+========================================================= */
+
+.about-final {
+    position: relative;
+
+    width: 100%;
+
+    margin-top:
+        clamp(40px, 6vw, 75px);
+
+    margin-bottom:
+        clamp(35px, 5vw, 60px);
+
+    padding:
+        clamp(35px, 5vw, 65px);
+
+    overflow: hidden;
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.12);
+
+    border-radius:
+        32px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(30, 8, 52, 0.94),
+            rgba(76, 12, 92, 0.82)
+        );
+
+    box-shadow:
+        0 20px 55px
+        rgba(0, 0, 0, 0.24);
+}
+
+
+/* =========================================================
+   CONTENT
+========================================================= */
+
+.about-final__content {
+    position: relative;
+
+    z-index: 2;
+
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1.15fr)
+        minmax(280px, 0.85fr);
+
+    align-items: center;
+
+    gap:
+        clamp(30px, 5vw, 65px);
+}
+
+
+/* =========================================================
+   TEXT
+========================================================= */
+
+.about-final__text {
+    position: relative;
+
+    z-index: 2;
+}
+
+
+/* =========================================================
+   EYEBROW
+========================================================= */
+
+.about-final__eyebrow {
+    margin:
+        0
+        0
+        12px;
+
+    color:
+        #22f2ef;
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    font-size:
+        0.82rem;
+
+    font-weight:
+        900;
+
+    letter-spacing:
+        0.16em;
+
+    text-transform:
+        uppercase;
+}
+
+
+/* =========================================================
+   TITLE
+========================================================= */
+
+.about-final__title {
+    margin:
+        0
+        0
+        22px;
+
+    color:
+        #ffffff;
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    font-size:
+        clamp(
+            2.4rem,
+            4.8vw,
+            4.6rem
+        );
+
+    font-weight:
+        900;
+
+    line-height:
+        1.04;
+
+    letter-spacing:
+        -0.04em;
+}
+
+
+.about-final__title span {
+    display: block;
+
+    color:
+        #f22292;
+
+    text-shadow:
+        0 0 18px
+        rgba(242, 34, 146, 0.22);
+}
+
+
+/* =========================================================
+   DESCRIPTION
+========================================================= */
+
+.about-final__description {
+    max-width:
+        720px;
+
+    margin:
+        0
+        0
+        16px;
+
+    color:
+        rgb(255, 255, 255);
+
+    font-size:
+        1rem;
+
+    font-weight:
+        600;
+
+    line-height:
+        1.75;
+}
+
+
+/* =========================================================
+   MESSAGE
+========================================================= */
+
+.about-final__message {
+    margin:
+        0
+        0
+        28px;
+
+    color:
+        #ffffff;
+
+    font-size:
+        1.05rem;
+
+    font-weight:
+        900;
+}
+
+
+/* =========================================================
+   ACTIONS
+========================================================= */
+
+.about-final__actions {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap:
+        12px;
+}
+
+
+/* =========================================================
+   BUTTON
+========================================================= */
+
+.about-final__button {
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap:
+        9px;
+
+    min-height:
+        48px;
+
+    padding:
+        10px
+        20px;
+
+    border-radius:
+        14px;
+
+    font-size:
+        0.86rem;
+
+    font-weight:
+        900;
+
+    text-decoration:
+        none;
+
+    transition:
+        transform 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+}
+
+
+/* =========================================================
+   PRIMARY BUTTON
+========================================================= */
+
+.about-final__button--primary {
+    color:
+        #7200a8;
+
+    border:
+        1px solid
+        rgba(109, 0, 163, 0.40);
+
+    background:
+        rgba(255, 255, 255, 0.95);
+
+    box-shadow:
+        0 6px 18px
+        rgba(0, 0, 0, 0.12);
+}
+
+
+/* =========================================================
+   SECONDARY BUTTON
+========================================================= */
+
+.about-final__button--secondary {
+    color:
+        #7200a8;
+
+    border:
+        1px solid
+        rgba(109, 0, 163, 0.40);
+
+    background:
+        rgba(255, 255, 255, 0.90);
+
+    box-shadow:
+        0 6px 18px
+        rgba(0, 0, 0, 0.10);
+}
+
+
+/* =========================================================
+   BUTTON HOVER
+========================================================= */
+
+.about-final__button:hover {
+    color:
+        #7200a8;
+
+    border-color:
+        #22f2ef;
+
+    background:
+        #ffffff;
+
+    transform:
+        translateY(-3px);
+
+    box-shadow:
+        0 0 12px
+        rgba(34, 242, 239, 0.35),
+
+        0 0 28px
+        rgba(34, 242, 239, 0.20),
+
+        0 10px 24px
+        rgba(0, 0, 0, 0.14);
+}
+
+
+/* =========================================================
+   BUTTON ICON
+========================================================= */
+
+.about-final__button-icon {
+    font-size:
+        1.05rem;
+}
+
+
+/* =========================================================
+   VISUAL
+========================================================= */
+
+.about-final__visual {
+    position: relative;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    min-height:
+        430px;
+}
+
+
+/* =========================================================
+   IMAGE GLOW
+========================================================= */
+
+.about-final__image-glow {
+    position: absolute;
+
+    top: 50%;
+    left: 50%;
+
+    width:
+        min(380px, 95%);
+
+    aspect-ratio:
+        1;
+
+    border-radius:
+        50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(242, 34, 146, 0.26) 0%,
+            rgba(109, 0, 163, 0.18) 40%,
+            rgba(34, 242, 239, 0.10) 60%,
+            transparent 74%
+        );
+
+    filter:
+        blur(10px);
+
+    transform:
+        translate(-50%, -50%);
+
+    pointer-events:
+        none;
+}
+
+
+/* =========================================================
+   IMAGE
+========================================================= */
+
+.about-final__image {
+    position: relative;
+
+    z-index: 2;
+
+    display: block;
+
+    width:
+        min(100%, 360px);
+
+    max-height:
+        450px;
+
+    object-fit:
+        contain;
+
+    object-position:
+        center;
+
+    filter:
+        drop-shadow(
+            0 18px 30px
+            rgba(0, 0, 0, 0.28)
+        );
+
+    transition:
+        transform 0.3s ease;
+}
+
+
+.about-final:hover
+.about-final__image {
+    transform:
+        translateY(-4px);
+}
+
+
+/* =========================================================
+   BACKGROUND GLOWS
+========================================================= */
+
+.about-final__glow {
+    position: absolute;
+
+    border-radius:
+        50%;
+
+    pointer-events:
+        none;
+}
+
+
+.about-final__glow--left {
+    top:
+        -160px;
+
+    left:
+        -120px;
+
+    width:
+        420px;
+
+    height:
+        420px;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(242, 34, 146, 0.18),
+            transparent 70%
+        );
+}
+
+
+.about-final__glow--right {
+    right:
+        -140px;
+
+    bottom:
+        -180px;
+
+    width:
+        460px;
+
+    height:
+        460px;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(34, 242, 239, 0.14),
+            transparent 70%
+        );
+}
+
+
+/* =========================================================
+   LIGHT MODE
+========================================================= */
+
+html[data-theme="light"]
+.about-final {
+    border-color:
+        rgba(109, 0, 163, 0.14);
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.94),
+            rgba(248, 232, 255, 0.92)
+        );
+
+    box-shadow:
+        0 20px 55px
+        rgba(109, 0, 163, 0.09);
+}
+
+
+/* =========================================================
+   LIGHT MODE — TEXT
+========================================================= */
+
+html[data-theme="light"]
+.about-final__eyebrow {
+    color:
+        #008f9b;
+}
+
+
+html[data-theme="light"]
+.about-final__title {
+    color:
+        #3d1555;
+}
+
+
+html[data-theme="light"]
+.about-final__title span {
+    color:
+        #b10072;
+
+    text-shadow:
+        0 0 16px
+        rgba(177, 0, 114, 0.12);
+}
+
+
+html[data-theme="light"]
+.about-final__description {
+    color:
+        #654c70;
+}
+
+
+html[data-theme="light"]
+.about-final__message {
+    color:
+        #4f315c;
+}
+
+
+/* =========================================================
+   LIGHT MODE — BUTTONS
+========================================================= */
+
+html[data-theme="light"]
+.about-final__button {
+    color:
+        #7200a8;
+
+    border-color:
+        rgba(109, 0, 163, 0.36);
+
+    background:
+        rgba(255, 255, 255, 0.90);
+}
+
+
+html[data-theme="light"]
+.about-final__button:hover {
+    color:
+        #7200a8;
+
+    border-color:
+        #22f2ef;
+
+    background:
+        #ffffff;
+
+    box-shadow:
+        0 0 12px
+        rgba(34, 242, 239, 0.35),
+
+        0 0 28px
+        rgba(34, 242, 239, 0.18),
+
+        0 10px 24px
+        rgba(109, 0, 163, 0.08);
+}
+
+
+/* =========================================================
+   RESPONSIVE — TABLET
+========================================================= */
+
+@media (
+    max-width: 900px
+) {
+
+    .about-final__content {
+        grid-template-columns:
+            1fr;
+
+        gap:
+            20px;
+    }
+
+
+    .about-final__text {
+        text-align:
+            center;
+    }
+
+
+    .about-final__description {
+        margin-left:
+            auto;
+
+        margin-right:
+            auto;
+    }
+
+
+    .about-final__actions {
+        justify-content:
+            center;
+    }
+
+
+    .about-final__visual {
+        min-height:
+            350px;
+    }
+
+
+    .about-final__image {
+        width:
+            min(100%, 310px);
+
+        max-height:
+            370px;
+    }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE — MOBILE
+========================================================= */
+
+@media (
+    max-width: 550px
+) {
+
+    .about-final {
+        margin-top:
+            30px;
+
+        padding:
+            30px
+            18px;
+
+        border-radius:
+            24px;
+    }
+
+
+    .about-final__title {
+        font-size:
+            clamp(
+                2.1rem,
+                11vw,
+                3.2rem
+            );
+    }
+
+
+    .about-final__description {
+        font-size:
+            0.9rem;
+    }
+
+
+    .about-final__actions {
+        flex-direction:
+            column;
+    }
+
+
+    .about-final__button {
+        width:
+            100%;
+    }
+
+
+    .about-final__visual {
+        min-height:
+            300px;
+    }
+
+
+    .about-final__image {
+        width:
+            min(100%, 270px);
+
+        max-height:
+            320px;
+    }
+
+}

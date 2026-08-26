@@ -86,19 +86,16 @@ import TwitchSection
 
                 <div class="home-hero__visual">
 
-                    <div class="home-hero__image-wrapper">
+                    <div class="home-hero__visual">
 
-                        <!--
-                            TEMPORAIRE :
-                            on mettra ensuite ton vrai visuel
-                            depuis Supabase ou src/assets/images.
-                        -->
+                        <div class="home-hero__image-wrapper">
 
-                        <div
-                            class="home-hero__placeholder"
-                            aria-label="Illustration de Couaxia"
-                        >
-                            🐙
+                            <img
+                                src="https://qudeuzkwvwprlhqtzsct.supabase.co/storage/v1/object/public/artworks/stream/Koleander_chibi.png"
+                                alt="Illustration de Couaxia"
+                                class="home-hero__image"
+                            />
+
                         </div>
 
                     </div>

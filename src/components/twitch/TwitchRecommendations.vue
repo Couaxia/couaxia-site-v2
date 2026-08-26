@@ -191,7 +191,8 @@ const recommendationGroups =
                 "Yuka_Portesonges",
                 "Nysselya_vt",
                 "Meizy_11",
-                "mokaa_cafe"
+                "mokaa_cafe", 
+                "SaturneSmile"
 
             ],
 

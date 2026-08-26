@@ -1408,3 +1408,683 @@
     }
 
 }   
+
+/* =========================================================
+   HOME — TWITCH SECTION
+========================================================= */
+
+.home-twitch {
+    width: 100%;
+
+    padding:
+        clamp(
+            30px,
+            4vw,
+            55px
+        );
+
+    color:
+        var(--twitch-text);
+
+    border:
+        1px solid
+        var(--twitch-border);
+
+    border-radius:
+        32px;
+
+    background:
+        var(--twitch-surface);
+
+    box-shadow:
+        var(--twitch-shadow);
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.home-twitch__header {
+    margin-bottom:
+        28px;
+
+    text-align:
+        center;
+}
+
+
+.home-twitch__eyebrow {
+    display:
+        block;
+
+    margin-bottom:
+        8px;
+
+    color:
+        var(--twitch-cyan);
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    font-size:
+        0.82rem;
+
+    font-weight:
+        900;
+
+    letter-spacing:
+        0.18em;
+
+    text-transform:
+        uppercase;
+}
+
+
+.home-twitch__title {
+    margin:
+        0;
+
+    color:
+        var(--twitch-text);
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    font-size:
+        clamp(
+            2rem,
+            4vw,
+            3.4rem
+        );
+
+    font-weight:
+        900;
+}
+
+
+.home-twitch__description {
+    margin:
+        12px
+        auto
+        0;
+
+    max-width:
+        700px;
+
+    color:
+        var(--twitch-muted);
+
+    line-height:
+        1.6;
+}
+
+
+/* =========================================================
+   CARD
+========================================================= */
+
+.home-twitch__card {
+    display:
+        grid;
+
+    grid-template-columns:
+        minmax(
+            320px,
+            0.9fr
+        )
+        minmax(
+            0,
+            1.1fr
+        );
+
+    gap:
+        32px;
+
+    overflow:
+        hidden;
+
+    border:
+        1px solid
+        rgba(
+            109,
+            0,
+            163,
+            0.35
+        );
+
+    border-radius:
+        24px;
+
+    background:
+        rgba(
+            18,
+            6,
+            37,
+            0.55
+        );
+}
+
+
+/* =========================================================
+   VISUAL
+========================================================= */
+
+.home-twitch__visual {
+    position:
+        relative;
+
+    min-height:
+        320px;
+
+    overflow:
+        hidden;
+
+    background:
+        rgba(
+            0,
+            0,
+            0,
+            0.18
+        );
+}
+
+
+.home-twitch__preview {
+    display:
+        block;
+
+    width:
+        100%;
+
+    height:
+        100%;
+
+    object-fit:
+        cover;
+}
+
+
+/* =========================================================
+   OFFLINE
+========================================================= */
+
+.home-twitch__offline {
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    width:
+        100%;
+
+    height:
+        100%;
+
+    min-height:
+        320px;
+}
+
+
+.home-twitch__avatar {
+    width:
+        150px;
+
+    height:
+        150px;
+
+    object-fit:
+        cover;
+
+    border:
+        5px solid
+        #ffffff;
+
+    border-radius:
+        50%;
+
+    box-shadow:
+        0 0 26px
+        rgba(
+            145,
+            70,
+            255,
+            0.35
+        );
+}
+
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+.home-twitch__status {
+    position:
+        absolute;
+
+    top:
+        16px;
+
+    left:
+        16px;
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    gap:
+        8px;
+
+    padding:
+        7px
+        12px;
+
+    color:
+        #ffffff;
+
+    border-radius:
+        999px;
+
+    background:
+        rgba(
+            20,
+            20,
+            20,
+            0.82
+        );
+
+    font-size:
+        0.76rem;
+
+    font-weight:
+        900;
+}
+
+
+.home-twitch__status-dot {
+    width:
+        9px;
+
+    height:
+        9px;
+
+    border-radius:
+        50%;
+
+    background:
+        #999999;
+}
+
+
+.home-twitch__status--live
+.home-twitch__status-dot {
+    background:
+        #ff3131;
+
+    box-shadow:
+        0 0 10px
+        rgba(
+            255,
+            49,
+            49,
+            0.8
+        );
+}
+
+
+.home-twitch__status--offline
+.home-twitch__status-dot {
+    background:
+        #777777;
+}
+
+
+/* =========================================================
+   CONTENT
+========================================================= */
+
+.home-twitch__content {
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    justify-content:
+        center;
+
+    padding:
+        28px;
+}
+
+
+/* =========================================================
+   IDENTITY
+========================================================= */
+
+.home-twitch__identity {
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        14px;
+
+    margin-bottom:
+        20px;
+}
+
+
+.home-twitch__profile {
+    width:
+        58px;
+
+    height:
+        58px;
+
+    object-fit:
+        cover;
+
+    border:
+        3px solid
+        #ffffff;
+
+    border-radius:
+        50%;
+}
+
+
+.home-twitch__name {
+    margin:
+        0;
+
+    color:
+        var(--twitch-text);
+
+    font-size:
+        1.45rem;
+
+    font-weight:
+        900;
+}
+
+
+.home-twitch__login {
+    color:
+        var(--twitch-muted);
+
+    font-size:
+        0.9rem;
+}
+
+
+/* =========================================================
+   STREAM INFO
+========================================================= */
+
+.home-twitch__stream-title {
+    margin:
+        0
+        0
+        14px;
+
+    color:
+        var(--twitch-text);
+
+    font-size:
+        1.2rem;
+
+    line-height:
+        1.45;
+}
+
+
+.home-twitch__meta {
+    display:
+        flex;
+
+    flex-wrap:
+        wrap;
+
+    gap:
+        12px;
+
+    margin-bottom:
+        20px;
+
+    color:
+        var(--twitch-muted);
+}
+
+
+.home-twitch__offline-text {
+    margin:
+        0
+        0
+        22px;
+
+    color:
+        var(--twitch-muted);
+
+    line-height:
+        1.7;
+}
+
+
+/* =========================================================
+   ACTIONS
+========================================================= */
+
+.home-twitch__actions {
+    display:
+        flex;
+
+    flex-wrap:
+        wrap;
+
+    gap:
+        12px;
+}
+
+
+.home-twitch__button {
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    gap:
+        8px;
+
+    min-height:
+        46px;
+
+    padding:
+        10px
+        18px;
+
+    border-radius:
+        999px;
+
+    font-weight:
+        900;
+
+    text-decoration:
+        none;
+
+    transition:
+        transform 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+.home-twitch__button--primary {
+    color:
+        #ffffff;
+
+    border:
+        1px solid
+        rgba(
+            34,
+            242,
+            239,
+            0.6
+        );
+
+    background:
+        linear-gradient(
+            135deg,
+            #6d00a3,
+            #f22292
+        );
+}
+
+
+.home-twitch__button--secondary {
+    color:
+        #7200a8;
+
+    border:
+        1px solid
+        rgba(
+            109,
+            0,
+            163,
+            0.45
+        );
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            0.90
+        );
+}
+
+
+.home-twitch__button--secondary:hover {
+    transform:
+        translateY(
+            -2px
+        );
+
+    border-color:
+        var(--twitch-cyan);
+
+    box-shadow:
+        0 0 12px
+        rgba(
+            34,
+            242,
+            239,
+            0.35
+        ),
+        0 0 28px
+        rgba(
+            34,
+            242,
+            239,
+            0.20
+        );
+}
+
+
+/* =========================================================
+   LIGHT MODE
+========================================================= */
+
+html[data-theme="light"]
+.home-twitch__card {
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            0.68
+        );
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (
+    max-width: 850px
+) {
+
+    .home-twitch__card {
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .home-twitch__visual {
+        min-height:
+            280px;
+    }
+
+
+    .home-twitch__offline {
+        min-height:
+            280px;
+    }
+
+}
+
+
+@media (
+    max-width: 550px
+) {
+
+    .home-twitch {
+        padding:
+            24px
+            16px;
+    }
+
+
+    .home-twitch__content {
+        padding:
+            20px;
+    }
+
+
+    .home-twitch__actions {
+        flex-direction:
+            column;
+    }
+
+
+    .home-twitch__button {
+        width:
+            100%;
+    }
+
+}
+.home-hero__image {
+    display: block;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: contain;
+
+    object-position: center;
+}
