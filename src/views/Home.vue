@@ -2,7 +2,7 @@
 import "../assets/styles/pages/home.css";
 
 import TwitchSection
-    from "../components/twitch/Section.vue/index.js";
+    from "../components/twitch/Section.vue";
 </script>
 
 
