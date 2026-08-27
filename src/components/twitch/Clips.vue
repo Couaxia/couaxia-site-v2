@@ -4,6 +4,10 @@ import {
     onMounted,
     ref
 } from "vue";
+
+import {
+    apiFetch
+} from "../../services/api";
 import AppLoader from "../ui/AppLoader.vue";
 
 /* =========================================================
@@ -163,18 +167,17 @@ async function loadClips():
 
     try {
 
-        const response =
-            await fetch(
+        const result =
+            await apiFetch<TwitchClipsResponse>(
                 "/api/twitch/clips?first=100"
             );
 
 
-        const result: TwitchClipsResponse =
-            await response.json();
-
+        /* =================================================
+           API ERROR
+        ================================================= */
 
         if (
-            !response.ok ||
             !result.success ||
             !result.data
         ) {
@@ -187,6 +190,10 @@ async function loadClips():
 
         }
 
+
+        /* =================================================
+           SUCCESS
+        ================================================= */
 
         clips.value =
             result.data;

@@ -1,11 +1,11 @@
 <script setup lang="ts">
 
-import GamesHero from "../components/games/GamesHero.vue";
-import GamesFavorites from "../components/games/GamesFavorites.vue";
-import GamesCurrently from "../components/games/GamesCurrently.vue";
-import GamesCategories from "../components/games/GamesCategories.vue";
-import GamesFinal from "../components/games/GamesFinal.vue";
-import GamesStats from "../components/games/GamesStats.vue";
+import GamesHero from "../components/games/Hero.vue";
+import GamesFavorites from "../components/games/Favorites.vue";
+import GamesCurrently from "../components/games/Currently.vue";
+import GamesCategories from "../components/games/Categories.vue";
+import GamesFinal from "../components/games/Final.vue";
+import GamesStats from "../components/games/Stats.vue";
 
 import "../assets/styles/pages/games.css";
 

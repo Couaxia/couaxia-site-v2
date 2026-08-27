@@ -4,7 +4,9 @@ import {
     ref
 } from "vue";
 
-
+import {
+    apiFetch
+} from "../../services/api";
 /* =========================================================
    TYPES
 ========================================================= */
@@ -64,7 +66,8 @@ const tags =
    LOAD FOLLOWERS
 ========================================================= */
 
-async function loadFollowers(): Promise<void> {
+async function loadFollowers():
+    Promise<void> {
 
     followersError.value =
         null;
@@ -72,18 +75,13 @@ async function loadFollowers(): Promise<void> {
 
     try {
 
-        const response =
-            await fetch(
+        const result =
+            await apiFetch<TwitchFollowersResponse>(
                 "/api/twitch/followers"
             );
 
 
-        const result: TwitchFollowersResponse =
-            await response.json();
-
-
         if (
-            !response.ok ||
             !result.success ||
             !result.data
         ) {
@@ -125,7 +123,6 @@ async function loadFollowers(): Promise<void> {
     }
 
 }
-
 
 /* =========================================================
    MOUNT

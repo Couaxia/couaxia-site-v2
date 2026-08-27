@@ -5,6 +5,9 @@ import {
     ref
 } from "vue";
 import AppLoader from "../ui/AppLoader.vue";
+import {
+    apiFetch
+} from "../../services/api.ts";
 
 
 /* =========================================================
@@ -146,7 +149,6 @@ const canGoNext =
 
     });
 
-
 /* =========================================================
    LOAD VIDEOS
 ========================================================= */
@@ -164,18 +166,17 @@ async function loadVideos():
 
     try {
 
-        const response =
-            await fetch(
+        const result =
+            await apiFetch<TwitchVideosResponse>(
                 "/api/twitch/videos?first=100"
             );
 
 
-        const result: TwitchVideosResponse =
-            await response.json();
-
+        /* =================================================
+           API ERROR
+        ================================================= */
 
         if (
-            !response.ok ||
             !result.success ||
             !result.data
         ) {
@@ -188,6 +189,10 @@ async function loadVideos():
 
         }
 
+
+        /* =================================================
+           SUCCESS
+        ================================================= */
 
         videos.value =
             result.data;
@@ -221,7 +226,6 @@ async function loadVideos():
     }
 
 }
-
 
 /* =========================================================
    PREVIOUS PAGE

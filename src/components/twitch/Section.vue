@@ -6,7 +6,9 @@ import {
 } from "vue";
 
 import AppLoader from "../ui/AppLoader.vue";
-
+import {
+    apiFetch
+} from "../../services/api.ts";
 
 /* =========================================================
    TYPES
@@ -100,7 +102,6 @@ const errorMessage =
         null
     );
 
-
 /* =========================================================
    LOAD TWITCH
 ========================================================= */
@@ -118,54 +119,10 @@ async function loadTwitch():
 
     try {
 
-        const response =
-            await fetch(
-                `${apiUrl}/api/twitch/live`
-            );
-
-
-        /* =================================================
-           CONTENT TYPE
-        ================================================= */
-
-        const contentType =
-            response.headers.get(
-                "content-type"
-            );
-
-
-        if (
-            !contentType?.includes(
-                "application/json"
-            )
-        ) {
-
-            const text =
-                await response.text();
-
-
-            console.error(
-                "❌ Réponse Twitch non JSON :",
-                text.slice(
-                    0,
-                    300
-                )
-            );
-
-
-            throw new Error(
-                "Le serveur Twitch n'a pas renvoyé du JSON."
-            );
-
-        }
-
-
-        /* =================================================
-           JSON
-        ================================================= */
-
         const result =
-            await response.json() as TwitchLiveResponse;
+            await apiFetch<TwitchLiveResponse>(
+                "/api/twitch/live"
+            );
 
 
         /* =================================================
@@ -173,7 +130,6 @@ async function loadTwitch():
         ================================================= */
 
         if (
-            !response.ok ||
             !result.success ||
             !result.data
         ) {
@@ -219,8 +175,6 @@ async function loadTwitch():
     }
 
 }
-
-
 /* =========================================================
    FORMAT VIEWERS
 ========================================================= */

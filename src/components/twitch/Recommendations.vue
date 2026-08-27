@@ -4,7 +4,9 @@ import {
     ref
 } from "vue";
 import AppLoader from "../ui/AppLoader.vue";
-
+import {
+    apiFetch
+} from "../../services/api";
 /* =========================================================
    TYPES
 ========================================================= */
@@ -233,7 +235,6 @@ function getOnlineCount(
 
 }
 
-
 /* =========================================================
    LOAD GROUP
 ========================================================= */
@@ -258,18 +259,21 @@ async function loadGroup(
     );
 
 
-    const response =
-        await fetch(
+    /* =====================================================
+       API
+    ===================================================== */
+
+    const result =
+        await apiFetch<TwitchRecommendationsResponse>(
             `/api/twitch/recommendations?${params.toString()}`
         );
 
 
-    const result: TwitchRecommendationsResponse =
-        await response.json();
-
+    /* =====================================================
+       ERROR
+    ===================================================== */
 
     if (
-        !response.ok ||
         !result.success ||
         !result.data
     ) {
@@ -283,11 +287,14 @@ async function loadGroup(
     }
 
 
+    /* =====================================================
+       SUCCESS
+    ===================================================== */
+
     group.streamers =
         result.data;
 
 }
-
 
 /* =========================================================
    LOAD ALL

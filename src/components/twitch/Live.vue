@@ -4,7 +4,9 @@ import {
     onMounted,
     ref
 } from "vue";
-
+import {
+    apiFetch
+} from "../../services/api";
 
 /* =========================================================
    TYPES
@@ -149,7 +151,6 @@ const twitchPlayerUrl =
 
     });
 
-
 /* =========================================================
    LOAD LIVE DATA
 ========================================================= */
@@ -162,18 +163,13 @@ async function loadTwitchLive() {
 
     try {
 
-        const response =
-            await fetch(
+        const result =
+            await apiFetch<TwitchLiveResponse>(
                 "/api/twitch/live"
             );
 
 
-        const result: TwitchLiveResponse =
-    await response.json();
-
-
         if (
-            !response.ok ||
             !result.success ||
             !result.data
         ) {
@@ -192,7 +188,7 @@ async function loadTwitchLive() {
 
     }
 
-    catch (error) {
+    catch (error: unknown) {
 
         console.error(
             "Erreur Twitch :",
@@ -215,7 +211,6 @@ async function loadTwitchLive() {
     }
 
 }
-
 
 /* =========================================================
    REFRESH

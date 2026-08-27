@@ -170,11 +170,22 @@ onMounted(
             <RouterLink
                 to="/"
                 class="app-header__brand"
-                aria-label="Retour à l'accueil"
-            >
+                aria-label="Retour à l'accueil">
 
                 <span class="app-header__logo">
-                    Couaxia
+                    <video
+                        class="app-header__logo-video"
+                        autoplay
+                        muted
+                        loop
+                        playsinline
+                        aria-label="Couaxia">
+                    
+                        <source
+                        src="https://qudeuzkwvwprlhqtzsct.supabase.co/storage/v1/object/public/site-asset/logo/Transparents.webm"
+                        type="video/webm">
+                   
+                    </video>
                 </span>
 
             </RouterLink>
@@ -1357,5 +1368,31 @@ onMounted(
             none;
     }
 
+}
+
+/* =========================================================
+   LOGO COUAXIA
+========================================================= */
+
+.app-header__logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    overflow: visible;
+}
+
+
+.app-header__logo-video {
+    display: block;
+
+    width: auto;
+    height: 65px;
+
+    object-fit: contain;
+
+    pointer-events: none;
 }
 </style>

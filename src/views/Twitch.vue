@@ -12,15 +12,15 @@ import "../assets/styles/pages/twitch.css";
 
 
 
-import TwitchHero from "../components/twitch/TwitchHero.vue";   
+import TwitchHero from "../components/twitch/Hero.vue";   
     
-import TwitchLive from "../components/twitch/TwitchLive.vue"   
+import TwitchLive from "../components/twitch/Live.vue"   
 
-import TwitchRecommendations from "../components/twitch/TwitchRecommendations.vue"
+import TwitchRecommendations from "../components/twitch/Recommendations.vue"
 
-import TwitchClips from "../components/twitch/TwitchClips.vue"
+import TwitchClips from "../components/twitch/Clips.vue"
 
-import TwitchVideos from "../components/twitch/TwitchVideos.vue"
+import TwitchVideos from "../components/twitch/Videos.vue"
 
 </script>
 
