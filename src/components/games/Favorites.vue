@@ -2,15 +2,18 @@
 
 import {
     computed,
+    onBeforeUnmount,
     onMounted,
     ref
 } from "vue";
+
 
 import {
     getGames,
     type Game,
     type GameStatus
 } from "../../services/games.service";
+
 
 import {
     getTwitchGamesByIds,
@@ -57,17 +60,10 @@ const twitchGames =
    FAVORITE GAMES
 ========================================================= */
 
-/*
- * Pour le moment, tous les jeux présents dans Supabase
- * sont considérés comme faisant partie de la bibliothèque.
- *
- * Plus tard, on pourra ajouter une colonne "favorite"
- * dans Supabase pour distinguer réellement les favoris.
- */
-
 const favoriteGames =
     computed(
-        () => games.value
+        () =>
+            games.value
     );
 
 
@@ -119,33 +115,58 @@ const filteredGames =
 const filters = [
 
     {
-        value: "all",
-        label: "Tous",
-        icon: "🎮"
+        value:
+            "all",
+
+        label:
+            "Tous",
+
+        icon:
+            "🎮"
     },
 
     {
-        value: "current",
-        label: "En cours",
-        icon: "🔥"
+        value:
+            "current",
+
+        label:
+            "En cours",
+
+        icon:
+            "🔥"
     },
 
     {
-        value: "regular",
-        label: "Réguliers",
-        icon: "🔁"
+        value:
+            "regular",
+
+        label:
+            "Réguliers",
+
+        icon:
+            "🔁"
     },
 
     {
-        value: "backlog",
-        label: "À faire",
-        icon: "📚"
+        value:
+            "backlog",
+
+        label:
+            "À faire",
+
+        icon:
+            "📚"
     },
 
     {
-        value: "finished",
-        label: "Terminés",
-        icon: "🏆"
+        value:
+            "finished",
+
+        label:
+            "Terminés",
+
+        icon:
+            "🏆"
     }
 
 ] as const;
@@ -206,7 +227,7 @@ async function loadGames() {
 
 
         /* =============================================
-           CREATE LOOKUP
+           LOOKUP
         ============================================== */
 
         twitchGames.value =
@@ -263,7 +284,8 @@ async function loadGames() {
 ========================================================= */
 
 function getTwitchGame(
-    game: Game
+    game:
+        Game
 ):
     TwitchGameData | null {
 
@@ -279,7 +301,8 @@ function getTwitchGame(
     return (
         twitchGames.value[
             game.twitch_game_id
-        ] ??
+        ]
+        ??
         null
     );
 
@@ -291,8 +314,10 @@ function getTwitchGame(
 ========================================================= */
 
 function getGameName(
-    game: Game
-) {
+    game:
+        Game
+):
+    string {
 
     const twitchGame =
         getTwitchGame(
@@ -301,8 +326,10 @@ function getGameName(
 
 
     return (
-        twitchGame?.name ??
-        game.twitch_name ??
+        twitchGame?.name
+        ??
+        game.twitch_name
+        ??
         "Jeu sans nom"
     );
 
@@ -314,11 +341,16 @@ function getGameName(
 ========================================================= */
 
 function getStatusLabel(
-    status: string
-) {
+    status:
+        string
+):
+    string {
 
     const labels:
-        Record<string, string> = {
+        Record<
+            string,
+            string
+        > = {
 
             current:
                 "En cours",
@@ -339,7 +371,10 @@ function getStatusLabel(
 
 
     return (
-        labels[status] ??
+        labels[
+            status
+        ]
+        ??
         status
     );
 
@@ -351,11 +386,16 @@ function getStatusLabel(
 ========================================================= */
 
 function getStatusIcon(
-    status: string
-) {
+    status:
+        string
+):
+    string {
 
     const icons:
-        Record<string, string> = {
+        Record<
+            string,
+            string
+        > = {
 
             current:
                 "🔥",
@@ -376,7 +416,10 @@ function getStatusIcon(
 
 
     return (
-        icons[status] ??
+        icons[
+            status
+        ]
+        ??
         "🎮"
     );
 
@@ -384,91 +427,29 @@ function getStatusIcon(
 
 
 /* =========================================================
-   MASCOT MESSAGES
+   MASCOT TIMER
 ========================================================= */
 
-const mascotMessages:
-    Record<string, string[]> = {
-
-        current: [
-
-            "Celui-là, on est encore en plein dedans !",
-
-            "Pas de spoilers, l'aventure n'est pas terminée !",
-
-            "On continue bientôt cette aventure ensemble !"
-
-        ],
-
-
-        regular: [
-
-            "Celui-là revient régulièrement sur la chaîne !",
-
-            "Un classique des streams de Couaxia !",
-
-            "Prépare-toi, ça finit généralement en chaos !"
-
-        ],
-
-
-        backlog: [
-
-            "Encore un jeu dans ma liste à découvrir !",
-
-            "Celui-là attend encore son tour !",
-
-            "Un jour peut-être... quand ma liste de jeux aura diminué !"
-
-        ],
-
-
-        paused: [
-
-            "Cette aventure est en pause pour le moment.",
-
-            "On y reviendra peut-être plus tard !",
-
-            "Même les Kraduks ont parfois besoin d'une pause !"
-
-        ],
-
-
-        finished: [
-
-            "Mission accomplie !",
-
-            "Celui-là est terminé !",
-
-            "Une aventure de plus dans les souvenirs des Poups !"
-
-        ]
-
-    };
+let mascotHoverTimer:
+    number | null =
+        null;
 
 
 /* =========================================================
-   SPEAK WITH MASCOT
+   RANDOM MESSAGE
 ========================================================= */
 
-function speakWithMascot(
-    game: Game
-) {
-
-    const messages =
-        mascotMessages[
-            game.status
-        ] ??
-        [
-            "Encore une aventure dans ma bibliothèque !"
-        ];
-
+function getRandomMessage(
+    messages:
+        string[]
+):
+    string {
 
     if (
         messages.length === 0
     ) {
 
-        return;
+        return "";
 
     }
 
@@ -480,10 +461,33 @@ function speakWithMascot(
         );
 
 
-    const message =
+    return (
         messages[
             randomIndex
-        ];
+        ]
+        ??
+        ""
+    );
+
+}
+
+
+/* =========================================================
+   SEND MASCOT MESSAGE
+========================================================= */
+
+function sendMascotMessage(
+    message:
+        string
+) {
+
+    if (
+        !message.trim()
+    ) {
+
+        return;
+
+    }
 
 
     window.dispatchEvent(
@@ -501,11 +505,495 @@ function speakWithMascot(
 
 
 /* =========================================================
+   START MASCOT HOVER
+========================================================= */
+
+function startMascotHover(
+    messages:
+        string[]
+) {
+
+    stopMascotHover();
+
+
+    mascotHoverTimer =
+        window.setTimeout(
+            () => {
+
+                const message =
+                    getRandomMessage(
+                        messages
+                    );
+
+
+                sendMascotMessage(
+                    message
+                );
+
+
+                mascotHoverTimer =
+                    null;
+
+            },
+            400
+        );
+
+}
+
+
+/* =========================================================
+   STOP MASCOT HOVER
+========================================================= */
+
+function stopMascotHover() {
+
+    if (
+        mascotHoverTimer ===
+        null
+    ) {
+
+        return;
+
+    }
+
+
+    window.clearTimeout(
+        mascotHoverTimer
+    );
+
+
+    mascotHoverTimer =
+        null;
+
+}
+
+
+/* =========================================================
+   MASCOT — LIBRARY
+========================================================= */
+
+function speakAboutLibrary() {
+
+    const amount =
+        favoriteGames.value.length;
+
+
+    startMascotHover(
+        [
+
+            `Bienvenue dans ma bibliothèque ! J'ai ${amount} jeu${amount > 1 ? "x" : ""} ici.`,
+
+            "Voici toutes les aventures qui sont passées entre mes tentacules ! 🐙",
+
+            "Attention... cette bibliothèque contient beaucoup trop de jeux !",
+
+            "Tu cherches quelque chose à regarder ? Fouille un peu par ici ! 👀",
+
+            "Entre les jeux terminés et ma liste à faire... j'ai encore du travail !"
+
+        ]
+    );
+
+}
+
+
+/* =========================================================
+   MASCOT — FILTER
+========================================================= */
+
+function speakAboutFilter(
+    filter:
+        typeof filters[number]
+) {
+
+    const messages:
+        Record<
+            string,
+            string[]
+        > = {
+
+            all: [
+
+                "Tu veux vraiment TOUT voir ? Bon courage !",
+
+                "Voilà toute ma bibliothèque ! 🎮",
+
+                "Attention, il commence à y avoir beaucoup de jeux ici !"
+
+            ],
+
+
+            current: [
+
+                "Voici les aventures qui sont encore en cours !",
+
+                "Pas de spoilers sur ceux-là ! 👀",
+
+                "Mes tentacules travaillent encore sur ces jeux !"
+
+            ],
+
+
+            regular: [
+
+                "Ceux-là reviennent régulièrement en stream !",
+
+                "Les habitués de la chaîne sont par ici !",
+
+                "Prépare-toi, les réguliers finissent souvent en chaos."
+
+            ],
+
+
+            backlog: [
+
+                "Ahem... oui, ma liste de jeux à faire commence à être longue.",
+
+                "Ils attendent patiemment leur tour !",
+
+                "Je vais les faire un jour. Promis. Enfin... probablement."
+
+            ],
+
+
+            finished: [
+
+                "Mission accomplie ! 🏆",
+
+                "Toutes ces aventures sont terminées !",
+
+                "Que de souvenirs dans cette catégorie ! 💜"
+
+            ]
+
+        };
+
+
+    startMascotHover(
+        messages[
+            filter.value
+        ]
+        ??
+        [
+            "Voyons ce qu'on trouve ici !"
+        ]
+    );
+
+}
+
+
+/* =========================================================
+   MASCOT — GAME
+========================================================= */
+
+function speakAboutGame(
+    game:
+        Game
+) {
+
+    const gameName =
+        getGameName(
+            game
+        );
+
+
+    const statusMessages:
+        Record<
+            string,
+            string[]
+        > = {
+
+            current: [
+
+                `${gameName} est encore en cours !`,
+
+                `Pas de spoilers sur ${gameName}, l'aventure n'est pas terminée !`,
+
+                `On continue bientôt ${gameName} ensemble !`,
+
+                `Mes tentacules sont encore occupées avec ${gameName} !`
+
+            ],
+
+
+            regular: [
+
+                `${gameName} revient régulièrement sur la chaîne !`,
+
+                `${gameName}, un habitué des streams !`,
+
+                `Tu risques de revoir souvent ${gameName} par ici.`,
+
+                `${gameName} + les Poups = probablement du chaos.`
+
+            ],
+
+
+            backlog: [
+
+                `${gameName} attend encore son tour !`,
+
+                `Oui oui... je jouerai à ${gameName} un jour !`,
+
+                `${gameName} est encore dans ma liste à découvrir.`,
+
+                `Il faudrait peut-être que je commence ${gameName}... 👀`
+
+            ],
+
+
+            paused: [
+
+                `${gameName} est en pause pour le moment.`,
+
+                `On reviendra peut-être sur ${gameName} plus tard !`,
+
+                `Même les Kraduks ont parfois besoin d'une pause !`,
+
+                `${gameName} attend sagement que je revienne.`
+
+            ],
+
+
+            finished: [
+
+                `${gameName} ? Mission accomplie ! 🏆`,
+
+                `J'ai terminé ${gameName} !`,
+
+                `${gameName} fait maintenant partie des souvenirs des Poups !`,
+
+                `Une aventure terminée de plus avec ${gameName} !`
+
+            ]
+
+        };
+
+
+    startMascotHover(
+        statusMessages[
+            game.status
+        ]
+        ??
+        [
+            `${gameName} fait partie de ma bibliothèque !`
+        ]
+    );
+
+}
+
+
+/* =========================================================
+   MASCOT — TAG
+========================================================= */
+
+function speakAboutTag(
+    game:
+        Game,
+
+    tag:
+        string
+) {
+
+    const gameName =
+        getGameName(
+            game
+        );
+
+
+    startMascotHover(
+        [
+
+            `${tag} fait partie des thèmes de ${gameName} !`,
+
+            `Hmm... "${tag}", ça décrit plutôt bien ${gameName}.`,
+
+            `Tu aimes les jeux "${tag}" ? 👀`,
+
+            `${gameName} est classé dans "${tag}" !`,
+
+            `Encore un peu de "${tag}" dans ma bibliothèque !`
+
+        ]
+    );
+
+}
+
+
+/* =========================================================
+   MASCOT — RATING
+========================================================= */
+
+function speakAboutRating(
+    game:
+        Game
+) {
+
+    if (
+        game.rating === null
+        ||
+        game.rating === undefined
+    ) {
+
+        return;
+
+    }
+
+
+    const gameName =
+        getGameName(
+            game
+        );
+
+
+    const rating =
+        game.rating;
+
+
+    const messages = [
+
+        `J'ai donné ${rating}/10 à ${gameName} !`,
+
+        `${gameName} obtient ${rating}/10 !`,
+
+        `${rating}/10... tu aurais mis combien à ${gameName} ? 👀`
+
+    ];
+
+
+    if (
+        rating >= 9
+    ) {
+
+        messages.push(
+            `${rating}/10 ! Oui... j'ai vraiment adoré ${gameName} ! 💜`
+        );
+
+    }
+
+    else if (
+        rating >= 7
+    ) {
+
+        messages.push(
+            `${gameName} s'en sort plutôt bien avec ${rating}/10 !`
+        );
+
+    }
+
+    else if (
+        rating >= 5
+    ) {
+
+        messages.push(
+            `${rating}/10... sympathique, mais pas parfait !`
+        );
+
+    }
+
+    else {
+
+        messages.push(
+            `${rating}/10... disons que ${gameName} et moi, ça n'a pas vraiment fonctionné. 😅`
+        );
+
+    }
+
+
+    startMascotHover(
+        messages
+    );
+
+}
+
+
+/* =========================================================
+   MASCOT — PLAYLIST
+========================================================= */
+
+function speakAboutPlaylist(
+    game:
+        Game
+) {
+
+    const gameName =
+        getGameName(
+            game
+        );
+
+
+    startMascotHover(
+        [
+
+            `Tu veux revoir mes aventures sur ${gameName} ?`,
+
+            `La playlist de ${gameName} est juste ici ! ▶️`,
+
+            `Attention aux spoilers dans la playlist de ${gameName} ! 👀`,
+
+            `Installe-toi confortablement... direction ${gameName} !`,
+
+            `Envie d'un petit marathon ${gameName} ?`
+
+        ]
+    );
+
+}
+
+
+/* =========================================================
+   MASCOT — POLL
+========================================================= */
+
+function speakAboutPoll(
+    game:
+        Game
+) {
+
+    const gameName =
+        getGameName(
+            game
+        );
+
+
+    startMascotHover(
+        [
+
+            `${gameName} est disponible dans les sondages ! 🗳️`,
+
+            `Tu peux voter pour ${gameName} !`,
+
+            `Peut-être que ton vote fera revenir ${gameName} en stream... 👀`,
+
+            `Les Poups peuvent donner leur avis sur ${gameName} !`,
+
+            `Direction les sondages si tu veux soutenir ${gameName} !`
+
+        ]
+    );
+
+}
+
+
+/* =========================================================
    MOUNT
 ========================================================= */
 
 onMounted(
     loadGames
+);
+
+
+/* =========================================================
+   CLEANUP
+========================================================= */
+
+onBeforeUnmount(
+    () => {
+
+        stopMascotHover();
+
+    }
 );
 
 </script>
@@ -522,7 +1010,27 @@ onMounted(
              HEADER
         ================================================== -->
 
-        <header class="games-favorites__header">
+        <header
+            class="games-favorites__header"
+
+            tabindex="0"
+
+            @mouseenter="
+                speakAboutLibrary
+            "
+
+            @mouseleave="
+                stopMascotHover
+            "
+
+            @focus="
+                speakAboutLibrary
+            "
+
+            @blur="
+                stopMascotHover
+            "
+        >
 
             <div class="games-favorites__heading">
 
@@ -545,6 +1053,7 @@ onMounted(
                         id="games-favorites-title"
                         class="games-favorites__title"
                     >
+
                         Mes jeux
 
                         <span>
@@ -559,9 +1068,11 @@ onMounted(
 
 
             <p class="games-favorites__description">
+
                 Quelques jeux et aventures que j'aime
                 particulièrement retrouver en stream
                 avec les Poups.
+
             </p>
 
         </header>
@@ -582,6 +1093,7 @@ onMounted(
             >
                 🎮
             </span>
+
 
             <p>
                 Chargement de ma bibliothèque...
@@ -616,8 +1128,13 @@ onMounted(
         ================================================== -->
 
         <div
-            v-else-if="favoriteGames.length === 0"
-            class="games-library__empty"
+            v-else-if="
+                favoriteGames.length === 0
+            "
+
+            class="
+                games-library__empty
+            "
         >
 
             <span
@@ -634,8 +1151,10 @@ onMounted(
 
 
             <p>
+
                 Ma bibliothèque intergalactique
                 est encore vide !
+
             </p>
 
         </div>
@@ -647,7 +1166,6 @@ onMounted(
 
         <template v-else>
 
-
             <!-- =============================================
                  FILTERS
             ============================================== -->
@@ -656,16 +1174,46 @@ onMounted(
 
                 <button
                     v-for="filter in filters"
-                    :key="filter.value"
+
+                    :key="
+                        filter.value
+                    "
+
                     type="button"
-                    class="games-favorites__filter"
+
+                    class="
+                        games-favorites__filter
+                    "
+
                     :class="{
                         'games-favorites__filter--active':
-                            selectedStatus === filter.value
+                            selectedStatus ===
+                            filter.value
                     }"
+
                     @click="
                         selectedStatus =
                             filter.value
+                    "
+
+                    @mouseenter="
+                        speakAboutFilter(
+                            filter
+                        )
+                    "
+
+                    @mouseleave="
+                        stopMascotHover
+                    "
+
+                    @focus="
+                        speakAboutFilter(
+                            filter
+                        )
+                    "
+
+                    @blur="
+                        stopMascotHover
                     "
                 >
 
@@ -684,12 +1232,17 @@ onMounted(
 
 
             <!-- =============================================
-                 NO RESULT FOR FILTER
+                 NO RESULT
             ============================================== -->
 
             <div
-                v-if="filteredGames.length === 0"
-                class="games-library__empty"
+                v-if="
+                    filteredGames.length === 0
+                "
+
+                class="
+                    games-library__empty
+                "
             >
 
                 <span
@@ -723,31 +1276,47 @@ onMounted(
 
                 <article
                     v-for="game in filteredGames"
-                    :key="game.id"
-                    class="game-favorite-card"
+
+                    :key="
+                        game.id
+                    "
+
+                    class="
+                        game-favorite-card
+                    "
+
                     :class="[
                         `game-favorite-card--${game.status}`
                     ]"
+
                     tabindex="0"
+
                     @mouseenter="
-                        speakWithMascot(
+                        speakAboutGame(
                             game
                         )
                     "
+
+                    @mouseleave="
+                        stopMascotHover
+                    "
+
                     @focus="
-                        speakWithMascot(
+                        speakAboutGame(
                             game
                         )
+                    "
+
+                    @blur="
+                        stopMascotHover
                     "
                 >
-
 
                     <!-- =====================================
                          VISUAL
                     ====================================== -->
 
                     <div class="game-favorite-card__visual">
-
 
                         <!-- TWITCH COVER -->
 
@@ -757,15 +1326,21 @@ onMounted(
                                     game
                                 )?.boxArtUrl
                             "
+
                             :src="
                                 getTwitchGame(
                                     game
                                 )!.boxArtUrl
                             "
+
                             :alt="
                                 `Jaquette de ${getGameName(game)}`
                             "
-                            class="game-favorite-card__image"
+
+                            class="
+                                game-favorite-card__image
+                            "
+
                             loading="lazy"
                         >
 
@@ -774,7 +1349,11 @@ onMounted(
 
                         <div
                             v-else
-                            class="game-favorite-card__placeholder"
+
+                            class="
+                                game-favorite-card__placeholder
+                            "
+
                             aria-hidden="true"
                         >
                             🎮
@@ -784,7 +1363,10 @@ onMounted(
                         <!-- STATUS -->
 
                         <span
-                            class="game-favorite-card__status"
+                            class="
+                                game-favorite-card__status
+                            "
+
                             :class="[
                                 `game-favorite-card__status--${game.status}`
                             ]"
@@ -818,10 +1400,13 @@ onMounted(
 
                     <div class="game-favorite-card__content">
 
-
                         <!-- GAME NAME -->
 
-                        <h3 class="game-favorite-card__title">
+                        <h3
+                            class="
+                                game-favorite-card__title
+                            "
+                        >
 
                             {{
                                 getGameName(
@@ -839,13 +1424,46 @@ onMounted(
                                 game.tags &&
                                 game.tags.length > 0
                             "
-                            class="game-favorite-card__tags"
+
+                            class="
+                                game-favorite-card__tags
+                            "
                         >
 
                             <span
                                 v-for="tag in game.tags"
-                                :key="tag"
-                                class="game-favorite-card__tag"
+
+                                :key="
+                                    tag
+                                "
+
+                                class="
+                                    game-favorite-card__tag
+                                "
+
+                                tabindex="0"
+
+                                @mouseenter.stop="
+                                    speakAboutTag(
+                                        game,
+                                        tag
+                                    )
+                                "
+
+                                @mouseleave.stop="
+                                    stopMascotHover
+                                "
+
+                                @focus.stop="
+                                    speakAboutTag(
+                                        game,
+                                        tag
+                                    )
+                                "
+
+                                @blur.stop="
+                                    stopMascotHover
+                                "
                             >
 
                                 {{ tag }}
@@ -858,8 +1476,13 @@ onMounted(
                         <!-- DESCRIPTION -->
 
                         <p
-                            v-if="game.description"
-                            class="game-favorite-card__description"
+                            v-if="
+                                game.description
+                            "
+
+                            class="
+                                game-favorite-card__description
+                            "
                         >
 
                             {{ game.description }}
@@ -871,7 +1494,6 @@ onMounted(
 
                         <div class="game-favorite-card__footer">
 
-
                             <!-- RATING -->
 
                             <div
@@ -879,7 +1501,32 @@ onMounted(
                                     game.rating !== null &&
                                     game.rating !== undefined
                                 "
-                                class="game-favorite-card__rating"
+
+                                class="
+                                    game-favorite-card__rating
+                                "
+
+                                tabindex="0"
+
+                                @mouseenter.stop="
+                                    speakAboutRating(
+                                        game
+                                    )
+                                "
+
+                                @mouseleave.stop="
+                                    stopMascotHover
+                                "
+
+                                @focus.stop="
+                                    speakAboutRating(
+                                        game
+                                    )
+                                "
+
+                                @blur.stop="
+                                    stopMascotHover
+                                "
                             >
 
                                 <span aria-hidden="true">
@@ -902,15 +1549,42 @@ onMounted(
                             <!-- YOUTUBE -->
 
                             <a
-                                v-if="game.youtube_playlist"
-                                :href="game.youtube_playlist"
+                                v-if="
+                                    game.youtube_playlist
+                                "
+
+                                :href="
+                                    game.youtube_playlist
+                                "
+
                                 target="_blank"
-                                rel="noopener noreferrer"
-                                class="game-favorite-card__youtube"
+
+                                rel="
+                                    noopener noreferrer
+                                "
+
+                                class="
+                                    game-favorite-card__youtube
+                                "
+
                                 @mouseenter.stop="
-                                    speakWithMascot(
+                                    speakAboutPlaylist(
                                         game
                                     )
+                                "
+
+                                @mouseleave.stop="
+                                    stopMascotHover
+                                "
+
+                                @focus.stop="
+                                    speakAboutPlaylist(
+                                        game
+                                    )
+                                "
+
+                                @blur.stop="
+                                    stopMascotHover
                                 "
                             >
 
@@ -928,8 +1602,35 @@ onMounted(
                         <!-- POLL -->
 
                         <div
-                            v-if="game.poll_enabled"
-                            class="game-favorite-card__poll"
+                            v-if="
+                                game.poll_enabled
+                            "
+
+                            class="
+                                game-favorite-card__poll
+                            "
+
+                            tabindex="0"
+
+                            @mouseenter.stop="
+                                speakAboutPoll(
+                                    game
+                                )
+                            "
+
+                            @mouseleave.stop="
+                                stopMascotHover
+                            "
+
+                            @focus.stop="
+                                speakAboutPoll(
+                                    game
+                                )
+                            "
+
+                            @blur.stop="
+                                stopMascotHover
+                            "
                         >
 
                             <span aria-hidden="true">

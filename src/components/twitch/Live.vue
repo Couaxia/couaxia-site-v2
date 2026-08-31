@@ -1,56 +1,82 @@
 <script setup lang="ts">
+
 import {
     computed,
+    onBeforeUnmount,
     onMounted,
     ref
 } from "vue";
+
 import {
     apiFetch
 } from "../../services/api";
+
 
 /* =========================================================
    TYPES
 ========================================================= */
 
 interface TwitchLiveData {
-    isLive: boolean;
 
-    userId: string;
+    isLive:
+        boolean;
 
-    login: string;
+    userId:
+        string;
 
-    displayName: string;
+    login:
+        string;
 
-    profileImageUrl: string;
+    displayName:
+        string;
 
-    offlineImageUrl: string;
+    profileImageUrl:
+        string;
 
-    title: string | null;
+    offlineImageUrl:
+        string;
 
-    gameId: string | null;
+    title:
+        string | null;
 
-    gameName: string | null;
+    gameId:
+        string | null;
 
-    viewers: number;
+    gameName:
+        string | null;
 
-    startedAt: string | null;
+    viewers:
+        number;
 
-    language: string | null;
+    startedAt:
+        string | null;
 
-    thumbnailUrl: string | null;
+    language:
+        string | null;
 
-    isMature: boolean;
+    thumbnailUrl:
+        string | null;
+
+    isMature:
+        boolean;
+
 }
 
 
 interface TwitchLiveResponse {
-    success: boolean;
 
-    data?: TwitchLiveData;
+    success:
+        boolean;
 
-    message?: string;
+    data?:
+        TwitchLiveData;
 
-    error?: string;
+    message?:
+        string;
+
+    error?:
+        string;
+
 }
 
 
@@ -65,11 +91,15 @@ const liveData =
 
 
 const loading =
-    ref(true);
+    ref(
+        true
+    );
 
 
 const refreshing =
-    ref(false);
+    ref(
+        false
+    );
 
 
 const errorMessage =
@@ -79,77 +109,525 @@ const errorMessage =
 
 
 /* =========================================================
+   MASCOT TIMER
+========================================================= */
+
+let mascotHoverTimer:
+    number | null =
+        null;
+
+
+/* =========================================================
    COMPUTED
 ========================================================= */
 
 const isLive =
-    computed(() => {
+    computed(
+        () => {
 
-        return liveData.value?.isLive
-            ?? false;
+            return (
+                liveData.value?.isLive
+                ??
+                false
+            );
 
-    });
+        }
+    );
 
 
 const liveStatusText =
-    computed(() => {
+    computed(
+        () => {
 
-        if (loading.value) {
+            if (
+                loading.value
+            ) {
 
-            return "Vérification…";
+                return "Vérification…";
+
+            }
+
+
+            return (
+                isLive.value
+                    ? "En direct"
+                    : "Hors ligne"
+            );
 
         }
-
-
-        return isLive.value
-            ? "En direct"
-            : "Hors ligne";
-
-    });
+    );
 
 
 const gameName =
-    computed(() => {
+    computed(
+        () => {
 
-        return liveData.value?.gameName
-            ?? "Hors ligne";
+            return (
+                liveData.value?.gameName
+                ??
+                "Hors ligne"
+            );
 
-    });
+        }
+    );
 
 
 const viewers =
-    computed(() => {
+    computed(
+        () => {
 
-        return liveData.value?.viewers
-            ?? 0;
+            return (
+                liveData.value?.viewers
+                ??
+                0
+            );
 
-    });
+        }
+    );
 
 
 const streamTitle =
-    computed(() => {
+    computed(
+        () => {
 
-        return liveData.value?.title
-            ?? "Couaxia est actuellement hors ligne.";
+            return (
+                liveData.value?.title
+                ??
+                "Couaxia est actuellement hors ligne."
+            );
 
-    });
+        }
+    );
 
 
 const twitchPlayerUrl =
-    computed(() => {
+    computed(
+        () => {
 
-        const parent =
-            window.location.hostname;
+            const parent =
+                window.location.hostname;
 
 
-        return (
-            "https://player.twitch.tv/" +
-            "?channel=couaxia" +
-            `&parent=${parent}` +
-            "&muted=true"
+            return (
+                "https://player.twitch.tv/"
+                +
+                "?channel=couaxia"
+                +
+                `&parent=${parent}`
+                +
+                "&muted=true"
+            );
+
+        }
+    );
+
+
+/* =========================================================
+   RANDOM MESSAGE
+========================================================= */
+
+function getRandomMessage(
+    messages:
+        string[]
+):
+    string {
+
+    if (
+        messages.length === 0
+    ) {
+
+        return "";
+
+    }
+
+
+    const randomIndex =
+        Math.floor(
+            Math.random()
+            *
+            messages.length
         );
 
-    });
+
+    return (
+        messages[randomIndex]
+        ??
+        ""
+    );
+
+}
+
+
+/* =========================================================
+   SEND MASCOT MESSAGE
+========================================================= */
+
+function sendMascotMessage(
+    message:
+        string
+) {
+
+    if (
+        !message.trim()
+    ) {
+
+        return;
+
+    }
+
+
+    window.dispatchEvent(
+        new CustomEvent(
+            "couaxia-mascot-message",
+            {
+                detail: {
+                    message
+                }
+            }
+        )
+    );
+
+}
+
+
+/* =========================================================
+   START MASCOT HOVER
+========================================================= */
+
+function startMascotHover(
+    messages:
+        string[]
+) {
+
+    stopMascotHover();
+
+
+    mascotHoverTimer =
+        window.setTimeout(
+            () => {
+
+                sendMascotMessage(
+                    getRandomMessage(
+                        messages
+                    )
+                );
+
+
+                mascotHoverTimer =
+                    null;
+
+            },
+            400
+        );
+
+}
+
+
+/* =========================================================
+   STOP MASCOT HOVER
+========================================================= */
+
+function stopMascotHover() {
+
+    if (
+        mascotHoverTimer ===
+        null
+    ) {
+
+        return;
+
+    }
+
+
+    window.clearTimeout(
+        mascotHoverTimer
+    );
+
+
+    mascotHoverTimer =
+        null;
+
+}
+
+
+/* =========================================================
+   SECTION MESSAGES
+========================================================= */
+
+function speakAboutLive() {
+
+    if (
+        loading.value
+    ) {
+
+        startMascotHover(
+            [
+                "Je vérifie Twitch... une seconde ! 👀",
+                "Voyons voir si je suis actuellement en live...",
+                "Mes tentacules interrogent Twitch ! 🐙"
+            ]
+        );
+
+
+        return;
+
+    }
+
+
+    if (
+        isLive.value
+    ) {
+
+        startMascotHover(
+            [
+                "Je suis actuellement en direct ! 🔴",
+                `Je suis en train de jouer à ${gameName.value} ! 🎮`,
+                "Pourquoi es-tu encore ici ? Viens sur le live ! 👀",
+                "Le stream est lancé, rejoins les Poups ! 💜",
+                `${viewers.value} personne${viewers.value > 1 ? "s" : ""} regarde${viewers.value > 1 ? "nt" : ""} actuellement le live !`
+            ]
+        );
+
+
+        return;
+
+    }
+
+
+    startMascotHover(
+        [
+            "Pas de live pour le moment. 🌙",
+            "Je suis actuellement hors ligne !",
+            "Même une Kraduk doit dormir de temps en temps. 💤",
+            "Pas de panique, il y aura d'autres aventures !",
+            "En attendant, tu peux regarder les clips et les vidéos ! 💜"
+        ]
+    );
+
+}
+
+
+/* =========================================================
+   STATUS MESSAGES
+========================================================= */
+
+function speakAboutStatus() {
+
+    if (
+        isLive.value
+    ) {
+
+        startMascotHover(
+            [
+                "Le petit point est allumé : je suis en live ! 🔴",
+                "EN DIRECT ! C'est le moment de rejoindre Twitch !",
+                "Oui oui, le stream est bien lancé ! 👀",
+                "Les Poups sont actuellement en live avec moi ! 💜"
+            ]
+        );
+
+    }
+
+    else {
+
+        startMascotHover(
+            [
+                "Le live est actuellement hors ligne. 🌙",
+                "Pas de stream pour le moment !",
+                "Le prochain live arrivera bientôt !",
+                "Profite de ce moment pour explorer le reste du site. 🐙"
+            ]
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   GAME MESSAGES
+========================================================= */
+
+function speakAboutGame() {
+
+    if (
+        !isLive.value
+    ) {
+
+        startMascotHover(
+            [
+                "Pas de jeu en cours pour le moment ! 🎮",
+                "Il faudra attendre le prochain live pour découvrir le prochain jeu.",
+                "La prochaine aventure reste encore un mystère... 👀"
+            ]
+        );
+
+
+        return;
+
+    }
+
+
+    startMascotHover(
+        [
+            `Aujourd'hui, je joue à ${gameName.value} ! 🎮`,
+            `${gameName.value} occupe actuellement mes tentacules ! 🐙`,
+            `Tu connais ${gameName.value} ?`,
+            `Direction Twitch si tu veux me voir jouer à ${gameName.value} !`,
+            `${gameName.value} est l'aventure du moment !`
+        ]
+    );
+
+}
+
+
+/* =========================================================
+   VIEWERS MESSAGES
+========================================================= */
+
+function speakAboutViewers() {
+
+    if (
+        !isLive.value
+    ) {
+
+        startMascotHover(
+            [
+                "Personne sur le live puisqu'il est hors ligne. 🌙",
+                "Le compteur attend tranquillement le prochain stream !",
+                "Les Poups reviendront au prochain live ! 💜"
+            ]
+        );
+
+
+        return;
+
+    }
+
+
+    const count =
+        viewers.value;
+
+
+    startMascotHover(
+        [
+            `${count} personne${count > 1 ? "s" : ""} regarde${count > 1 ? "nt" : ""} le live actuellement ! 👀`,
+
+            `Nous sommes ${count} sur le live ! 💜`,
+
+            `${count} Pou${count > 1 ? "ps" : "p"} devant mes aventures ! 🐙`,
+
+            "Merci à toutes les personnes présentes sur le live !",
+
+            "Plus on est nombreux, plus le chaos augmente ! 😂"
+        ]
+    );
+
+}
+
+
+/* =========================================================
+   PLAYER MESSAGES
+========================================================= */
+
+function speakAboutPlayer() {
+
+    if (
+        isLive.value
+    ) {
+
+        startMascotHover(
+            [
+                "Tu peux regarder le live directement ici ! 📺",
+                "Oui, le stream fonctionne directement sur mon site !",
+                "Tu peux rester ici... ou venir discuter directement sur Twitch. 💜",
+                `Tu peux me regarder jouer à ${gameName.value} juste ici !`,
+                "Attention, le chaos peut commencer à tout moment. 👀"
+            ]
+        );
+
+    }
+
+    else {
+
+        startMascotHover(
+            [
+                "Le player attend le prochain live. 🌙",
+                "Rien à voir en direct pour le moment !",
+                "Reviens au prochain stream et cette zone prendra vie ! ✨",
+                "Le calme avant la prochaine tempête... 🐙"
+            ]
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   STREAM TITLE MESSAGES
+========================================================= */
+
+function speakAboutTitle() {
+
+    if (
+        !isLive.value
+    ) {
+
+        return;
+
+    }
+
+
+    startMascotHover(
+        [
+            `Le live s'appelle : « ${streamTitle.value} »`,
+            "Oui, c'est bien le titre actuel du stream !",
+            "Mes titres de live sont parfois... très inspirés. 😂",
+            "Le titre peut donner quelques indices sur le chaos du jour !"
+        ]
+    );
+
+}
+
+
+/* =========================================================
+   TWITCH BUTTON MESSAGES
+========================================================= */
+
+const twitchButtonMessages = [
+
+    "Direction Twitch ! 💜",
+
+    "Tu veux ouvrir directement ma chaîne ?",
+
+    "Viens rejoindre les Poups sur Twitch ! 🐙",
+
+    "Un petit clic et tu arrives directement sur ma chaîne !",
+
+    "On se retrouve de l'autre côté ! 👀"
+
+];
+
+
+/* =========================================================
+   REFRESH MESSAGES
+========================================================= */
+
+const refreshMessages = [
+
+    "Tu veux vérifier si quelque chose a changé ? 👀",
+
+    "Actualisation des informations Twitch !",
+
+    "Voyons si Twitch a quelque chose de nouveau à raconter.",
+
+    "Mes tentacules vont interroger Twitch une nouvelle fois ! 🐙",
+
+    "Actualisons tout ça ! ↻"
+
+];
+
 
 /* =========================================================
    LOAD LIVE DATA
@@ -170,14 +648,17 @@ async function loadTwitchLive() {
 
 
         if (
-            !result.success ||
+            !result.success
+            ||
             !result.data
         ) {
 
             throw new Error(
                 result.error
-                ?? result.message
-                ?? "Impossible de récupérer les informations Twitch."
+                ??
+                result.message
+                ??
+                "Impossible de récupérer les informations Twitch."
             );
 
         }
@@ -188,7 +669,10 @@ async function loadTwitchLive() {
 
     }
 
-    catch (error: unknown) {
+    catch (
+        error:
+            unknown
+    ) {
 
         console.error(
             "Erreur Twitch :",
@@ -212,13 +696,16 @@ async function loadTwitchLive() {
 
 }
 
+
 /* =========================================================
    REFRESH
 ========================================================= */
 
 async function refreshLive() {
 
-    if (refreshing.value) {
+    if (
+        refreshing.value
+    ) {
 
         return;
 
@@ -227,6 +714,17 @@ async function refreshLive() {
 
     refreshing.value =
         true;
+
+
+    /*
+     * Message immédiat au clic.
+     */
+
+    sendMascotMessage(
+        getRandomMessage(
+            refreshMessages
+        )
+    );
 
 
     try {
@@ -252,6 +750,20 @@ async function refreshLive() {
 onMounted(
     loadTwitchLive
 );
+
+
+/* =========================================================
+   CLEANUP
+========================================================= */
+
+onBeforeUnmount(
+    () => {
+
+        stopMascotHover();
+
+    }
+);
+
 </script>
 
 
@@ -260,6 +772,14 @@ onMounted(
     <section
         id="live"
         class="twitch-live"
+
+        @mouseenter="
+            speakAboutLive
+        "
+
+        @mouseleave="
+            stopMascotHover
+        "
     >
 
         <!-- =================================================
@@ -279,6 +799,7 @@ onMounted(
 
                     <span
                         class="twitch-live__status"
+
                         :class="{
                             'twitch-live__status--online':
                                 isLive,
@@ -286,12 +807,31 @@ onMounted(
                             'twitch-live__status--offline':
                                 !isLive
                         }"
+
+                        tabindex="0"
+
+                        @mouseenter.stop="
+                            speakAboutStatus
+                        "
+
+                        @mouseleave.stop="
+                            stopMascotHover
+                        "
+
+                        @focus.stop="
+                            speakAboutStatus
+                        "
+
+                        @blur.stop="
+                            stopMascotHover
+                        "
                     >
 
                         <span
                             class="twitch-live__status-dot"
                             aria-hidden="true"
                         ></span>
+
 
                         {{ liveStatusText }}
 
@@ -315,30 +855,83 @@ onMounted(
 
                 <a
                     href="https://www.twitch.tv/couaxia"
+
                     target="_blank"
+
                     rel="noopener noreferrer"
+
                     class="twitch-live__twitch-link"
+
+                    @mouseenter.stop="
+                        startMascotHover(
+                            twitchButtonMessages
+                        )
+                    "
+
+                    @mouseleave.stop="
+                        stopMascotHover
+                    "
+
+                    @focus.stop="
+                        startMascotHover(
+                            twitchButtonMessages
+                        )
+                    "
+
+                    @blur.stop="
+                        stopMascotHover
+                    "
                 >
+
                     Twitch
+
                     <span aria-hidden="true">
                         ↗
                     </span>
+
                 </a>
 
 
                 <button
                     type="button"
+
                     class="twitch-live__refresh"
+
                     :disabled="refreshing"
-                    @click="refreshLive"
+
+                    @mouseenter.stop="
+                        startMascotHover(
+                            refreshMessages
+                        )
+                    "
+
+                    @mouseleave.stop="
+                        stopMascotHover
+                    "
+
+                    @focus.stop="
+                        startMascotHover(
+                            refreshMessages
+                        )
+                    "
+
+                    @blur.stop="
+                        stopMascotHover
+                    "
+
+                    @click.stop="
+                        refreshLive
+                    "
                 >
 
                     <span
                         class="twitch-live__refresh-icon"
+
                         :class="{
                             'twitch-live__refresh-icon--loading':
                                 refreshing
                         }"
+
                         aria-hidden="true"
                     >
                         ↻
@@ -346,11 +939,13 @@ onMounted(
 
 
                     <span>
+
                         {{
                             refreshing
                                 ? "Actualisation..."
                                 : "Actualiser"
                         }}
+
                     </span>
 
                 </button>
@@ -373,6 +968,7 @@ onMounted(
             <strong>
                 Impossible de récupérer Twitch.
             </strong>
+
 
             <p>
                 {{ errorMessage }}
@@ -397,6 +993,7 @@ onMounted(
                 ↻
             </span>
 
+
             <span>
                 Vérification du statut Twitch...
             </span>
@@ -410,20 +1007,43 @@ onMounted(
                  PLAYER
             ============================================== -->
 
-            <div class="twitch-live__player">
+            <div
+                class="twitch-live__player"
+
+                tabindex="0"
+
+                @mouseenter.stop="
+                    speakAboutPlayer
+                "
+
+                @mouseleave.stop="
+                    stopMascotHover
+                "
+
+                @focus.stop="
+                    speakAboutPlayer
+                "
+
+                @blur.stop="
+                    stopMascotHover
+                "
+            >
 
                 <span
                     class="twitch-live__player-status"
+
                     :class="{
                         'twitch-live__player-status--online':
                             isLive
                     }"
                 >
+
                     {{
                         isLive
                             ? "EN DIRECT"
                             : "HORS LIGNE"
                     }}
+
                 </span>
 
 
@@ -444,11 +1064,36 @@ onMounted(
 
             <div class="twitch-live__infos">
 
-                <div class="twitch-live__info">
+                <!-- =========================================
+                     GAME
+                ========================================== -->
+
+                <div
+                    class="twitch-live__info"
+
+                    tabindex="0"
+
+                    @mouseenter.stop="
+                        speakAboutGame
+                    "
+
+                    @mouseleave.stop="
+                        stopMascotHover
+                    "
+
+                    @focus.stop="
+                        speakAboutGame
+                    "
+
+                    @blur.stop="
+                        stopMascotHover
+                    "
+                >
 
                     <span class="twitch-live__info-label">
                         Catégorie
                     </span>
+
 
                     <strong>
                         {{ gameName }}
@@ -457,11 +1102,36 @@ onMounted(
                 </div>
 
 
-                <div class="twitch-live__info">
+                <!-- =========================================
+                     VIEWERS
+                ========================================== -->
+
+                <div
+                    class="twitch-live__info"
+
+                    tabindex="0"
+
+                    @mouseenter.stop="
+                        speakAboutViewers
+                    "
+
+                    @mouseleave.stop="
+                        stopMascotHover
+                    "
+
+                    @focus.stop="
+                        speakAboutViewers
+                    "
+
+                    @blur.stop="
+                        stopMascotHover
+                    "
+                >
 
                     <span class="twitch-live__info-label">
                         Viewers
                     </span>
+
 
                     <strong>
                         {{ viewers }}
@@ -478,12 +1148,32 @@ onMounted(
 
             <div
                 v-if="isLive"
+
                 class="twitch-live__stream-details"
+
+                tabindex="0"
+
+                @mouseenter.stop="
+                    speakAboutTitle
+                "
+
+                @mouseleave.stop="
+                    stopMascotHover
+                "
+
+                @focus.stop="
+                    speakAboutTitle
+                "
+
+                @blur.stop="
+                    stopMascotHover
+                "
             >
 
                 <span class="twitch-live__stream-label">
                     Titre du live
                 </span>
+
 
                 <strong>
                     {{ streamTitle }}
@@ -498,7 +1188,26 @@ onMounted(
 
             <div
                 v-else
+
                 class="twitch-live__offline-message"
+
+                tabindex="0"
+
+                @mouseenter.stop="
+                    speakAboutLive
+                "
+
+                @mouseleave.stop="
+                    stopMascotHover
+                "
+
+                @focus.stop="
+                    speakAboutLive
+                "
+
+                @blur.stop="
+                    stopMascotHover
+                "
             >
 
                 <span
@@ -514,6 +1223,7 @@ onMounted(
                     <strong>
                         Couaxia est actuellement hors ligne.
                     </strong>
+
 
                     <p>
                         Tu peux retrouver les derniers clips

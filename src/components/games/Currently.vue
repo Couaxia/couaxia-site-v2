@@ -2,9 +2,11 @@
 
 import {
     computed,
+    onBeforeUnmount,
     onMounted,
     ref
 } from "vue";
+
 
 import {
     getGames,
@@ -30,6 +32,15 @@ const error =
     ref<string | null>(
         null
     );
+
+
+/* =========================================================
+   MASCOT TIMER
+========================================================= */
+
+let mascotHoverTimer:
+    number | null =
+        null;
 
 
 /* =========================================================
@@ -105,7 +116,8 @@ async function loadGames() {
 
 function getGameName(
     game: Game
-) {
+):
+    string {
 
     return (
         game.twitch_name ??
@@ -120,66 +132,48 @@ function getGameName(
 ========================================================= */
 
 function getRandomMessage(
-    messages: string[]
-) {
+    messages:
+        string[]
+):
+    string {
 
     if (
         messages.length === 0
     ) {
 
-        return null;
+        return "";
 
     }
 
 
-    const index =
+    const randomIndex =
         Math.floor(
             Math.random() *
             messages.length
         );
 
 
-    return messages[index];
+    return (
+        messages[randomIndex]
+        ??
+        ""
+    );
 
 }
 
 
 /* =========================================================
-   MASCOT — GAME
+   SEND MASCOT MESSAGE
 ========================================================= */
 
-function speakAboutGame(
-    game: Game
+function sendMascotMessage(
+    message:
+        string
 ) {
 
-    const gameName =
-        getGameName(
-            game
-        );
-
-
-    const messages = [
-
-        `En ce moment, je joue à ${gameName} !`,
-
-        `${gameName}, c'est l'une de mes aventures du moment !`,
-
-        `On n'a pas encore terminé ${gameName} !`,
-
-        `Pas de spoilers sur ${gameName}, l'aventure continue !`,
-
-        `Mes tentacules sont encore occupées avec ${gameName} !`
-
-    ];
-
-
-    const message =
-        getRandomMessage(
-            messages
-        );
-
-
-    if (!message) {
+    if (
+        !message.trim()
+    ) {
 
         return;
 
@@ -196,6 +190,70 @@ function speakAboutGame(
             }
         )
     );
+
+}
+
+
+/* =========================================================
+   START MASCOT HOVER
+========================================================= */
+
+function startMascotHover(
+    messages:
+        string[]
+) {
+
+    stopMascotHover();
+
+
+    mascotHoverTimer =
+        window.setTimeout(
+            () => {
+
+                const message =
+                    getRandomMessage(
+                        messages
+                    );
+
+
+                sendMascotMessage(
+                    message
+                );
+
+
+                mascotHoverTimer =
+                    null;
+
+            },
+            400
+        );
+
+}
+
+
+/* =========================================================
+   STOP MASCOT HOVER
+========================================================= */
+
+function stopMascotHover() {
+
+    if (
+        mascotHoverTimer ===
+        null
+    ) {
+
+        return;
+
+    }
+
+
+    window.clearTimeout(
+        mascotHoverTimer
+    );
+
+
+    mascotHoverTimer =
+        null;
 
 }
 
@@ -221,7 +279,9 @@ function speakAboutCurrentGames() {
 
                 "Attention aux spoilers, ces aventures ne sont pas encore terminées !",
 
-                "C'est ici que tu peux voir mes aventures du moment !"
+                "C'est ici que tu peux voir mes aventures du moment !",
+
+                "Mes tentacules ont encore beaucoup de travail ! 🐙"
 
             ]
 
@@ -231,33 +291,209 @@ function speakAboutCurrentGames() {
 
                 "Mes tentacules cherchent leur prochaine aventure...",
 
-                "Il va bientôt falloir choisir un nouveau jeu !"
+                "Il va bientôt falloir choisir un nouveau jeu !",
+
+                "Hmm... quel sera notre prochain jeu ? 👀"
 
             ];
 
 
-    const message =
-        getRandomMessage(
-            messages
+    startMascotHover(
+        messages
+    );
+
+}
+
+
+/* =========================================================
+   MASCOT — GAME
+========================================================= */
+
+function speakAboutGame(
+    game:
+        Game
+) {
+
+    const gameName =
+        getGameName(
+            game
         );
 
 
-    if (!message) {
+    startMascotHover(
+        [
+
+            `En ce moment, je joue à ${gameName} !`,
+
+            `${gameName}, c'est l'une de mes aventures du moment !`,
+
+            `On n'a pas encore terminé ${gameName} !`,
+
+            `Pas de spoilers sur ${gameName}, l'aventure continue !`,
+
+            `Mes tentacules sont encore occupées avec ${gameName} ! 🐙`,
+
+            `Tu connais ${gameName} ? 👀`
+
+        ]
+    );
+
+}
+
+
+/* =========================================================
+   MASCOT — TAG
+========================================================= */
+
+function speakAboutTag(
+    game:
+        Game,
+
+    tag:
+        string
+) {
+
+    const gameName =
+        getGameName(
+            game
+        );
+
+
+    startMascotHover(
+        [
+
+            `${tag} fait partie des thèmes de ${gameName} !`,
+
+            `Hmm... ${tag}. Ça résume plutôt bien cette aventure !`,
+
+            `${gameName} et ${tag}... intéressant, non ? 👀`,
+
+            `Si tu aimes les jeux avec "${tag}", regarde celui-ci !`,
+
+            `Oui oui, "${tag}" compte bien dans cette aventure !`
+
+        ]
+    );
+
+}
+
+
+/* =========================================================
+   MASCOT — RATING
+========================================================= */
+
+function speakAboutRating(
+    game:
+        Game
+) {
+
+    const gameName =
+        getGameName(
+            game
+        );
+
+
+    const rating =
+        game.rating;
+
+
+    if (
+        rating === null
+        ||
+        rating === undefined
+    ) {
 
         return;
 
     }
 
 
-    window.dispatchEvent(
-        new CustomEvent(
-            "couaxia-mascot-message",
-            {
-                detail: {
-                    message
-                }
-            }
-        )
+    const messages = [
+
+        `${gameName} a eu ${rating}/10 !`,
+
+        `J'ai donné ${rating}/10 à ${gameName}.`,
+
+        `${rating}/10 pour ${gameName}... tu aurais mis combien ? 👀`
+
+    ];
+
+
+    if (
+        rating >= 9
+    ) {
+
+        messages.push(
+            `Oui, ${rating}/10 ! J'ai vraiment beaucoup aimé ${gameName} ! 💜`
+        );
+
+    }
+
+    else if (
+        rating >= 7
+    ) {
+
+        messages.push(
+            `${gameName} s'en sort plutôt bien avec ${rating}/10 !`
+        );
+
+    }
+
+    else if (
+        rating >= 5
+    ) {
+
+        messages.push(
+            `${rating}/10... ${gameName} avait de bonnes idées, mais tout n'était pas parfait.`
+        );
+
+    }
+
+    else {
+
+        messages.push(
+            `${rating}/10... disons que ${gameName} ne m'a pas totalement convaincue. 😅`
+        );
+
+    }
+
+
+    startMascotHover(
+        messages
+    );
+
+}
+
+
+/* =========================================================
+   MASCOT — PLAYLIST
+========================================================= */
+
+function speakAboutPlaylist(
+    game:
+        Game
+) {
+
+    const gameName =
+        getGameName(
+            game
+        );
+
+
+    startMascotHover(
+        [
+
+            `Tu veux revoir mon aventure sur ${gameName} ?`,
+
+            `La playlist de ${gameName} t'attend ! ▶️`,
+
+            `Attention, la playlist peut contenir des spoilers ! 👀`,
+
+            `Tu peux retrouver mes aventures sur ${gameName} juste ici !`,
+
+            `Installe-toi confortablement, il y a peut-être plusieurs heures de ${gameName} !`
+
+        ]
     );
 
 }
@@ -269,6 +505,19 @@ function speakAboutCurrentGames() {
 
 onMounted(
     loadGames
+);
+
+
+/* =========================================================
+   CLEANUP
+========================================================= */
+
+onBeforeUnmount(
+    () => {
+
+        stopMascotHover();
+
+    }
 );
 
 </script>
@@ -287,9 +536,24 @@ onMounted(
 
         <header
             class="games-currently__header"
+
             tabindex="0"
-            @mouseenter="speakAboutCurrentGames"
-            @focus="speakAboutCurrentGames"
+
+            @mouseenter="
+                speakAboutCurrentGames
+            "
+
+            @mouseleave="
+                stopMascotHover
+            "
+
+            @focus="
+                speakAboutCurrentGames
+            "
+
+            @blur="
+                stopMascotHover
+            "
         >
 
             <div class="games-currently__heading">
@@ -313,10 +577,13 @@ onMounted(
                         id="games-currently-title"
                         class="games-currently__title"
                     >
+
                         Mes aventures
+
                         <span>
                             en cours
                         </span>
+
                     </h2>
 
                 </div>
@@ -325,9 +592,11 @@ onMounted(
 
 
             <p class="games-currently__description">
+
                 Les jeux et aventures que je suis
                 actuellement en train de découvrir
                 en stream avec les Poups.
+
             </p>
 
         </header>
@@ -389,7 +658,10 @@ onMounted(
         ================================================== -->
 
         <div
-            v-else-if="currentGames.length === 0"
+            v-else-if="
+                currentGames.length === 0
+            "
+
             class="
                 games-currently__state
                 games-currently__state--empty
@@ -410,8 +682,10 @@ onMounted(
 
 
             <p>
+
                 Mes tentacules attendent encore
                 leur prochaine aventure !
+
             </p>
 
         </div>
@@ -428,18 +702,35 @@ onMounted(
 
             <article
                 v-for="game in currentGames"
-                :key="game.id"
-                class="games-current-card"
+
+                :key="
+                    game.id
+                "
+
+                class="
+                    games-current-card
+                "
+
                 tabindex="0"
+
                 @mouseenter="
                     speakAboutGame(
                         game
                     )
                 "
+
+                @mouseleave="
+                    stopMascotHover
+                "
+
                 @focus="
                     speakAboutGame(
                         game
                     )
+                "
+
+                @blur="
+                    stopMascotHover
                 "
             >
 
@@ -450,17 +741,31 @@ onMounted(
                 <div class="games-current-card__visual">
 
                     <img
-                        v-if="game.box_art_url"
-                        :src="game.box_art_url"
-                        :alt="`Jaquette de ${game.twitch_name}`"
-                        class="games-current-card__image"
+                        v-if="
+                            game.box_art_url
+                        "
+
+                        :src="
+                            game.box_art_url
+                        "
+
+                        :alt="
+                            `Jaquette de ${getGameName(game)}`
+                        "
+
+                        class="
+                            games-current-card__image
+                        "
                     >
+
 
                     <div
                         v-else
-                        class="games-current-card__placeholder"
+                        class="
+                            games-current-card__placeholder
+                        "
                     >
-                     🎮
+                        🎮
                     </div>
 
 
@@ -468,11 +773,13 @@ onMounted(
                          STATUS
                     ====================================== -->
 
-                    <span class="games-current-card__status">
+                    <span
+                        class="
+                            games-current-card__status
+                        "
+                    >
 
-                        <span
-                            aria-hidden="true"
-                        >
+                        <span aria-hidden="true">
                             🔥
                         </span>
 
@@ -489,9 +796,15 @@ onMounted(
 
                 <div class="games-current-card__content">
 
-                    <!-- GAME NAME -->
+                    <!-- =====================================
+                         GAME NAME
+                    ====================================== -->
 
-                    <h3 class="games-current-card__title">
+                    <h3
+                        class="
+                            games-current-card__title
+                        "
+                    >
 
                         {{
                             getGameName(
@@ -511,13 +824,46 @@ onMounted(
                             game.tags &&
                             game.tags.length > 0
                         "
-                        class="games-current-card__tags"
+
+                        class="
+                            games-current-card__tags
+                        "
                     >
 
                         <span
                             v-for="tag in game.tags"
-                            :key="tag"
-                            class="games-current-card__tag"
+
+                            :key="
+                                tag
+                            "
+
+                            class="
+                                games-current-card__tag
+                            "
+
+                            tabindex="0"
+
+                            @mouseenter.stop="
+                                speakAboutTag(
+                                    game,
+                                    tag
+                                )
+                            "
+
+                            @mouseleave.stop="
+                                stopMascotHover
+                            "
+
+                            @focus.stop="
+                                speakAboutTag(
+                                    game,
+                                    tag
+                                )
+                            "
+
+                            @blur.stop="
+                                stopMascotHover
+                            "
                         >
                             {{ tag }}
                         </span>
@@ -530,8 +876,13 @@ onMounted(
                     ====================================== -->
 
                     <p
-                        v-if="game.description"
-                        class="games-current-card__description"
+                        v-if="
+                            game.description
+                        "
+
+                        class="
+                            games-current-card__description
+                        "
                     >
                         {{ game.description }}
                     </p>
@@ -543,19 +894,44 @@ onMounted(
 
                     <div class="games-current-card__footer">
 
-                        <!-- RATING -->
+                        <!-- =============================
+                             RATING
+                        ============================== -->
 
                         <div
                             v-if="
                                 game.rating !== null &&
                                 game.rating !== undefined
                             "
-                            class="games-current-card__rating"
+
+                            class="
+                                games-current-card__rating
+                            "
+
+                            tabindex="0"
+
+                            @mouseenter.stop="
+                                speakAboutRating(
+                                    game
+                                )
+                            "
+
+                            @mouseleave.stop="
+                                stopMascotHover
+                            "
+
+                            @focus.stop="
+                                speakAboutRating(
+                                    game
+                                )
+                            "
+
+                            @blur.stop="
+                                stopMascotHover
+                            "
                         >
 
-                            <span
-                                aria-hidden="true"
-                            >
+                            <span aria-hidden="true">
                                 ⭐
                             </span>
 
@@ -572,19 +948,51 @@ onMounted(
                         </div>
 
 
-                        <!-- YOUTUBE -->
+                        <!-- =============================
+                             YOUTUBE
+                        ============================== -->
 
                         <a
-                            v-if="game.youtube_playlist"
-                            :href="game.youtube_playlist"
+                            v-if="
+                                game.youtube_playlist
+                            "
+
+                            :href="
+                                game.youtube_playlist
+                            "
+
                             target="_blank"
-                            rel="noopener noreferrer"
-                            class="games-current-card__youtube"
+
+                            rel="
+                                noopener noreferrer
+                            "
+
+                            class="
+                                games-current-card__youtube
+                            "
+
+                            @mouseenter.stop="
+                                speakAboutPlaylist(
+                                    game
+                                )
+                            "
+
+                            @mouseleave.stop="
+                                stopMascotHover
+                            "
+
+                            @focus.stop="
+                                speakAboutPlaylist(
+                                    game
+                                )
+                            "
+
+                            @blur.stop="
+                                stopMascotHover
+                            "
                         >
 
-                            <span
-                                aria-hidden="true"
-                            >
+                            <span aria-hidden="true">
                                 ▶️
                             </span>
 

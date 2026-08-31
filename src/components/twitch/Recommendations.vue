@@ -1,12 +1,19 @@
 <script setup lang="ts">
+
 import {
+    onBeforeUnmount,
     onMounted,
     ref
 } from "vue";
-import AppLoader from "../ui/AppLoader.vue";
+
+import AppLoader
+    from "../ui/AppLoader.vue";
+
 import {
     apiFetch
 } from "../../services/api";
+
+
 /* =========================================================
    TYPES
 ========================================================= */
@@ -17,45 +24,68 @@ type StreamerStatus =
 
 
 interface Streamer {
-    login: string;
 
-    displayName: string;
+    login:
+        string;
 
-    avatar: string;
+    displayName:
+        string;
 
-    url: string;
+    avatar:
+        string;
 
-    status: StreamerStatus;
+    url:
+        string;
 
-    gameName: string | null;
+    status:
+        StreamerStatus;
 
-    viewers: number;
+    gameName:
+        string | null;
+
+    viewers:
+        number;
+
 }
 
 
 interface RecommendationGroup {
-    id: string;
 
-    title: string;
+    id:
+        string;
 
-    description: string;
+    title:
+        string;
 
-    icon: string;
+    description:
+        string;
 
-    logins: string[];
+    icon:
+        string;
 
-    streamers: Streamer[];
+    logins:
+        string[];
+
+    streamers:
+        Streamer[];
+
 }
 
 
 interface TwitchRecommendationsResponse {
-    success: boolean;
 
-    data?: Streamer[];
+    success:
+        boolean;
 
-    message?: string;
+    data?:
+        Streamer[];
 
-    error?: string;
+    message?:
+        string;
+
+    error?:
+        string;
+
 }
 
 
@@ -84,6 +114,7 @@ const recommendationGroups =
                 "💜",
 
             logins: [
+
                 "leareinepoulpe",
                 "yuto_mbc",
                 "000dracko000",
@@ -112,6 +143,7 @@ const recommendationGroups =
                 "ithalaine_VT",
                 "Captain_Gros_Cheh6",
                 "Zwar_vtuber"
+
             ],
 
             streamers:
@@ -137,6 +169,7 @@ const recommendationGroups =
                 "🌍",
 
             logins: [
+
                 "auroraleonisvt",
                 "ironmouse",
                 "laynalazar",
@@ -145,6 +178,7 @@ const recommendationGroups =
                 "sinder",
                 "yesseniaVO",
                 "SussySonia"
+
             ],
 
             streamers:
@@ -170,6 +204,7 @@ const recommendationGroups =
                 "⭐",
 
             logins: [
+
                 "biyona",
                 "fengaryx",
                 "kammy64",
@@ -193,7 +228,7 @@ const recommendationGroups =
                 "Yuka_Portesonges",
                 "Nysselya_vt",
                 "Meizy_11",
-                "mokaa_cafe", 
+                "mokaa_cafe",
                 "SaturneSmile"
 
             ],
@@ -210,7 +245,9 @@ const recommendationGroups =
 ========================================================= */
 
 const loading =
-    ref(true);
+    ref(
+        true
+    );
 
 
 const errorMessage =
@@ -220,11 +257,415 @@ const errorMessage =
 
 
 /* =========================================================
+   MASCOT TIMER
+========================================================= */
+
+let mascotHoverTimer:
+    number | null =
+        null;
+
+
+/* =========================================================
+   RANDOM MESSAGE
+========================================================= */
+
+function getRandomMessage(
+    messages:
+        string[]
+):
+    string {
+
+    if (
+        messages.length === 0
+    ) {
+
+        return "";
+
+    }
+
+
+    const randomIndex =
+        Math.floor(
+            Math.random()
+            *
+            messages.length
+        );
+
+
+    return (
+        messages[randomIndex]
+        ??
+        ""
+    );
+
+}
+
+
+/* =========================================================
+   SEND MASCOT MESSAGE
+========================================================= */
+
+function sendMascotMessage(
+    message:
+        string
+) {
+
+    if (
+        !message.trim()
+    ) {
+
+        return;
+
+    }
+
+
+    window.dispatchEvent(
+        new CustomEvent(
+            "couaxia-mascot-message",
+            {
+                detail: {
+                    message
+                }
+            }
+        )
+    );
+
+}
+
+
+/* =========================================================
+   START MASCOT HOVER
+========================================================= */
+
+function startMascotHover(
+    messages:
+        string[]
+) {
+
+    stopMascotHover();
+
+
+    mascotHoverTimer =
+        window.setTimeout(
+            () => {
+
+                sendMascotMessage(
+                    getRandomMessage(
+                        messages
+                    )
+                );
+
+
+                mascotHoverTimer =
+                    null;
+
+            },
+            400
+        );
+
+}
+
+
+/* =========================================================
+   STOP MASCOT HOVER
+========================================================= */
+
+function stopMascotHover() {
+
+    if (
+        mascotHoverTimer ===
+        null
+    ) {
+
+        return;
+
+    }
+
+
+    window.clearTimeout(
+        mascotHoverTimer
+    );
+
+
+    mascotHoverTimer =
+        null;
+
+}
+
+
+/* =========================================================
+   SECTION MESSAGES
+========================================================= */
+
+const recommendationMessages = [
+
+    "Tu veux découvrir quelques streamers que j'apprécie ? 💜",
+
+    "Bienvenue dans ma petite sélection Twitch !",
+
+    "Il y a plein de créateurs incroyables à découvrir ici !",
+
+    "Mes tentacules ont préparé quelques recommandations pour toi. 🐙",
+
+    "Attention... tu risques de repartir avec encore plus de chaînes à suivre ! 👀",
+
+    "Voici quelques personnes qui méritent un petit détour sur Twitch !"
+
+];
+
+
+/* =========================================================
+   GROUP MESSAGES
+========================================================= */
+
+function speakAboutGroup(
+    group:
+        RecommendationGroup
+) {
+
+    const onlineCount =
+        getOnlineCount(
+            group
+        );
+
+
+    const messages:
+        Record<
+            string,
+            string[]
+        > = {
+
+            friends: [
+
+                "Voici mes amis et compagnons de chaos ! 💜",
+
+                "Avec eux, même une partie tranquille peut devenir n'importe quoi.",
+
+                "Ce sont les personnes avec qui je partage beaucoup d'aventures !",
+
+                `${group.streamers.length} chaîne${group.streamers.length > 1 ? "s" : ""} dans ce groupe !`,
+
+                onlineCount > 0
+                    ? `${onlineCount} de mes amis ${onlineCount > 1 ? "sont" : "est"} actuellement en direct ! 👀`
+                    : "Personne n'est en direct ici pour le moment."
+
+            ],
+
+
+            world: [
+
+                "Direction le reste du monde ! 🌍",
+
+                "J'aime découvrir des créateurs venus de plein d'endroits différents.",
+
+                "Il y a tellement de VTubers et streamers à découvrir !",
+
+                `${group.streamers.length} chaîne${group.streamers.length > 1 ? "s" : ""} à explorer ici !`,
+
+                onlineCount > 0
+                    ? `${onlineCount} chaîne${onlineCount > 1 ? "s sont" : " est"} actuellement en direct !`
+                    : "Tout le monde est hors ligne pour le moment."
+
+            ],
+
+
+            favorites: [
+
+                "Voici quelques-unes de mes chaînes favorites ! ⭐",
+
+                "Ce sont des créateurs que j'aime particulièrement regarder.",
+
+                "Attention, cette section peut sérieusement agrandir ta liste de follows ! 👀",
+
+                `${group.streamers.length} streamer${group.streamers.length > 1 ? "s" : ""} parmi mes favoris !`,
+
+                onlineCount > 0
+                    ? `${onlineCount} de mes favoris ${onlineCount > 1 ? "sont" : "est"} en live !`
+                    : "Pas de live dans mes favoris pour le moment."
+
+            ]
+
+        };
+
+
+    startMascotHover(
+        messages[
+            group.id
+        ]
+        ??
+        [
+            "Encore quelques chaînes à découvrir !"
+        ]
+    );
+
+}
+
+
+/* =========================================================
+   STREAMER MESSAGES
+========================================================= */
+
+function speakAboutStreamer(
+    streamer:
+        Streamer
+) {
+
+    if (
+        streamer.status ===
+        "online"
+    ) {
+
+        const game =
+            streamer.gameName
+            ??
+            "un jeu mystérieux";
+
+
+        const viewerText =
+            streamer.viewers > 0
+                ? ` avec ${streamer.viewers} viewer${streamer.viewers > 1 ? "s" : ""}`
+                : "";
+
+
+        startMascotHover(
+            [
+
+                `${streamer.displayName} est actuellement en direct ! 🔴`,
+
+                `${streamer.displayName} joue à ${game} ! 🎮`,
+
+                `Tu peux aller faire un petit coucou à ${streamer.displayName} ! 💜`,
+
+                `${streamer.displayName} est en live${viewerText} !`,
+
+                `Oh ! ${streamer.displayName} est en ligne, va jeter un œil ! 👀`,
+
+                `${game} chez ${streamer.displayName} ? Ça peut être sympa !`
+
+            ]
+        );
+
+
+        return;
+
+    }
+
+
+    startMascotHover(
+        [
+
+            `${streamer.displayName} est hors ligne pour le moment. 🌙`,
+
+            `${streamer.displayName} reviendra sûrement bientôt en live !`,
+
+            `Pas de stream chez ${streamer.displayName} actuellement.`,
+
+            `Tu peux quand même aller découvrir la chaîne de ${streamer.displayName} ! 💜`,
+
+            `Même les streamers doivent dormir parfois ! ${streamer.displayName} est hors ligne.`
+
+        ]
+    );
+
+}
+
+
+/* =========================================================
+   STREAMER STATUS
+========================================================= */
+
+function speakAboutStatus(
+    streamer:
+        Streamer
+) {
+
+    if (
+        streamer.status ===
+        "online"
+    ) {
+
+        startMascotHover(
+            [
+
+                `${streamer.displayName} est bien en direct ! 🔴`,
+
+                `Le petit point est allumé : ${streamer.displayName} est en live !`,
+
+                `C'est le bon moment pour rejoindre ${streamer.displayName} !`,
+
+                streamer.gameName
+                    ? `${streamer.displayName} joue actuellement à ${streamer.gameName}.`
+                    : `${streamer.displayName} est actuellement en live !`
+
+            ]
+        );
+
+    }
+
+    else {
+
+        startMascotHover(
+            [
+
+                `${streamer.displayName} est hors ligne. 🌙`,
+
+                `Pas de live chez ${streamer.displayName} pour le moment.`,
+
+                `Il faudra revenir plus tard pour voir ${streamer.displayName} en direct !`
+
+            ]
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   STREAMER GAME
+========================================================= */
+
+function speakAboutGame(
+    streamer:
+        Streamer
+) {
+
+    if (
+        streamer.status !==
+        "online"
+        ||
+        !streamer.gameName
+    ) {
+
+        return;
+
+    }
+
+
+    startMascotHover(
+        [
+
+            `${streamer.displayName} joue à ${streamer.gameName} ! 🎮`,
+
+            `Tu connais ${streamer.gameName} ?`,
+
+            `${streamer.gameName} est le jeu du moment chez ${streamer.displayName} !`,
+
+            `Si tu veux voir du ${streamer.gameName}, c'est par ici !`
+
+        ]
+    );
+
+}
+
+
+/* =========================================================
    ONLINE COUNT
 ========================================================= */
 
 function getOnlineCount(
-    group: RecommendationGroup
+    group:
+        RecommendationGroup
 ) {
 
     return group.streamers.filter(
@@ -235,13 +676,16 @@ function getOnlineCount(
 
 }
 
+
 /* =========================================================
    LOAD GROUP
 ========================================================= */
 
 async function loadGroup(
-    group: RecommendationGroup
-): Promise<void> {
+    group:
+        RecommendationGroup
+):
+    Promise<void> {
 
     const params =
         new URLSearchParams();
@@ -261,7 +705,7 @@ async function loadGroup(
 
     /* =====================================================
        API
-    ===================================================== */
+    ====================================================== */
 
     const result =
         await apiFetch<TwitchRecommendationsResponse>(
@@ -271,16 +715,19 @@ async function loadGroup(
 
     /* =====================================================
        ERROR
-    ===================================================== */
+    ====================================================== */
 
     if (
-        !result.success ||
+        !result.success
+        ||
         !result.data
     ) {
 
         throw new Error(
-            result.error ??
-            result.message ??
+            result.error
+            ??
+            result.message
+            ??
             "Impossible de récupérer les streamers recommandés."
         );
 
@@ -289,12 +736,13 @@ async function loadGroup(
 
     /* =====================================================
        SUCCESS
-    ===================================================== */
+    ====================================================== */
 
     group.streamers =
         result.data;
 
 }
+
 
 /* =========================================================
    LOAD ALL
@@ -305,6 +753,7 @@ async function loadRecommendations():
 
     loading.value =
         true;
+
 
     errorMessage.value =
         null;
@@ -323,7 +772,10 @@ async function loadRecommendations():
 
     }
 
-    catch (error: unknown) {
+    catch (
+        error:
+            unknown
+    ) {
 
         console.error(
             "Erreur recommandations Twitch :",
@@ -355,12 +807,38 @@ async function loadRecommendations():
 onMounted(
     loadRecommendations
 );
+
+
+/* =========================================================
+   CLEANUP
+========================================================= */
+
+onBeforeUnmount(
+    () => {
+
+        stopMascotHover();
+
+    }
+);
+
 </script>
 
 
 <template>
 
-    <section class="twitch-recommendations">
+    <section
+        class="twitch-recommendations"
+
+        @mouseenter="
+            startMascotHover(
+                recommendationMessages
+            )
+        "
+
+        @mouseleave="
+            stopMascotHover
+        "
+    >
 
         <!-- =================================================
              HEADER
@@ -398,8 +876,6 @@ onMounted(
             text="Chargement des suggestions..."
         />
 
-            
-
 
         <!-- =================================================
              ERROR
@@ -413,6 +889,7 @@ onMounted(
             <strong>
                 Impossible de charger les recommandations.
             </strong>
+
 
             <p>
                 {{ errorMessage }}
@@ -432,10 +909,39 @@ onMounted(
 
             <section
                 v-for="group in recommendationGroups"
-                :key="group.id"
-                class="twitch-recommendation-group"
+
+                :key="
+                    group.id
+                "
+
+                class="
+                    twitch-recommendation-group
+                "
+
                 :class="
                     `twitch-recommendation-group--${group.id}`
+                "
+
+                tabindex="0"
+
+                @mouseenter.stop="
+                    speakAboutGroup(
+                        group
+                    )
+                "
+
+                @mouseleave.stop="
+                    stopMascotHover
+                "
+
+                @focus.stop="
+                    speakAboutGroup(
+                        group
+                    )
+                "
+
+                @blur.stop="
+                    stopMascotHover
                 "
             >
 
@@ -443,12 +949,23 @@ onMounted(
                      HEADER GROUPE
                 ========================================== -->
 
-                <header class="twitch-recommendation-group__header">
+                <header
+                    class="
+                        twitch-recommendation-group__header
+                    "
+                >
 
-                    <div class="twitch-recommendation-group__heading">
+                    <div
+                        class="
+                            twitch-recommendation-group__heading
+                        "
+                    >
 
                         <span
-                            class="twitch-recommendation-group__icon"
+                            class="
+                                twitch-recommendation-group__icon
+                            "
+
                             aria-hidden="true"
                         >
                             {{ group.icon }}
@@ -457,12 +974,20 @@ onMounted(
 
                         <div>
 
-                            <h3 class="twitch-recommendation-group__title">
+                            <h3
+                                class="
+                                    twitch-recommendation-group__title
+                                "
+                            >
                                 {{ group.title }}
                             </h3>
 
 
-                            <p class="twitch-recommendation-group__description">
+                            <p
+                                class="
+                                    twitch-recommendation-group__description
+                                "
+                            >
                                 {{ group.description }}
                             </p>
 
@@ -471,21 +996,39 @@ onMounted(
                     </div>
 
 
-                    <span class="twitch-recommendation-group__count">
+                    <span
+                        class="
+                            twitch-recommendation-group__count
+                        "
+                    >
 
                         {{ group.streamers.length }}
+
                         chaîne{{
                             group.streamers.length > 1
                                 ? "s"
                                 : ""
                         }}
 
+
                         <template
-                            v-if="getOnlineCount(group) > 0"
+                            v-if="
+                                getOnlineCount(
+                                    group
+                                ) > 0
+                            "
                         >
+
                             •
-                            {{ getOnlineCount(group) }}
+
+                            {{
+                                getOnlineCount(
+                                    group
+                                )
+                            }}
+
                             en direct
+
                         </template>
 
                     </span>
@@ -501,42 +1044,125 @@ onMounted(
 
                     <article
                         v-for="streamer in group.streamers"
-                        :key="streamer.login"
-                        class="twitch-streamer"
+
+                        :key="
+                            streamer.login
+                        "
+
+                        class="
+                            twitch-streamer
+                        "
+
+                        tabindex="0"
+
+                        @mouseenter.stop="
+                            speakAboutStreamer(
+                                streamer
+                            )
+                        "
+
+                        @mouseleave.stop="
+                            stopMascotHover
+                        "
+
+                        @focus.stop="
+                            speakAboutStreamer(
+                                streamer
+                            )
+                        "
+
+                        @blur.stop="
+                            stopMascotHover
+                        "
                     >
 
+                        <!-- =================================
+                             AVATAR
+                        ================================== -->
+
                         <a
-                            :href="streamer.url"
+                            :href="
+                                streamer.url
+                            "
+
                             target="_blank"
-                            rel="noopener noreferrer"
-                            class="twitch-streamer__avatar-link"
+
+                            rel="
+                                noopener noreferrer
+                            "
+
+                            class="
+                                twitch-streamer__avatar-link
+                            "
+
                             :aria-label="
                                 `Voir la chaîne Twitch de ${streamer.displayName}`
                             "
+
+                            @mouseenter.stop="
+                                speakAboutStreamer(
+                                    streamer
+                                )
+                            "
+
+                            @mouseleave.stop="
+                                stopMascotHover
+                            "
+
+                            @focus.stop="
+                                speakAboutStreamer(
+                                    streamer
+                                )
+                            "
+
+                            @blur.stop="
+                                stopMascotHover
+                            "
                         >
 
-                            <div class="twitch-streamer__avatar-wrapper">
+                            <div
+                                class="
+                                    twitch-streamer__avatar-wrapper
+                                "
+                            >
 
                                 <img
-                                    :src="streamer.avatar"
+                                    :src="
+                                        streamer.avatar
+                                    "
+
                                     :alt="
                                         `Avatar Twitch de ${streamer.displayName}`
                                     "
-                                    class="twitch-streamer__avatar"
+
+                                    class="
+                                        twitch-streamer__avatar
+                                    "
+
                                     loading="lazy"
                                 >
 
 
                                 <span
-                                    class="twitch-streamer__external"
+                                    class="
+                                        twitch-streamer__external
+                                    "
+
                                     aria-hidden="true"
                                 >
                                     ↗
                                 </span>
 
 
+                                <!-- =========================
+                                     STATUS
+                                ========================== -->
+
                                 <span
-                                    class="twitch-streamer__status"
+                                    class="
+                                        twitch-streamer__status
+                                    "
+
                                     :class="{
                                         'twitch-streamer__status--online':
                                             streamer.status ===
@@ -546,11 +1172,22 @@ onMounted(
                                             streamer.status ===
                                             'offline'
                                     }"
+
                                     :title="
                                         streamer.status ===
                                             'online'
                                             ? 'En direct'
                                             : 'Hors ligne'
+                                    "
+
+                                    @mouseenter.stop="
+                                        speakAboutStatus(
+                                            streamer
+                                        )
+                                    "
+
+                                    @mouseleave.stop="
+                                        stopMascotHover
                                     "
                                 ></span>
 
@@ -559,29 +1196,101 @@ onMounted(
                         </a>
 
 
+                        <!-- =================================
+                             NAME
+                        ================================== -->
+
                         <a
-                            :href="streamer.url"
+                            :href="
+                                streamer.url
+                            "
+
                             target="_blank"
-                            rel="noopener noreferrer"
-                            class="twitch-streamer__name"
+
+                            rel="
+                                noopener noreferrer
+                            "
+
+                            class="
+                                twitch-streamer__name
+                            "
+
+                            @mouseenter.stop="
+                                speakAboutStreamer(
+                                    streamer
+                                )
+                            "
+
+                            @mouseleave.stop="
+                                stopMascotHover
+                            "
+
+                            @focus.stop="
+                                speakAboutStreamer(
+                                    streamer
+                                )
+                            "
+
+                            @blur.stop="
+                                stopMascotHover
+                            "
                         >
                             {{ streamer.displayName }}
                         </a>
 
 
+                        <!-- =================================
+                             LIVE INFO
+                        ================================== -->
+
                         <span
-                            v-if="streamer.status === 'online'"
-                            class="twitch-streamer__live-info"
+                            v-if="
+                                streamer.status ===
+                                'online'
+                            "
+
+                            class="
+                                twitch-streamer__live-info
+                            "
+
+                            tabindex="0"
+
+                            @mouseenter.stop="
+                                speakAboutGame(
+                                    streamer
+                                )
+                            "
+
+                            @mouseleave.stop="
+                                stopMascotHover
+                            "
+
+                            @focus.stop="
+                                speakAboutGame(
+                                    streamer
+                                )
+                            "
+
+                            @blur.stop="
+                                stopMascotHover
+                            "
                         >
 
                             {{ streamer.gameName }}
 
+
                             <template
-                                v-if="streamer.viewers > 0"
+                                v-if="
+                                    streamer.viewers > 0
+                                "
                             >
+
                                 •
+
                                 {{ streamer.viewers }}
+
                                 viewers
+
                             </template>
 
                         </span>

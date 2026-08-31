@@ -1,6 +1,8 @@
 <script setup lang="ts">
+
 import {
     computed,
+    onBeforeUnmount,
     onMounted,
     ref
 } from "vue";
@@ -8,47 +10,70 @@ import {
 import {
     apiFetch
 } from "../../services/api";
-import AppLoader from "../ui/AppLoader.vue";
+
+import AppLoader
+    from "../ui/AppLoader.vue";
+
 
 /* =========================================================
    TYPES
 ========================================================= */
 
 interface TwitchClip {
-    id: string;
 
-    title: string;
+    id:
+        string;
 
-    creatorName: string;
+    title:
+        string;
 
-    url: string;
+    creatorName:
+        string;
 
-    embedUrl: string;
+    url:
+        string;
 
-    thumbnailUrl: string;
+    embedUrl:
+        string;
 
-    views: number;
+    thumbnailUrl:
+        string;
 
-    createdAt: string;
+    views:
+        number;
 
-    duration: number;
+    createdAt:
+        string;
 
-    gameId: string;
+    duration:
+        number;
 
-    videoId: string;
+    gameId:
+        string;
+
+    videoId:
+        string;
+
 }
 
 
 interface TwitchClipsResponse {
-    success: boolean;
 
-    data?: TwitchClip[];
+    success:
+        boolean;
 
-    total?: number;
+    data?:
+        TwitchClip[];
 
-    message?: string;
+    total?:
+        number;
 
-    error?: string;
+    message?:
+        string;
+
+    error?:
+        string;
+
 }
 
 
@@ -65,11 +90,15 @@ const CLIPS_PER_PAGE =
 ========================================================= */
 
 const clips =
-    ref<TwitchClip[]>([]);
+    ref<TwitchClip[]>(
+        []
+    );
 
 
 const loading =
-    ref(true);
+    ref(
+        true
+    );
 
 
 const errorMessage =
@@ -79,7 +108,18 @@ const errorMessage =
 
 
 const currentPage =
-    ref(1);
+    ref(
+        1
+    );
+
+
+/* =========================================================
+   MASCOT TIMER
+========================================================= */
+
+let mascotHoverTimer:
+    number | null =
+        null;
 
 
 /* =========================================================
@@ -87,17 +127,20 @@ const currentPage =
 ========================================================= */
 
 const totalPages =
-    computed(() => {
+    computed(
+        () => {
 
-        return Math.max(
-            1,
-            Math.ceil(
-                clips.value.length /
-                CLIPS_PER_PAGE
-            )
-        );
+            return Math.max(
+                1,
+                Math.ceil(
+                    clips.value.length
+                    /
+                    CLIPS_PER_PAGE
+                )
+            );
 
-    });
+        }
+    );
 
 
 /* =========================================================
@@ -105,27 +148,30 @@ const totalPages =
 ========================================================= */
 
 const paginatedClips =
-    computed(() => {
+    computed(
+        () => {
 
-        const start =
-            (
-                currentPage.value -
-                1
-            ) *
-            CLIPS_PER_PAGE;
-
-
-        const end =
-            start +
-            CLIPS_PER_PAGE;
+            const start =
+                (
+                    currentPage.value -
+                    1
+                )
+                *
+                CLIPS_PER_PAGE;
 
 
-        return clips.value.slice(
-            start,
-            end
-        );
+            const end =
+                start +
+                CLIPS_PER_PAGE;
 
-    });
+
+            return clips.value.slice(
+                start,
+                end
+            );
+
+        }
+    );
 
 
 /* =========================================================
@@ -133,21 +179,401 @@ const paginatedClips =
 ========================================================= */
 
 const canGoPrevious =
-    computed(() => {
+    computed(
+        () => {
 
-        return currentPage.value >
-            1;
+            return (
+                currentPage.value >
+                1
+            );
 
-    });
+        }
+    );
 
 
 const canGoNext =
-    computed(() => {
+    computed(
+        () => {
 
-        return currentPage.value <
-            totalPages.value;
+            return (
+                currentPage.value <
+                totalPages.value
+            );
 
-    });
+        }
+    );
+
+
+/* =========================================================
+   RANDOM MASCOT MESSAGE
+========================================================= */
+
+function getRandomMessage(
+    messages:
+        string[]
+):
+    string {
+
+    if (
+        messages.length === 0
+    ) {
+
+        return "";
+
+    }
+
+
+    const randomIndex =
+        Math.floor(
+            Math.random()
+            *
+            messages.length
+        );
+
+
+    return (
+        messages[randomIndex]
+        ??
+        ""
+    );
+
+}
+
+
+/* =========================================================
+   SEND MASCOT MESSAGE
+========================================================= */
+
+function sendMascotMessage(
+    message:
+        string
+) {
+
+    if (
+        !message.trim()
+    ) {
+
+        return;
+
+    }
+
+
+    window.dispatchEvent(
+        new CustomEvent(
+            "couaxia-mascot-message",
+            {
+                detail: {
+                    message
+                }
+            }
+        )
+    );
+
+}
+
+
+/* =========================================================
+   START MASCOT HOVER
+========================================================= */
+
+function startMascotHover(
+    messages:
+        string[]
+) {
+
+    stopMascotHover();
+
+
+    mascotHoverTimer =
+        window.setTimeout(
+            () => {
+
+                sendMascotMessage(
+                    getRandomMessage(
+                        messages
+                    )
+                );
+
+
+                mascotHoverTimer =
+                    null;
+
+            },
+            400
+        );
+
+}
+
+
+/* =========================================================
+   STOP MASCOT HOVER
+========================================================= */
+
+function stopMascotHover() {
+
+    if (
+        mascotHoverTimer ===
+        null
+    ) {
+
+        return;
+
+    }
+
+
+    window.clearTimeout(
+        mascotHoverTimer
+    );
+
+
+    mascotHoverTimer =
+        null;
+
+}
+
+
+/* =========================================================
+   SECTION MESSAGES
+========================================================= */
+
+const clipsMessages = [
+
+    "Bienvenue dans les archives du chaos ! 🎬",
+
+    "Ici, tu peux retrouver certains des meilleurs moments des lives !",
+
+    "Des fails, des cris et beaucoup trop de moments absurdes... 😂",
+
+    "Les clips sont les preuves officielles de mes catastrophes en stream.",
+
+    "Pourquoi est-ce que les Poups clippent toujours mes pires moments ? 👀",
+
+    "Il y a beaucoup trop de preuves contre moi dans cette section... 🐙"
+
+];
+
+
+/* =========================================================
+   ALL CLIPS MESSAGES
+========================================================= */
+
+const allClipsMessages = [
+
+    "Tu veux voir encore plus de clips ? 👀",
+
+    "Attention, Twitch contient encore beaucoup plus de preuves !",
+
+    "Direction Twitch pour découvrir tous les clips ! 🎬",
+
+    "Tu es vraiment certain de vouloir fouiller les archives ? 😂",
+
+    "Les Poups ont clippé beaucoup trop de choses...",
+
+    "Il y en a encore plein directement sur Twitch ! 💜"
+
+];
+
+
+/* =========================================================
+   CLIP MESSAGES
+========================================================= */
+
+function speakAboutClip(
+    clip:
+        TwitchClip
+) {
+
+    startMascotHover(
+        [
+
+            `Ce clip s'appelle « ${clip.title} » ! 🎬`,
+
+            `Ah... « ${clip.title} »... je me souviens de celui-là. 👀`,
+
+            `${clip.creatorName} est responsable de ce clip ! 😂`,
+
+            `Merci ${clip.creatorName} d'avoir immortalisé ce moment ! 💜`,
+
+            `Ce clip possède déjà ${formatViews(clip.views)} vue${clip.views > 1 ? "s" : ""} !`,
+
+            `${formatViews(clip.views)} vue${clip.views > 1 ? "s" : ""} sur cette preuve compromettante...`,
+
+            "Pourquoi est-ce que ce moment a été clippé ? 😭",
+
+            "Je refuse toute responsabilité concernant ce qui se passe dans ce clip. 🐙"
+
+        ]
+    );
+
+}
+
+
+/* =========================================================
+   CLIP TITLE MESSAGES
+========================================================= */
+
+function speakAboutClipTitle(
+    clip:
+        TwitchClip
+) {
+
+    startMascotHover(
+        [
+
+            `« ${clip.title} »... quel titre ! 😂`,
+
+            `Tu veux regarder « ${clip.title} » ?`,
+
+            `Ce moment a été immortalisé par ${clip.creatorName} !`,
+
+            "Clique dessus si tu veux découvrir ce qui s'est passé ! 👀",
+
+            "Attention, je ne garantis absolument pas ma dignité dans ce clip."
+
+        ]
+    );
+
+}
+
+
+/* =========================================================
+   CREATOR MESSAGES
+========================================================= */
+
+function speakAboutCreator(
+    clip:
+        TwitchClip
+) {
+
+    startMascotHover(
+        [
+
+            `Ce clip a été créé par ${clip.creatorName} ! 💜`,
+
+            `${clip.creatorName} était là au bon moment !`,
+
+            `Merci pour le clip, ${clip.creatorName} ! 🐙`,
+
+            `${clip.creatorName} possède maintenant une preuve contre moi... 👀`
+
+        ]
+    );
+
+}
+
+
+/* =========================================================
+   VIEWS MESSAGES
+========================================================= */
+
+function speakAboutViews(
+    clip:
+        TwitchClip
+) {
+
+    const count =
+        formatViews(
+            clip.views
+        );
+
+
+    startMascotHover(
+        [
+
+            `${count} vue${clip.views > 1 ? "s" : ""} sur ce clip ! 👀`,
+
+            `Vous êtes vraiment ${count} à avoir regardé ça ?!`,
+
+            `${count} vue${clip.views > 1 ? "s" : ""}... ma dignité diminue à chaque clic. 😂`,
+
+            `Ce moment a déjà été vu ${count} fois !`,
+
+            "Pourquoi vous regardez autant mes catastrophes ? 😭"
+
+        ]
+    );
+
+}
+
+
+/* =========================================================
+   EMPTY MESSAGES
+========================================================= */
+
+const emptyMessages = [
+
+    "Aucun clip ? Ma dignité est sauvée ! 😂",
+
+    "Les archives sont vides pour le moment.",
+
+    "Pas encore de preuves compromettantes ici !",
+
+    "Il faudra créer quelques clips pendant les prochains streams ! 🎬"
+
+];
+
+
+/* =========================================================
+   PAGINATION MESSAGES
+========================================================= */
+
+function speakAboutPreviousPage() {
+
+    startMascotHover(
+        [
+
+            "On retourne voir les clips précédents !",
+
+            "Retour dans les archives ! 🎬",
+
+            `Direction la page ${Math.max(1, currentPage.value - 1)} !`,
+
+            "Tu veux revoir les catastrophes précédentes ? 😂"
+
+        ]
+    );
+
+}
+
+
+function speakAboutNextPage() {
+
+    startMascotHover(
+        [
+
+            "Encore plus de clips ! 👀",
+
+            "Voyons les prochaines preuves contre moi...",
+
+            `Direction la page ${Math.min(totalPages.value, currentPage.value + 1)} !`,
+
+            "Tu continues vraiment à fouiller les archives ? 😂",
+
+            "Il y a encore du chaos à découvrir ! 🐙"
+
+        ]
+    );
+
+}
+
+
+function speakAboutPagination() {
+
+    startMascotHover(
+        [
+
+            `Tu es actuellement à la page ${currentPage.value} sur ${totalPages.value}.`,
+
+            `${totalPages.value} page${totalPages.value > 1 ? "s" : ""} de clips... ça commence à faire beaucoup de preuves. 👀`,
+
+            "Tu peux naviguer entre les différentes pages de clips !",
+
+            "Les archives sont organisées... contrairement à mes streams. 😂"
+
+        ]
+    );
+
+}
 
 
 /* =========================================================
@@ -178,13 +604,16 @@ async function loadClips():
         ================================================= */
 
         if (
-            !result.success ||
+            !result.success
+            ||
             !result.data
         ) {
 
             throw new Error(
-                result.error ??
-                result.message ??
+                result.error
+                ??
+                result.message
+                ??
                 "Impossible de récupérer les clips Twitch."
             );
 
@@ -204,7 +633,10 @@ async function loadClips():
 
     }
 
-    catch (error: unknown) {
+    catch (
+        error:
+            unknown
+    ) {
 
         console.error(
             "Erreur clips Twitch :",
@@ -247,6 +679,17 @@ function previousPage() {
     currentPage.value -=
         1;
 
+
+    sendMascotMessage(
+        getRandomMessage(
+            [
+                `Bienvenue à la page ${currentPage.value} !`,
+                "Encore quelques souvenirs par ici ! 🎬",
+                "Retour vers les clips précédents !"
+            ]
+        )
+    );
+
 }
 
 
@@ -268,6 +711,17 @@ function nextPage() {
     currentPage.value +=
         1;
 
+
+    sendMascotMessage(
+        getRandomMessage(
+            [
+                `Bienvenue à la page ${currentPage.value} !`,
+                "Encore plus de clips à découvrir ! 👀",
+                "Continuons notre exploration des archives ! 🐙"
+            ]
+        )
+    );
+
 }
 
 
@@ -276,7 +730,8 @@ function nextPage() {
 ========================================================= */
 
 function formatViews(
-    value: number
+    value:
+        number
 ) {
 
     return value.toLocaleString(
@@ -291,7 +746,8 @@ function formatViews(
 ========================================================= */
 
 function formatDate(
-    value: string
+    value:
+        string
 ) {
 
     const date =
@@ -341,7 +797,8 @@ function formatDate(
 ========================================================= */
 
 function formatDuration(
-    value: number
+    value:
+        number
 ) {
 
     const totalSeconds =
@@ -366,7 +823,8 @@ function formatDuration(
 
 
     return (
-        `${minutes}:` +
+        `${minutes}:`
+        +
         `${seconds
             .toString()
             .padStart(
@@ -385,12 +843,38 @@ function formatDuration(
 onMounted(
     loadClips
 );
+
+
+/* =========================================================
+   CLEANUP
+========================================================= */
+
+onBeforeUnmount(
+    () => {
+
+        stopMascotHover();
+
+    }
+);
+
 </script>
 
 
 <template>
 
-    <section class="twitch-clips">
+    <section
+        class="twitch-clips"
+
+        @mouseenter="
+            startMascotHover(
+                clipsMessages
+            )
+        "
+
+        @mouseleave="
+            stopMascotHover
+        "
+    >
 
         <!-- =================================================
              HEADER
@@ -409,11 +893,12 @@ onMounted(
                     Mes derniers clips
                 </h2>
 
+
                 <p class="twitch-clips__description">
 
-                    Des fails, des fous rires 
-                    et du chaos 
-                    : retrouve ici les 
+                    Des fails, des fous rires
+                    et du chaos :
+                    retrouve ici les
                     meilleurs moments de mes lives !
 
                 </p>
@@ -423,12 +908,36 @@ onMounted(
 
             <a
                 href="https://www.twitch.tv/couaxia/clips"
+
                 target="_blank"
+
                 rel="noopener noreferrer"
+
                 class="twitch-clips__all"
+
+                @mouseenter.stop="
+                    startMascotHover(
+                        allClipsMessages
+                    )
+                "
+
+                @mouseleave.stop="
+                    stopMascotHover
+                "
+
+                @focus.stop="
+                    startMascotHover(
+                        allClipsMessages
+                    )
+                "
+
+                @blur.stop="
+                    stopMascotHover
+                "
             >
 
                 Voir tous les clips
+
 
                 <span aria-hidden="true">
                     ↗
@@ -488,8 +997,36 @@ onMounted(
 
                 <article
                     v-for="clip in paginatedClips"
-                    :key="clip.id"
-                    class="twitch-clip-card"
+
+                    :key="
+                        clip.id
+                    "
+
+                    class="
+                        twitch-clip-card
+                    "
+
+                    tabindex="0"
+
+                    @mouseenter.stop="
+                        speakAboutClip(
+                            clip
+                        )
+                    "
+
+                    @mouseleave.stop="
+                        stopMascotHover
+                    "
+
+                    @focus.stop="
+                        speakAboutClip(
+                            clip
+                        )
+                    "
+
+                    @blur.stop="
+                        stopMascotHover
+                    "
                 >
 
                     <!-- =====================================
@@ -497,16 +1034,52 @@ onMounted(
                     ====================================== -->
 
                     <a
-                        :href="clip.url"
+                        :href="
+                            clip.url
+                        "
+
                         target="_blank"
+
                         rel="noopener noreferrer"
-                        class="twitch-clip-card__thumbnail-link"
+
+                        class="
+                            twitch-clip-card__thumbnail-link
+                        "
+
+                        @mouseenter.stop="
+                            speakAboutClip(
+                                clip
+                            )
+                        "
+
+                        @mouseleave.stop="
+                            stopMascotHover
+                        "
+
+                        @focus.stop="
+                            speakAboutClip(
+                                clip
+                            )
+                        "
+
+                        @blur.stop="
+                            stopMascotHover
+                        "
                     >
 
                         <img
-                            :src="clip.thumbnailUrl"
-                            :alt="`Miniature du clip ${clip.title}`"
-                            class="twitch-clip-card__thumbnail"
+                            :src="
+                                clip.thumbnailUrl
+                            "
+
+                            :alt="
+                                `Miniature du clip ${clip.title}`
+                            "
+
+                            class="
+                                twitch-clip-card__thumbnail
+                            "
+
                             loading="lazy"
                         >
 
@@ -560,10 +1133,37 @@ onMounted(
                         ================================== -->
 
                         <a
-                            :href="clip.url"
+                            :href="
+                                clip.url
+                            "
+
                             target="_blank"
+
                             rel="noopener noreferrer"
-                            class="twitch-clip-card__title"
+
+                            class="
+                                twitch-clip-card__title
+                            "
+
+                            @mouseenter.stop="
+                                speakAboutClipTitle(
+                                    clip
+                                )
+                            "
+
+                            @mouseleave.stop="
+                                stopMascotHover
+                            "
+
+                            @focus.stop="
+                                speakAboutClipTitle(
+                                    clip
+                                )
+                            "
+
+                            @blur.stop="
+                                stopMascotHover
+                            "
                         >
                             {{ clip.title }}
                         </a>
@@ -573,9 +1173,36 @@ onMounted(
                              CREATOR
                         ================================== -->
 
-                        <p class="twitch-clip-card__creator">
+                        <p
+                            class="
+                                twitch-clip-card__creator
+                            "
+
+                            tabindex="0"
+
+                            @mouseenter.stop="
+                                speakAboutCreator(
+                                    clip
+                                )
+                            "
+
+                            @mouseleave.stop="
+                                stopMascotHover
+                            "
+
+                            @focus.stop="
+                                speakAboutCreator(
+                                    clip
+                                )
+                            "
+
+                            @blur.stop="
+                                stopMascotHover
+                            "
+                        >
 
                             Par
+
 
                             <strong>
                                 {{ clip.creatorName }}
@@ -588,7 +1215,33 @@ onMounted(
                              VIEWS
                         ================================== -->
 
-                        <p class="twitch-clip-card__views">
+                        <p
+                            class="
+                                twitch-clip-card__views
+                            "
+
+                            tabindex="0"
+
+                            @mouseenter.stop="
+                                speakAboutViews(
+                                    clip
+                                )
+                            "
+
+                            @mouseleave.stop="
+                                stopMascotHover
+                            "
+
+                            @focus.stop="
+                                speakAboutViews(
+                                    clip
+                                )
+                            "
+
+                            @blur.stop="
+                                stopMascotHover
+                            "
+                        >
 
                             {{
                                 formatViews(
@@ -610,8 +1263,13 @@ onMounted(
                         ================================== -->
 
                         <time
-                            class="twitch-clip-card__date"
-                            :datetime="clip.createdAt"
+                            class="
+                                twitch-clip-card__date
+                            "
+
+                            :datetime="
+                                clip.createdAt
+                            "
                         >
 
                             {{
@@ -635,7 +1293,32 @@ onMounted(
 
             <div
                 v-else
-                class="twitch-clips__empty"
+
+                class="
+                    twitch-clips__empty
+                "
+
+                tabindex="0"
+
+                @mouseenter.stop="
+                    startMascotHover(
+                        emptyMessages
+                    )
+                "
+
+                @mouseleave.stop="
+                    stopMascotHover
+                "
+
+                @focus.stop="
+                    startMascotHover(
+                        emptyMessages
+                    )
+                "
+
+                @blur.stop="
+                    stopMascotHover
+                "
             >
 
                 <span aria-hidden="true">
@@ -655,30 +1338,92 @@ onMounted(
             ============================================== -->
 
             <nav
-                v-if="totalPages > 1"
-                class="twitch-clips__pagination"
-                aria-label="Pagination des clips Twitch"
+                v-if="
+                    totalPages > 1
+                "
+
+                class="
+                    twitch-clips__pagination
+                "
+
+                aria-label="
+                    Pagination des clips Twitch
+                "
             >
+
+                <!-- PREVIOUS -->
 
                 <button
                     type="button"
-                    class="twitch-clips__pagination-button"
-                    :disabled="!canGoPrevious"
-                    @click="previousPage"
+
+                    class="
+                        twitch-clips__pagination-button
+                    "
+
+                    :disabled="
+                        !canGoPrevious
+                    "
+
+                    @mouseenter.stop="
+                        speakAboutPreviousPage
+                    "
+
+                    @mouseleave.stop="
+                        stopMascotHover
+                    "
+
+                    @focus.stop="
+                        speakAboutPreviousPage
+                    "
+
+                    @blur.stop="
+                        stopMascotHover
+                    "
+
+                    @click.stop="
+                        previousPage
+                    "
                 >
                     ← Précédent
                 </button>
 
 
-                <span class="twitch-clips__page">
+                <!-- PAGE -->
+
+                <span
+                    class="
+                        twitch-clips__page
+                    "
+
+                    tabindex="0"
+
+                    @mouseenter.stop="
+                        speakAboutPagination
+                    "
+
+                    @mouseleave.stop="
+                        stopMascotHover
+                    "
+
+                    @focus.stop="
+                        speakAboutPagination
+                    "
+
+                    @blur.stop="
+                        stopMascotHover
+                    "
+                >
 
                     Page
+
 
                     <strong>
                         {{ currentPage }}
                     </strong>
 
+
                     /
+
 
                     <strong>
                         {{ totalPages }}
@@ -687,11 +1432,38 @@ onMounted(
                 </span>
 
 
+                <!-- NEXT -->
+
                 <button
                     type="button"
-                    class="twitch-clips__pagination-button"
-                    :disabled="!canGoNext"
-                    @click="nextPage"
+
+                    class="
+                        twitch-clips__pagination-button
+                    "
+
+                    :disabled="
+                        !canGoNext
+                    "
+
+                    @mouseenter.stop="
+                        speakAboutNextPage
+                    "
+
+                    @mouseleave.stop="
+                        stopMascotHover
+                    "
+
+                    @focus.stop="
+                        speakAboutNextPage
+                    "
+
+                    @blur.stop="
+                        stopMascotHover
+                    "
+
+                    @click.stop="
+                        nextPage
+                    "
                 >
                     Suivant →
                 </button>
