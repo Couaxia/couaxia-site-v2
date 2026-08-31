@@ -86,6 +86,7 @@ const props =
 
 const emit =
     defineEmits<{
+
         (
             event: "toggle-like",
             artwork: CreditArtwork
@@ -95,6 +96,7 @@ const emit =
             event: "open",
             artwork: CreditArtwork
         ): void;
+
     }>();
 
 
@@ -214,7 +216,8 @@ function getRandomMessage(
     string {
 
     if (
-        !messages ||
+        !messages
+        ||
         messages.length === 0
     ) {
 
@@ -274,6 +277,33 @@ function sendMascotMessage(
 
 
 /* =========================================================
+   STOP CARD HOVER MESSAGE
+========================================================= */
+
+function stopCardHoverMessage() {
+
+    if (
+        mascotHoverTimer ===
+        null
+    ) {
+
+        return;
+
+    }
+
+
+    window.clearTimeout(
+        mascotHoverTimer
+    );
+
+
+    mascotHoverTimer =
+        null;
+
+}
+
+
+/* =========================================================
    CARD HOVER MESSAGE
 ========================================================= */
 
@@ -321,28 +351,64 @@ function startCardHoverMessage() {
 
 
 /* =========================================================
-   STOP CARD HOVER MESSAGE
+   IMAGE MESSAGE
 ========================================================= */
 
-function stopCardHoverMessage() {
+function speakImageMessage() {
+
+    /*
+     * On annule d'abord le message générique de la carte.
+     * Sinon celui-ci pourrait apparaître juste après
+     * le message propre à l'image.
+     */
+
+    stopCardHoverMessage();
+
 
     if (
-        mascotHoverTimer ===
-        null
+        !props.artwork.imageMessages
+        ||
+        props.artwork.imageMessages.length === 0
     ) {
+
+        /*
+         * Aucun message personnalisé Supabase :
+         * on utilise les messages génériques.
+         */
+
+        startCardHoverMessage();
 
         return;
 
     }
 
 
-    window.clearTimeout(
-        mascotHoverTimer
-    );
-
+    /*
+     * Petit délai pour éviter que la mascotte parle
+     * lorsque la souris traverse simplement l'image.
+     */
 
     mascotHoverTimer =
-        null;
+        window.setTimeout(
+            () => {
+
+                const message =
+                    getRandomMessage(
+                        props.artwork.imageMessages
+                    );
+
+
+                sendMascotMessage(
+                    message
+                );
+
+
+                mascotHoverTimer =
+                    null;
+
+            },
+            400
+        );
 
 }
 
@@ -354,7 +420,8 @@ function stopCardHoverMessage() {
 function openArtwork() {
 
     if (
-        props.artwork.sensitive &&
+        props.artwork.sensitive
+        &&
         !adultContentVisible.value
     ) {
 
@@ -399,6 +466,24 @@ function toggleLike() {
         props.artwork
     );
 
+
+    if (
+        props.artwork.liked
+    ) {
+
+        sendMascotMessage(
+            "Oh... tu ne l'aimes plus ? 🥺"
+        );
+
+    }
+    else {
+
+        sendMascotMessage(
+            "Hop ! Une création de plus dans tes favoris ! 💜"
+        );
+
+    }
+
 }
 
 
@@ -408,16 +493,48 @@ function toggleLike() {
 
 function handleArtistButtonHover() {
 
+    stopCardHoverMessage();
+
+
     if (
+        !props.artwork.buttonMessages
+        ||
         props.artwork.buttonMessages.length === 0
     ) {
+
+        const fallbackMessages = [
+
+            `Tu veux découvrir le travail de ${props.artwork.artistName} ? 🎨`,
+
+            `Va jeter un œil au profil de ${props.artwork.artistName} ! 💜`,
+
+            "N'hésite pas à soutenir les artistes ! ✨"
+
+        ];
+
+
+        mascotHoverTimer =
+            window.setTimeout(
+                () => {
+
+                    sendMascotMessage(
+                        getRandomMessage(
+                            fallbackMessages
+                        )
+                    );
+
+
+                    mascotHoverTimer =
+                        null;
+
+                },
+                400
+            );
+
 
         return;
 
     }
-
-
-    stopCardHoverMessage();
 
 
     mascotHoverTimer =
@@ -441,34 +558,6 @@ function handleArtistButtonHover() {
             },
             400
         );
-
-}
-
-
-/* =========================================================
-   IMAGE MESSAGE
-========================================================= */
-
-function speakImageMessage() {
-
-    if (
-        props.artwork.imageMessages.length === 0
-    ) {
-
-        return;
-
-    }
-
-
-    const message =
-        getRandomMessage(
-            props.artwork.imageMessages
-        );
-
-
-    sendMascotMessage(
-        message
-    );
 
 }
 
@@ -522,6 +611,22 @@ function speakImageMessage() {
                     : `Ouvrir ${artwork.title}`
             "
 
+            @mouseenter.stop="
+                speakImageMessage
+            "
+
+            @mouseleave.stop="
+                stopCardHoverMessage
+            "
+
+            @focus="
+                speakImageMessage
+            "
+
+            @blur="
+                stopCardHoverMessage
+            "
+
             @click="
                 openArtwork
             "
@@ -555,15 +660,11 @@ function speakImageMessage() {
                 loading="lazy"
 
                 draggable="false"
-
-                @load="
-                    () => {}
-                "
             >
 
 
             <!-- =============================================
-                 VIDEO — GIF MODE
+                 VIDEO
             ============================================== -->
 
             <video
@@ -579,13 +680,17 @@ function speakImageMessage() {
                 "
 
                 autoplay
+
                 loop
+
                 muted
+
                 playsinline
 
                 preload="metadata"
 
                 disablepictureinpicture
+
                 disableremoteplayback
 
                 draggable="false"
@@ -725,11 +830,13 @@ function speakImageMessage() {
             >
 
                 <span aria-hidden="true">
+
                     {{
                         artwork.liked
                             ? "♥"
                             : "♡"
                     }}
+
                 </span>
 
 
@@ -828,6 +935,14 @@ function speakImageMessage() {
                         @mouseleave.stop="
                             stopCardHoverMessage
                         "
+
+                        @focus="
+                            handleArtistButtonHover
+                        "
+
+                        @blur="
+                            stopCardHoverMessage
+                        "
                     >
                         {{ artwork.artistHandle }}
                         ↗
@@ -896,11 +1011,13 @@ function speakImageMessage() {
             >
 
                 <span>
+
                     {{
                         artwork.buttonText
                         ||
                         "Voir son profil artiste"
                     }}
+
                 </span>
 
 

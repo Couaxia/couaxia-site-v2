@@ -1,24 +1,103 @@
 <script setup lang="ts">
-import { RouterView } from "vue-router";
+
+/* =========================================================
+   VUE
+========================================================= */
+
+import {
+    onMounted,
+    onBeforeUnmount
+} from "vue";
+
+import {
+    RouterView
+} from "vue-router";
+
+
+/* =========================================================
+   LAYOUT
+========================================================= */
 
 import AppHeader
     from "./components/layout/AppHeader.vue";
 
+import ScrollPage
+    from "./components/layout/ScrollPage.vue";
+
+
+/* =========================================================
+   MASCOT
+========================================================= */
 
 import Mascot
     from "./components/mascot/Mascot.vue";
-import ScrollPage
-    from "./components/layout/ScrollPage.vue";    
+
+
+/* =========================================================
+   CONTENT PROTECTION
+========================================================= */
+
+import {
+    disableContentProtection,
+    enableContentProtection
+} from "./composables/useImageProtection";
+
+
+/* =========================================================
+   ENABLE CONTENT PROTECTION
+========================================================= */
+
+onMounted(
+    () => {
+
+        enableContentProtection();
+
+    }
+);
+
+
+/* =========================================================
+   DISABLE CONTENT PROTECTION
+========================================================= */
+
+onBeforeUnmount(
+    () => {
+
+        disableContentProtection();
+
+    }
+);
+
 </script>
 
 
 <template>
 
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
     <AppHeader />
+
+
+    <!-- =====================================================
+         CURRENT PAGE
+    ====================================================== -->
 
     <RouterView />
 
+
+    <!-- =====================================================
+         GLOBAL MASCOT
+    ====================================================== -->
+
     <Mascot />
 
-    <ScrollPage/>
+
+    <!-- =====================================================
+         GLOBAL SCROLL BUTTONS
+    ====================================================== -->
+
+    <ScrollPage />
+
 </template>
