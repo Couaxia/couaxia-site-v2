@@ -560,6 +560,56 @@ const characterImage =
                         </span>
 
                     </a>
+
+
+                    <!-- =====================================
+                         STORY
+                    ====================================== -->
+
+                    <RouterLink
+                        to="/history"
+
+                        class="
+                            about-hero__action
+                            about-hero__action--secondary
+                            about-hero__action--story
+                        "
+
+                        @mouseenter="
+                            startMascotHover(
+                                storyMessages
+                            )
+                        "
+
+                        @mouseleave="
+                            stopMascotHover
+                        "
+
+                        @focus="
+                            startMascotHover(
+                                storyMessages
+                            )
+                        "
+
+                        @blur="
+                            stopMascotHover
+                        "
+                    >
+
+                        <span
+                            class="about-hero__action-emoji"
+                            aria-hidden="true"
+                        >
+                            📖
+                        </span>
+
+
+                        <span>
+                            Découvrir mon histoire
+                        </span>
+
+                    </RouterLink>
+
                 </div>
 
             </div>
