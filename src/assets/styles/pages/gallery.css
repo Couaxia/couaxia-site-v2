@@ -1,0 +1,4080 @@
+/* =========================================================
+   CREDITS GALLERY
+========================================================= */
+
+.credits-gallery {
+    position: relative;
+
+    width: min(
+        1240px,
+        calc(100% - 48px)
+    );
+
+    margin:
+        0
+        auto;
+
+    padding:
+        42px
+        0
+        56px;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.credits-gallery__header {
+    display: flex;
+
+    align-items: flex-end;
+    justify-content: space-between;
+
+    gap: 24px;
+
+    margin-bottom:
+        28px;
+}
+
+
+.credits-gallery__eyebrow {
+    margin:
+        0
+        0
+        8px;
+
+    color:
+        #22f2ef;
+
+    font-size:
+        0.78rem;
+
+    font-weight:
+        900;
+
+    letter-spacing:
+        0.14em;
+
+    text-transform:
+        uppercase;
+}
+
+
+.credits-gallery__title {
+    margin: 0;
+
+    color:
+        #ffffff;
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    font-size:
+        clamp(
+            2rem,
+            4vw,
+            3.2rem
+        );
+
+    font-weight:
+        900;
+}
+
+
+.credits-gallery__count {
+    margin: 0;
+
+    color:
+        rgba(
+            255,
+            255,
+            255,
+            0.58
+        );
+
+    font-size:
+        0.82rem;
+
+    font-weight:
+        700;
+}
+
+
+/* =========================================================
+   GRID
+========================================================= */
+
+.credits-gallery__grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            3,
+            minmax(
+                0,
+                1fr
+            )
+        );
+
+    gap:
+        24px;
+}
+
+
+/* =========================================================
+   ITEM
+========================================================= */
+
+.credits-gallery__item {
+    min-width: 0;
+
+    transition:
+        transform 0.25s ease,
+        filter 0.25s ease;
+}
+
+
+.credits-gallery__item--highlighted {
+    transform:
+        translateY(-4px)
+        scale(1.015);
+
+    filter:
+        drop-shadow(
+            0 0 20px
+            rgba(
+                242,
+                34,
+                146,
+                0.35
+            )
+        );
+}
+
+
+/* =========================================================
+   CARD
+========================================================= */
+
+.credits-card {
+    position: relative;
+
+    display: flex;
+
+    flex-direction: column;
+
+    height: 100%;
+
+    overflow: hidden;
+
+    border:
+        1px solid
+        rgba(
+            242,
+            34,
+            146,
+            0.32
+        );
+
+    border-radius:
+        22px;
+
+    background:
+        rgba(
+            30,
+            18,
+            45,
+            0.95
+        );
+
+    box-shadow:
+        0 14px 35px
+        rgba(
+            0,
+            0,
+            0,
+            0.16
+        );
+
+    transition:
+        transform 0.25s ease,
+        border-color 0.25s ease,
+        box-shadow 0.25s ease;
+}
+
+
+.credits-card:hover {
+    transform:
+        translateY(-4px);
+
+    border-color:
+        rgba(
+            242,
+            34,
+            146,
+            0.60
+        );
+
+    box-shadow:
+        0 18px 40px
+        rgba(
+            0,
+            0,
+            0,
+            0.22
+        ),
+        0 0 22px
+        rgba(
+            242,
+            34,
+            146,
+            0.09
+        );
+}
+
+
+/* =========================================================
+   CARD VISUAL
+========================================================= */
+
+.credits-card__visual {
+    position: relative;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    aspect-ratio:
+        1 / 0.92;
+
+    overflow: hidden;
+
+    margin:
+        12px
+        12px
+        0;
+
+    border-radius:
+        16px;
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            0.08
+        );
+
+    cursor: pointer;
+}
+
+
+/* =========================================================
+   IMAGE
+========================================================= */
+
+.credits-card__image {
+    display: block;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: contain;
+
+    transition:
+        transform 0.35s ease,
+        filter 0.35s ease;
+
+    user-select: none;
+}
+
+
+.credits-card__visual:hover
+.credits-card__image {
+    transform:
+        scale(1.06);
+}
+
+
+/* =========================================================
+   VIDEO
+========================================================= */
+
+.credits-card__video {
+    display: block;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: contain;
+
+    background:
+        transparent;
+
+    transition:
+        transform 0.35s ease;
+}
+
+
+.credits-card__visual:hover
+.credits-card__video {
+    transform:
+        scale(1.04);
+}
+
+
+/* =========================================================
+   WATERMARK
+========================================================= */
+
+.credits-card__watermark {
+    position: absolute;
+
+    inset: 0;
+
+    z-index: 3;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    pointer-events: none;
+
+    user-select: none;
+}
+
+
+.credits-card__watermark img {
+    display: block;
+
+    width:
+        min(
+            72%,
+            280px
+        );
+
+    height: auto;
+
+    opacity:
+        0.30;
+
+    filter:
+        drop-shadow(
+            0 2px 4px
+            rgba(
+                0,
+                0,
+                0,
+                0.18
+            )
+        );
+}
+
+
+/* =========================================================
+   CATEGORY
+========================================================= */
+
+.credits-card__category {
+    position: absolute;
+
+    top: 12px;
+    left: 12px;
+
+    z-index: 5;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+    padding:
+        7px
+        11px;
+
+    border-radius:
+        999px;
+
+    background:
+        rgba(
+            109,
+            0,
+            163,
+            0.90
+        );
+
+    color:
+        #ffffff;
+
+    font-size:
+        0.74rem;
+
+    font-weight:
+        800;
+
+    backdrop-filter:
+        blur(8px);
+}
+
+
+/* =========================================================
+   LIKE
+========================================================= */
+
+.credits-card__like {
+    position: absolute;
+
+    top: 12px;
+    right: 12px;
+
+    z-index: 6;
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 4px;
+
+    min-width:
+        46px;
+
+    height:
+        38px;
+
+    padding:
+        0
+        10px;
+
+    border:
+        1px solid
+        rgba(
+            109,
+            0,
+            163,
+            0.18
+        );
+
+    border-radius:
+        999px;
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            0.96
+        );
+
+    color:
+        #e91e78;
+
+    cursor:
+        pointer;
+
+    box-shadow:
+        0 6px 16px
+        rgba(
+            0,
+            0,
+            0,
+            0.12
+        );
+
+    transition:
+        transform 0.2s ease,
+        background 0.2s ease;
+}
+
+
+.credits-card__like:hover {
+    transform:
+        scale(1.06);
+}
+
+
+.credits-card__like--active {
+    background:
+        #ffe4f0;
+}
+
+
+/* =========================================================
+   CARD CONTENT
+========================================================= */
+
+.credits-card__content {
+    display: flex;
+
+    flex-direction: column;
+
+    flex: 1;
+
+    gap:
+        16px;
+
+    padding:
+        18px;
+}
+
+
+/* =========================================================
+   ARTIST
+========================================================= */
+
+.credits-card__artist {
+    display: flex;
+
+    align-items: center;
+
+    gap:
+        12px;
+}
+
+
+.credits-card__artist-icon {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    width:
+        42px;
+    height:
+        42px;
+
+    flex:
+        0 0
+        auto;
+
+    border:
+        1px solid
+        rgba(
+            255,
+            255,
+            255,
+            0.10
+        );
+
+    border-radius:
+        50%;
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            0.05
+        );
+
+    font-size:
+        1.15rem;
+}
+
+
+.credits-card__artist-info {
+    min-width: 0;
+}
+
+
+.credits-card__artist-name {
+    margin:
+        0;
+
+    color:
+        #ffffff;
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    font-size:
+        1.12rem;
+
+    font-weight:
+        900;
+
+    word-break:
+        break-word;
+}
+
+
+.credits-card__artist-role {
+    display:
+        block;
+
+    margin-top:
+        4px;
+
+    color:
+        #22f2ef;
+
+    font-size:
+        0.76rem;
+
+    font-weight:
+        800;
+}
+
+
+.credits-card__artist-handle {
+    display:
+        inline-flex;
+
+    margin-top:
+        4px;
+
+    color:
+        #f58ac0;
+
+    font-size:
+        0.76rem;
+
+    text-decoration:
+        none;
+}
+
+
+/* =========================================================
+   DESCRIPTION
+========================================================= */
+
+.credits-card__description {
+    margin:
+        0;
+
+    color:
+        rgba(
+            255,
+            255,
+            255,
+            0.72
+        );
+
+    font-size:
+        0.85rem;
+
+    font-style:
+        italic;
+
+    line-height:
+        1.55;
+
+    text-align:
+        center;
+}
+
+
+/* =========================================================
+   ARTIST BUTTON
+========================================================= */
+
+.credits-card__artist-button {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap:
+        8px;
+
+    margin-top:
+        auto;
+
+    min-height:
+        42px;
+
+    padding:
+        10px
+        14px;
+
+    border-radius:
+        11px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #8200b6,
+            #d900b8
+        );
+
+    color:
+        #ffffff;
+
+    font-size:
+        0.78rem;
+
+    font-weight:
+        900;
+
+    text-decoration:
+        none;
+
+    transition:
+        transform 0.2s ease,
+        filter 0.2s ease;
+}
+
+
+.credits-card__artist-button:hover {
+    transform:
+        translateY(-2px);
+
+    filter:
+        brightness(1.08);
+}
+
+
+/* =========================================================
+   LOADING
+========================================================= */
+
+.credits-gallery__loading,
+.credits-gallery__empty {
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    gap:
+        10px;
+
+    min-height:
+        220px;
+
+    padding:
+        32px;
+
+    border:
+        1px dashed
+        rgba(
+            255,
+            255,
+            255,
+            0.12
+        );
+
+    border-radius:
+        20px;
+
+    color:
+        rgba(
+            255,
+            255,
+            255,
+            0.65
+        );
+
+    text-align:
+        center;
+}
+
+
+.credits-gallery__loading > span,
+.credits-gallery__empty > span {
+    font-size:
+        2rem;
+}
+
+
+/* =========================================================
+   ERROR
+========================================================= */
+
+.credits-gallery__error {
+    display: flex;
+
+    align-items: center;
+
+    gap:
+        16px;
+
+    padding:
+        18px
+        20px;
+
+    border:
+        1px solid
+        rgba(
+            255,
+            90,
+            130,
+            0.38
+        );
+
+    border-radius:
+        18px;
+
+    background:
+        rgba(
+            70,
+            18,
+            35,
+            0.60
+        );
+
+    color:
+        #ffffff;
+}
+
+
+.credits-gallery__error > span {
+    font-size:
+        1.6rem;
+}
+
+
+.credits-gallery__error strong {
+    display:
+        block;
+
+    margin-bottom:
+        4px;
+}
+
+
+.credits-gallery__error p {
+    margin:
+        0;
+
+    color:
+        rgba(
+            255,
+            255,
+            255,
+            0.72
+        );
+}
+
+
+.credits-gallery__retry {
+    margin-left:
+        auto;
+
+    padding:
+        9px
+        14px;
+
+    border:
+        1px solid
+        rgba(
+            255,
+            255,
+            255,
+            0.14
+        );
+
+    border-radius:
+        10px;
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            0.06
+        );
+
+    color:
+        #ffffff;
+
+    cursor:
+        pointer;
+}
+
+
+/* =========================================================
+   SENSITIVE / +18
+========================================================= */
+
+.credits-card__visual--sensitive
+.credits-card__image,
+.credits-card__visual--sensitive
+.credits-card__video {
+    filter:
+        blur(18px)
+        brightness(0.45);
+
+    transform:
+        scale(1.08);
+}
+
+
+.credits-card__sensitive-overlay {
+    position:
+        absolute;
+
+    inset:
+        0;
+
+    z-index:
+        10;
+
+    display:
+        flex;
+
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    gap:
+        8px;
+
+    padding:
+        20px;
+
+    background:
+        rgba(
+            20,
+            8,
+            28,
+            0.38
+        );
+
+    color:
+        #ffffff;
+
+    text-align:
+        center;
+
+    cursor:
+        pointer;
+
+    backdrop-filter:
+        blur(2px);
+}
+
+
+.credits-card__sensitive-icon {
+    font-size:
+        2rem;
+}
+
+
+.credits-card__sensitive-title {
+    font-size:
+        1rem;
+
+    font-weight:
+        900;
+}
+
+
+.credits-card__sensitive-text {
+    max-width:
+        220px;
+
+    color:
+        rgba(
+            255,
+            255,
+            255,
+            0.70
+        );
+
+    font-size:
+        0.78rem;
+
+    line-height:
+        1.45;
+}
+
+
+/* =========================================================
+   LIGHT MODE
+========================================================= */
+
+html[data-theme="light"]
+.credits-gallery__title {
+    color:
+        #4f315c;
+}
+
+
+html[data-theme="light"]
+.credits-gallery__count {
+    color:
+        #7f6688;
+}
+
+
+html[data-theme="light"]
+.credits-card {
+    border-color:
+        rgba(
+            109,
+            0,
+            163,
+            0.18
+        );
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            0.94
+        );
+
+    box-shadow:
+        0 14px 32px
+        rgba(
+            109,
+            0,
+            163,
+            0.08
+        );
+}
+
+
+html[data-theme="light"]
+.credits-card__visual {
+    background:
+        rgba(
+            109,
+            0,
+            163,
+            0.07
+        );
+}
+
+
+html[data-theme="light"]
+.credits-card__artist-name {
+    color:
+        #4f315c;
+}
+
+
+html[data-theme="light"]
+.credits-card__description {
+    color:
+        #745f7c;
+}
+
+
+html[data-theme="light"]
+.credits-card__artist-icon {
+    border-color:
+        rgba(
+            109,
+            0,
+            163,
+            0.08
+        );
+
+    background:
+        rgba(
+            109,
+            0,
+            163,
+            0.05
+        );
+}
+
+
+html[data-theme="light"]
+.credits-gallery__loading,
+html[data-theme="light"]
+.credits-gallery__empty {
+    border-color:
+        rgba(
+            109,
+            0,
+            163,
+            0.12
+        );
+
+    color:
+        #725e79;
+}
+
+
+html[data-theme="light"]
+.credits-gallery__error {
+    background:
+        rgba(
+            255,
+            238,
+            244,
+            0.92
+        );
+
+    color:
+        #5d3043;
+}
+
+
+html[data-theme="light"]
+.credits-gallery__error p {
+    color:
+        #7b5967;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1100px) {
+
+    .credits-gallery__grid {
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(
+                    0,
+                    1fr
+                )
+            );
+    }
+
+}
+
+
+@media (max-width: 720px) {
+
+    .credits-gallery {
+        width:
+            min(
+                100% - 24px,
+                1240px
+            );
+
+        padding-top:
+            28px;
+    }
+
+
+    .credits-gallery__header {
+        align-items:
+            flex-start;
+
+        flex-direction:
+            column;
+
+        gap:
+            10px;
+    }
+
+
+    .credits-gallery__grid {
+        grid-template-columns:
+            1fr;
+
+        gap:
+            18px;
+    }
+
+
+    .credits-card__content {
+        padding:
+            15px;
+    }
+
+}
+
+/* =========================================================
+   CREDIT CARD
+========================================================= */
+
+.credits-card {
+    position: relative;
+
+    display: flex;
+    flex-direction: column;
+
+    width: 100%;
+    height: 100%;
+
+    overflow: hidden;
+
+    border:
+        1px solid
+        rgba(242, 34, 146, 0.28);
+
+    border-radius: 22px;
+
+    background:
+        rgba(28, 18, 42, 0.94);
+
+    box-shadow:
+        0 14px 35px
+        rgba(0, 0, 0, 0.18);
+
+    transition:
+        transform 0.25s ease,
+        border-color 0.25s ease,
+        box-shadow 0.25s ease;
+}
+
+
+.credits-card:hover {
+    transform:
+        translateY(-5px);
+
+    border-color:
+        rgba(242, 34, 146, 0.58);
+
+    box-shadow:
+        0 20px 42px
+        rgba(0, 0, 0, 0.24),
+        0 0 24px
+        rgba(242, 34, 146, 0.10);
+}
+
+
+/* =========================================================
+   VISUAL
+========================================================= */
+
+.credits-card__visual {
+    position: relative;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    width: auto;
+
+    min-height: 360px;
+
+    margin:
+        12px
+        12px
+        0;
+
+    overflow: hidden;
+
+    border-radius: 16px;
+
+    background:
+        rgba(255, 255, 255, 0.06);
+
+    cursor: pointer;
+
+    isolation: isolate;
+}
+
+
+/* =========================================================
+   IMAGE
+========================================================= */
+
+.credits-card__image {
+    position: relative;
+
+    z-index: 1;
+
+    display: block;
+
+    width: 100%;
+    height: 100%;
+
+    max-height: 520px;
+
+    object-fit: contain;
+    object-position: center;
+
+    user-select: none;
+
+    -webkit-user-drag: none;
+
+    transition:
+        transform 0.35s ease,
+        filter 0.35s ease,
+        opacity 0.35s ease;
+}
+
+
+.credits-card__visual:hover
+.credits-card__image {
+    transform:
+        scale(1.035);
+}
+
+
+/* =========================================================
+   VIDEO
+========================================================= */
+
+.credits-card__video {
+    width: 100%;
+    height: 100%;
+
+    max-height: 520px;
+
+    object-fit: contain;
+    object-position: center;
+
+    background: transparent;
+
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   CATEGORY
+========================================================= */
+
+.credits-card__category {
+    position: absolute;
+
+    top: 12px;
+    left: 12px;
+
+    z-index: 8;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+    max-width:
+        calc(100% - 82px);
+
+    padding:
+        7px
+        12px;
+
+    overflow: hidden;
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.12);
+
+    border-radius: 999px;
+
+    background:
+        rgba(109, 0, 163, 0.88);
+
+    color: #ffffff;
+
+    font-size: 0.72rem;
+    font-weight: 900;
+
+    line-height: 1;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    backdrop-filter:
+        blur(10px);
+
+    -webkit-backdrop-filter:
+        blur(10px);
+
+    box-shadow:
+        0 5px 14px
+        rgba(0, 0, 0, 0.16);
+
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   LIKE
+========================================================= */
+
+.credits-card__like {
+    position: absolute;
+
+    top: 12px;
+    right: 12px;
+
+    z-index: 12;
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 5px;
+
+    min-width: 46px;
+    height: 38px;
+
+    padding:
+        0
+        10px;
+
+    border:
+        1px solid
+        rgba(109, 0, 163, 0.16);
+
+    border-radius: 999px;
+
+    background:
+        rgba(255, 255, 255, 0.94);
+
+    color: #e91e78;
+
+    font-size: 1rem;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 6px 18px
+        rgba(0, 0, 0, 0.16);
+
+    transition:
+        transform 0.2s ease,
+        background 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+.credits-card__like strong {
+    font-size: 0.72rem;
+    font-weight: 900;
+}
+
+
+.credits-card__like:hover {
+    transform:
+        scale(1.08);
+
+    box-shadow:
+        0 8px 20px
+        rgba(233, 30, 120, 0.20);
+}
+
+
+.credits-card__like--active {
+    background: #ffe0ee;
+
+    color: #d70065;
+}
+
+
+/* =========================================================
+   WATERMARK
+========================================================= */
+
+.credits-card__watermark {
+    position: absolute;
+
+    inset: 0;
+
+    z-index: 5;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    overflow: hidden;
+
+    pointer-events: none;
+
+    user-select: none;
+}
+
+
+.credits-card__watermark img {
+    display: block;
+
+    width:
+        min(64%, 250px);
+
+    max-height: 70%;
+
+    object-fit: contain;
+
+    opacity: 0.22;
+
+    user-select: none;
+
+    -webkit-user-drag: none;
+
+    filter:
+        drop-shadow(
+            0 3px 7px
+            rgba(0, 0, 0, 0.20)
+        );
+}
+
+
+/* =========================================================
+   SENSITIVE CONTENT
+========================================================= */
+
+.credits-card__visual--sensitive
+.credits-card__image,
+.credits-card__visual--sensitive
+.credits-card__video {
+    transform:
+        scale(1.08);
+
+    filter:
+        blur(20px)
+        brightness(0.38);
+
+    pointer-events: none;
+}
+
+
+.credits-card__visual--sensitive:hover
+.credits-card__image,
+.credits-card__visual--sensitive:hover
+.credits-card__video {
+    transform:
+        scale(1.08);
+}
+
+
+/* =========================================================
+   SENSITIVE OVERLAY
+========================================================= */
+
+.credits-card__sensitive-overlay {
+    position: absolute;
+
+    inset: 0;
+
+    z-index: 20;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+
+    padding: 24px;
+
+    background:
+        rgba(20, 8, 28, 0.42);
+
+    color: #ffffff;
+
+    text-align: center;
+
+    cursor: pointer;
+
+    backdrop-filter:
+        blur(2px);
+
+    -webkit-backdrop-filter:
+        blur(2px);
+}
+
+
+.credits-card__sensitive-icon {
+    margin-bottom: 2px;
+
+    font-size: 2.1rem;
+}
+
+
+.credits-card__sensitive-title {
+    font-size: 1.05rem;
+    font-weight: 900;
+}
+
+
+.credits-card__sensitive-text {
+    max-width: 250px;
+
+    margin: 0;
+
+    color:
+        rgba(255, 255, 255, 0.78);
+
+    font-size: 0.76rem;
+
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   SENSITIVE BUTTON
+========================================================= */
+
+.credits-card__sensitive-button {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 6px;
+
+    margin-top: 7px;
+
+    padding:
+        9px
+        16px;
+
+    border: 0;
+
+    border-radius: 999px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #6d00a3,
+            #f22292
+        );
+
+    color: #ffffff;
+
+    font: inherit;
+
+    font-size: 0.75rem;
+    font-weight: 900;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 6px 18px
+        rgba(0, 0, 0, 0.22);
+
+    transition:
+        transform 0.2s ease,
+        filter 0.2s ease;
+}
+
+
+.credits-card__sensitive-button:hover {
+    transform:
+        translateY(-2px)
+        scale(1.03);
+
+    filter:
+        brightness(1.10);
+}
+
+
+/* =========================================================
+   REVEALED SENSITIVE
+========================================================= */
+
+.credits-card__visual--revealed
+.credits-card__image,
+.credits-card__visual--revealed
+.credits-card__video {
+    filter: none;
+}
+
+
+/* =========================================================
+   CONTENT
+========================================================= */
+
+.credits-card__content {
+    display: flex;
+
+    flex: 1;
+
+    flex-direction: column;
+
+    gap: 15px;
+
+    padding:
+        18px
+        18px
+        20px;
+}
+
+
+/* =========================================================
+   ARTIST
+========================================================= */
+
+.credits-card__artist {
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    min-width: 0;
+}
+
+
+.credits-card__artist-icon {
+    display: flex;
+
+    flex:
+        0 0
+        auto;
+
+    align-items: center;
+    justify-content: center;
+
+    width: 42px;
+    height: 42px;
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.10);
+
+    border-radius: 50%;
+
+    background:
+        rgba(255, 255, 255, 0.06);
+
+    font-size: 1.15rem;
+}
+
+
+/* =========================================================
+   ARTIST INFO
+========================================================= */
+
+.credits-card__artist-info {
+    min-width: 0;
+}
+
+
+.credits-card__artist-name {
+    margin: 0;
+
+    overflow-wrap: anywhere;
+
+    color: #ffffff;
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    font-size: 1.05rem;
+    font-weight: 900;
+
+    line-height: 1.25;
+}
+
+
+.credits-card__artist-role {
+    display: block;
+
+    margin-top: 4px;
+
+    color: #22f2ef;
+
+    font-size: 0.73rem;
+    font-weight: 800;
+
+    line-height: 1.35;
+}
+
+
+.credits-card__artist-handle {
+    display: inline-flex;
+
+    margin-top: 4px;
+
+    color: #f58ac0;
+
+    font-size: 0.74rem;
+    font-weight: 700;
+
+    text-decoration: none;
+
+    transition:
+        color 0.2s ease;
+}
+
+
+.credits-card__artist-handle:hover {
+    color: #ffffff;
+}
+
+
+/* =========================================================
+   DESCRIPTION
+========================================================= */
+
+.credits-card__description {
+    margin: 0;
+
+    color:
+        rgba(255, 255, 255, 0.70);
+
+    font-size: 0.83rem;
+
+    font-style: italic;
+
+    line-height: 1.55;
+
+    text-align: center;
+}
+
+
+/* =========================================================
+   ARTIST BUTTON
+========================================================= */
+
+.credits-card__artist-button {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+
+    width: 100%;
+
+    min-height: 43px;
+
+    margin-top: auto;
+
+    padding:
+        10px
+        15px;
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.10);
+
+    border-radius: 11px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #7200a8,
+            #d600b3
+        );
+
+    color: #ffffff;
+
+    font-size: 0.76rem;
+    font-weight: 900;
+
+    line-height: 1.2;
+
+    text-align: center;
+    text-decoration: none;
+
+    box-shadow:
+        0 7px 18px
+        rgba(109, 0, 163, 0.20);
+
+    transition:
+        transform 0.2s ease,
+        filter 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+.credits-card__artist-button:hover {
+    transform:
+        translateY(-2px);
+
+    filter:
+        brightness(1.10);
+
+    box-shadow:
+        0 10px 24px
+        rgba(109, 0, 163, 0.30);
+}
+
+
+/* =========================================================
+   LIKED CARD
+========================================================= */
+
+.credits-card--liked {
+    border-color:
+        rgba(233, 30, 120, 0.50);
+
+    box-shadow:
+        0 16px 38px
+        rgba(0, 0, 0, 0.20),
+        0 0 22px
+        rgba(233, 30, 120, 0.10);
+}
+
+
+/* =========================================================
+   LIGHT MODE
+========================================================= */
+
+html[data-theme="light"]
+.credits-card {
+    border-color:
+        rgba(109, 0, 163, 0.17);
+
+    background:
+        rgba(255, 255, 255, 0.95);
+
+    box-shadow:
+        0 14px 34px
+        rgba(109, 0, 163, 0.08);
+}
+
+
+html[data-theme="light"]
+.credits-card:hover {
+    border-color:
+        rgba(233, 30, 120, 0.34);
+
+    box-shadow:
+        0 18px 38px
+        rgba(109, 0, 163, 0.12),
+        0 0 20px
+        rgba(233, 30, 120, 0.07);
+}
+
+
+/* =========================================================
+   LIGHT MODE — VISUAL
+========================================================= */
+
+html[data-theme="light"]
+.credits-card__visual {
+    background:
+        linear-gradient(
+            145deg,
+            rgba(244, 235, 248, 0.88),
+            rgba(255, 245, 251, 0.88)
+        );
+}
+
+
+/* =========================================================
+   LIGHT MODE — ARTIST
+========================================================= */
+
+html[data-theme="light"]
+.credits-card__artist-name {
+    color: #4d3157;
+}
+
+
+html[data-theme="light"]
+.credits-card__artist-role {
+    color: #007d83;
+}
+
+
+html[data-theme="light"]
+.credits-card__artist-icon {
+    border-color:
+        rgba(109, 0, 163, 0.10);
+
+    background:
+        rgba(109, 0, 163, 0.05);
+}
+
+
+/* =========================================================
+   LIGHT MODE — DESCRIPTION
+========================================================= */
+
+html[data-theme="light"]
+.credits-card__description {
+    color: #745f7c;
+}
+
+
+/* =========================================================
+   LIGHT MODE — HANDLE
+========================================================= */
+
+html[data-theme="light"]
+.credits-card__artist-handle {
+    color: #b5186a;
+}
+
+
+html[data-theme="light"]
+.credits-card__artist-handle:hover {
+    color: #6d00a3;
+}
+
+
+/* =========================================================
+   LIGHT MODE — LIKE
+========================================================= */
+
+html[data-theme="light"]
+.credits-card__like {
+    border-color:
+        rgba(109, 0, 163, 0.12);
+
+    background:
+        rgba(255, 255, 255, 0.96);
+}
+
+
+html[data-theme="light"]
+.credits-card__like--active {
+    background: #ffe0ee;
+}
+
+
+/* =========================================================
+   FOCUS ACCESSIBILITY
+========================================================= */
+
+.credits-card__visual:focus-visible,
+.credits-card__like:focus-visible,
+.credits-card__artist-button:focus-visible,
+.credits-card__sensitive-button:focus-visible {
+    outline:
+        3px solid
+        rgba(34, 242, 239, 0.75);
+
+    outline-offset: 3px;
+}
+
+
+/* =========================================================
+   RESPONSIVE — TABLET
+========================================================= */
+
+@media (max-width: 1000px) {
+
+    .credits-card__visual {
+        min-height: 320px;
+    }
+
+
+    .credits-card__image,
+    .credits-card__video {
+        max-height: 460px;
+    }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE — MOBILE
+========================================================= */
+
+@media (max-width: 720px) {
+
+    .credits-card {
+        border-radius: 18px;
+    }
+
+
+    .credits-card__visual {
+        min-height: 280px;
+
+        margin:
+            9px
+            9px
+            0;
+
+        border-radius: 13px;
+    }
+
+
+    .credits-card__image,
+    .credits-card__video {
+        max-height: 430px;
+    }
+
+
+    .credits-card__content {
+        gap: 13px;
+
+        padding:
+            15px
+            15px
+            17px;
+    }
+
+
+    .credits-card__artist-icon {
+        width: 38px;
+        height: 38px;
+
+        font-size: 1rem;
+    }
+
+
+    .credits-card__artist-name {
+        font-size: 0.98rem;
+    }
+
+
+    .credits-card__description {
+        font-size: 0.79rem;
+    }
+
+
+    .credits-card__category {
+        top: 9px;
+        left: 9px;
+
+        padding:
+            6px
+            9px;
+
+        font-size: 0.66rem;
+    }
+
+
+    .credits-card__like {
+        top: 9px;
+        right: 9px;
+
+        min-width: 42px;
+        height: 34px;
+
+        padding:
+            0
+            8px;
+    }
+
+
+    .credits-card__watermark img {
+        width: 58%;
+    }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE — VERY SMALL
+========================================================= */
+
+@media (max-width: 420px) {
+
+    .credits-card__visual {
+        min-height: 240px;
+    }
+
+
+    .credits-card__sensitive-text {
+        max-width: 200px;
+
+        font-size: 0.70rem;
+    }
+
+
+    .credits-card__artist-button {
+        min-height: 40px;
+
+        font-size: 0.72rem;
+    }
+
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .credits-card,
+    .credits-card__image,
+    .credits-card__video,
+    .credits-card__like,
+    .credits-card__artist-button,
+    .credits-card__sensitive-button {
+        transition: none;
+    }
+
+
+    .credits-card:hover {
+        transform: none;
+    }
+
+
+    .credits-card__visual:hover
+    .credits-card__image,
+    .credits-card__visual:hover
+    .credits-card__video {
+        transform: none;
+    }
+
+}
+
+/* =========================================================
+   LIGHTBOX
+========================================================= */
+
+.credits-lightbox {
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 9000;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 28px;
+
+    overflow-y: auto;
+
+    background:
+        rgba(8, 4, 14, 0.88);
+
+    backdrop-filter:
+        blur(16px);
+
+    -webkit-backdrop-filter:
+        blur(16px);
+}
+
+
+/* =========================================================
+   PANEL
+========================================================= */
+
+.credits-lightbox__panel {
+    position: relative;
+
+    display: flex;
+    flex-direction: column;
+
+    width:
+        min(1180px, 100%);
+
+    max-height:
+        calc(100vh - 56px);
+
+    overflow: hidden;
+
+    border:
+        1px solid
+        rgba(242, 34, 146, 0.28);
+
+    border-radius: 26px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(30, 18, 45, 0.98),
+            rgba(18, 12, 29, 0.98)
+        );
+
+    box-shadow:
+        0 30px 90px
+        rgba(0, 0, 0, 0.55),
+        0 0 45px
+        rgba(109, 0, 163, 0.14);
+
+    animation:
+        credits-lightbox-open
+        0.25s ease;
+}
+
+
+/* =========================================================
+   OPEN ANIMATION
+========================================================= */
+
+@keyframes credits-lightbox-open {
+
+    from {
+        opacity: 0;
+
+        transform:
+            translateY(12px)
+            scale(0.985);
+    }
+
+    to {
+        opacity: 1;
+
+        transform:
+            translateY(0)
+            scale(1);
+    }
+
+}
+
+
+/* =========================================================
+   TOP BAR
+========================================================= */
+
+.credits-lightbox__topbar {
+    position: relative;
+
+    z-index: 30;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    min-height: 62px;
+
+    padding:
+        12px
+        16px
+        10px;
+}
+
+
+/* =========================================================
+   COUNTER
+========================================================= */
+
+.credits-lightbox__counter {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    min-width: 62px;
+
+    padding:
+        7px
+        11px;
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.10);
+
+    border-radius: 999px;
+
+    background:
+        rgba(255, 255, 255, 0.06);
+
+    color:
+        rgba(255, 255, 255, 0.72);
+
+    font-size: 0.75rem;
+    font-weight: 900;
+
+    backdrop-filter:
+        blur(10px);
+}
+
+
+/* =========================================================
+   ACTIONS
+========================================================= */
+
+.credits-lightbox__actions {
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+}
+
+
+.credits-lightbox__action {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    width: 42px;
+    height: 42px;
+
+    padding: 0;
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.11);
+
+    border-radius: 50%;
+
+    background:
+        rgba(255, 255, 255, 0.07);
+
+    color: #ffffff;
+
+    font-size: 1.15rem;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.2s ease,
+        background 0.2s ease,
+        border-color 0.2s ease;
+}
+
+
+.credits-lightbox__action:hover {
+    transform:
+        scale(1.08);
+
+    background:
+        rgba(255, 255, 255, 0.13);
+
+    border-color:
+        rgba(255, 255, 255, 0.20);
+}
+
+
+.credits-lightbox__action--liked {
+    background:
+        rgba(233, 30, 120, 0.18);
+
+    border-color:
+        rgba(233, 30, 120, 0.36);
+
+    color: #ff5ca6;
+}
+
+
+.credits-lightbox__action--close:hover {
+    background:
+        rgba(255, 70, 100, 0.17);
+
+    border-color:
+        rgba(255, 70, 100, 0.35);
+}
+
+
+/* =========================================================
+   MAIN
+========================================================= */
+
+.credits-lightbox__main {
+    position: relative;
+
+    display: flex;
+
+    flex: 1;
+
+    align-items: center;
+    justify-content: center;
+
+    min-height: 0;
+
+    padding:
+        0
+        76px
+        14px;
+}
+
+
+/* =========================================================
+   VISUAL
+========================================================= */
+
+.credits-lightbox__visual {
+    position: relative;
+
+    display: flex;
+
+    flex: 1;
+
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+
+    min-width: 0;
+    min-height: 300px;
+
+    max-height: 58vh;
+
+    overflow: hidden;
+
+    border-radius: 18px;
+
+    background:
+        radial-gradient(
+            circle at center,
+            rgba(109, 0, 163, 0.10),
+            rgba(255, 255, 255, 0.025)
+        );
+}
+
+
+/* =========================================================
+   IMAGE
+========================================================= */
+
+.credits-lightbox__image {
+    position: relative;
+
+    z-index: 1;
+
+    display: block;
+
+    width: 100%;
+    height: 100%;
+
+    max-width: 100%;
+    max-height: 58vh;
+
+    object-fit: contain;
+    object-position: center;
+
+    user-select: none;
+
+    -webkit-user-drag: none;
+}
+
+
+/* =========================================================
+   VIDEO
+========================================================= */
+
+.credits-lightbox__video {
+    background: transparent;
+}
+
+
+/* =========================================================
+   WATERMARK
+========================================================= */
+
+.credits-lightbox__watermark {
+    position: absolute;
+
+    inset: 0;
+
+    z-index: 5;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    pointer-events: none;
+
+    user-select: none;
+}
+
+
+.credits-lightbox__watermark img {
+    display: block;
+
+    width:
+        min(48%, 360px);
+
+    max-height: 65%;
+
+    object-fit: contain;
+
+    opacity: 0.22;
+
+    user-select: none;
+
+    -webkit-user-drag: none;
+
+    filter:
+        drop-shadow(
+            0 4px 10px
+            rgba(0, 0, 0, 0.28)
+        );
+}
+
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+.credits-lightbox__navigation {
+    position: absolute;
+
+    top: 50%;
+
+    z-index: 20;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    width: 48px;
+    height: 66px;
+
+    padding: 0;
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.12);
+
+    border-radius: 16px;
+
+    background:
+        rgba(255, 255, 255, 0.07);
+
+    color: #ffffff;
+
+    font-family: Arial, sans-serif;
+
+    font-size: 2.2rem;
+    font-weight: 300;
+
+    line-height: 1;
+
+    cursor: pointer;
+
+    transform:
+        translateY(-50%);
+
+    backdrop-filter:
+        blur(12px);
+
+    -webkit-backdrop-filter:
+        blur(12px);
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+.credits-lightbox__navigation:hover {
+    background:
+        rgba(109, 0, 163, 0.40);
+
+    border-color:
+        rgba(242, 34, 146, 0.45);
+}
+
+
+.credits-lightbox__navigation--previous {
+    left: 14px;
+}
+
+
+.credits-lightbox__navigation--previous:hover {
+    transform:
+        translateY(-50%)
+        translateX(-3px);
+}
+
+
+.credits-lightbox__navigation--next {
+    right: 14px;
+}
+
+
+.credits-lightbox__navigation--next:hover {
+    transform:
+        translateY(-50%)
+        translateX(3px);
+}
+
+
+/* =========================================================
+   CONTENT
+========================================================= */
+
+.credits-lightbox__content {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 14px;
+
+    flex-shrink: 0;
+
+    padding:
+        16px
+        22px
+        20px;
+
+    border-top:
+        1px solid
+        rgba(255, 255, 255, 0.07);
+}
+
+
+/* =========================================================
+   ARTIST
+========================================================= */
+
+.credits-lightbox__artist {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+}
+
+
+.credits-lightbox__artist-main {
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    min-width: 0;
+}
+
+
+.credits-lightbox__artist-icon {
+    display: flex;
+
+    flex:
+        0 0
+        auto;
+
+    align-items: center;
+    justify-content: center;
+
+    width: 44px;
+    height: 44px;
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.10);
+
+    border-radius: 50%;
+
+    background:
+        rgba(255, 255, 255, 0.06);
+
+    font-size: 1.15rem;
+}
+
+
+.credits-lightbox__artist-info {
+    min-width: 0;
+}
+
+
+.credits-lightbox__artist h2 {
+    margin: 0;
+
+    color: #ffffff;
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    font-size:
+        clamp(
+            1rem,
+            2vw,
+            1.35rem
+        );
+
+    font-weight: 900;
+}
+
+
+.credits-lightbox__artist-role {
+    display: block;
+
+    margin-top: 4px;
+
+    color: #22f2ef;
+
+    font-size: 0.74rem;
+    font-weight: 800;
+}
+
+
+/* =========================================================
+   ARTIST LINK
+========================================================= */
+
+.credits-lightbox__artist-link {
+    display: inline-flex;
+
+    flex:
+        0 0
+        auto;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+
+    min-height: 40px;
+
+    padding:
+        9px
+        15px;
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.10);
+
+    border-radius: 10px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #7200a8,
+            #d600b3
+        );
+
+    color: #ffffff;
+
+    font-size: 0.75rem;
+    font-weight: 900;
+
+    text-decoration: none;
+
+    box-shadow:
+        0 7px 18px
+        rgba(109, 0, 163, 0.20);
+
+    transition:
+        transform 0.2s ease,
+        filter 0.2s ease;
+}
+
+
+.credits-lightbox__artist-link:hover {
+    transform:
+        translateY(-2px);
+
+    filter:
+        brightness(1.10);
+}
+
+
+/* =========================================================
+   DESCRIPTION
+========================================================= */
+
+.credits-lightbox__description {
+    margin: 0;
+
+    color:
+        rgba(255, 255, 255, 0.68);
+
+    font-size: 0.82rem;
+
+    font-style: italic;
+
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   META
+========================================================= */
+
+.credits-lightbox__meta {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            3,
+            minmax(0, 1fr)
+        );
+
+    gap: 10px;
+}
+
+
+.credits-lightbox__meta-item {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 4px;
+
+    padding:
+        10px
+        12px;
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.07);
+
+    border-radius: 10px;
+
+    background:
+        rgba(255, 255, 255, 0.035);
+}
+
+
+.credits-lightbox__meta-item span {
+    color:
+        rgba(255, 255, 255, 0.44);
+
+    font-size: 0.65rem;
+    font-weight: 800;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.06em;
+}
+
+
+.credits-lightbox__meta-item strong {
+    overflow-wrap: anywhere;
+
+    color: #ffffff;
+
+    font-size: 0.78rem;
+}
+
+
+/* =========================================================
+   LIGHT MODE
+========================================================= */
+
+html[data-theme="light"]
+.credits-lightbox {
+    background:
+        rgba(244, 235, 248, 0.82);
+}
+
+
+html[data-theme="light"]
+.credits-lightbox__panel {
+    border-color:
+        rgba(109, 0, 163, 0.18);
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255, 255, 255, 0.98),
+            rgba(251, 245, 253, 0.98)
+        );
+
+    box-shadow:
+        0 30px 80px
+        rgba(76, 39, 91, 0.18);
+}
+
+
+html[data-theme="light"]
+.credits-lightbox__visual {
+    background:
+        radial-gradient(
+            circle at center,
+            rgba(109, 0, 163, 0.07),
+            rgba(109, 0, 163, 0.025)
+        );
+}
+
+
+html[data-theme="light"]
+.credits-lightbox__counter {
+    border-color:
+        rgba(109, 0, 163, 0.10);
+
+    background:
+        rgba(109, 0, 163, 0.05);
+
+    color: #735b7d;
+}
+
+
+html[data-theme="light"]
+.credits-lightbox__action {
+    border-color:
+        rgba(109, 0, 163, 0.11);
+
+    background:
+        rgba(109, 0, 163, 0.05);
+
+    color: #563561;
+}
+
+
+html[data-theme="light"]
+.credits-lightbox__action:hover {
+    background:
+        rgba(109, 0, 163, 0.10);
+}
+
+
+html[data-theme="light"]
+.credits-lightbox__action--liked {
+    border-color:
+        rgba(233, 30, 120, 0.24);
+
+    background:
+        rgba(233, 30, 120, 0.09);
+
+    color: #d71870;
+}
+
+
+html[data-theme="light"]
+.credits-lightbox__navigation {
+    border-color:
+        rgba(109, 0, 163, 0.12);
+
+    background:
+        rgba(255, 255, 255, 0.88);
+
+    color: #6d00a3;
+
+    box-shadow:
+        0 8px 24px
+        rgba(109, 0, 163, 0.10);
+}
+
+
+html[data-theme="light"]
+.credits-lightbox__navigation:hover {
+    background:
+        rgba(109, 0, 163, 0.10);
+}
+
+
+html[data-theme="light"]
+.credits-lightbox__content {
+    border-top-color:
+        rgba(109, 0, 163, 0.08);
+}
+
+
+html[data-theme="light"]
+.credits-lightbox__artist h2 {
+    color: #4f315c;
+}
+
+
+html[data-theme="light"]
+.credits-lightbox__artist-role {
+    color: #007d83;
+}
+
+
+html[data-theme="light"]
+.credits-lightbox__artist-icon {
+    border-color:
+        rgba(109, 0, 163, 0.09);
+
+    background:
+        rgba(109, 0, 163, 0.05);
+}
+
+
+html[data-theme="light"]
+.credits-lightbox__description {
+    color: #745f7c;
+}
+
+
+html[data-theme="light"]
+.credits-lightbox__meta-item {
+    border-color:
+        rgba(109, 0, 163, 0.08);
+
+    background:
+        rgba(109, 0, 163, 0.035);
+}
+
+
+html[data-theme="light"]
+.credits-lightbox__meta-item span {
+    color: #907b98;
+}
+
+
+html[data-theme="light"]
+.credits-lightbox__meta-item strong {
+    color: #51365b;
+}
+
+
+/* =========================================================
+   RESPONSIVE — TABLET
+========================================================= */
+
+@media (max-width: 900px) {
+
+    .credits-lightbox {
+        padding: 16px;
+    }
+
+
+    .credits-lightbox__panel {
+        max-height:
+            calc(100vh - 32px);
+
+        border-radius: 20px;
+    }
+
+
+    .credits-lightbox__main {
+        padding:
+            0
+            58px
+            12px;
+    }
+
+
+    .credits-lightbox__navigation {
+        width: 40px;
+        height: 58px;
+
+        border-radius: 13px;
+
+        font-size: 1.9rem;
+    }
+
+
+    .credits-lightbox__navigation--previous {
+        left: 9px;
+    }
+
+
+    .credits-lightbox__navigation--next {
+        right: 9px;
+    }
+
+
+    .credits-lightbox__visual {
+        max-height: 52vh;
+    }
+
+
+    .credits-lightbox__image {
+        max-height: 52vh;
+    }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE — MOBILE
+========================================================= */
+
+@media (max-width: 650px) {
+
+    .credits-lightbox {
+        align-items: flex-start;
+
+        padding: 8px;
+    }
+
+
+    .credits-lightbox__panel {
+        width: 100%;
+
+        max-height:
+            calc(100dvh - 16px);
+
+        margin: auto;
+
+        border-radius: 16px;
+    }
+
+
+    .credits-lightbox__topbar {
+        min-height: 52px;
+
+        padding:
+            8px
+            10px;
+    }
+
+
+    .credits-lightbox__counter {
+        min-width: 54px;
+
+        padding:
+            6px
+            9px;
+
+        font-size: 0.68rem;
+    }
+
+
+    .credits-lightbox__action {
+        width: 36px;
+        height: 36px;
+
+        font-size: 1rem;
+    }
+
+
+    .credits-lightbox__main {
+        padding:
+            0
+            44px
+            8px;
+    }
+
+
+    .credits-lightbox__visual {
+        min-height: 220px;
+
+        max-height: 48vh;
+
+        border-radius: 12px;
+    }
+
+
+    .credits-lightbox__image {
+        max-height: 48vh;
+    }
+
+
+    .credits-lightbox__navigation {
+        width: 34px;
+        height: 52px;
+
+        border-radius: 11px;
+
+        font-size: 1.65rem;
+    }
+
+
+    .credits-lightbox__navigation--previous {
+        left: 5px;
+    }
+
+
+    .credits-lightbox__navigation--next {
+        right: 5px;
+    }
+
+
+    .credits-lightbox__content {
+        gap: 11px;
+
+        padding:
+            12px
+            13px
+            15px;
+
+        overflow-y: auto;
+    }
+
+
+    .credits-lightbox__artist {
+        align-items: flex-start;
+
+        flex-direction: column;
+
+        gap: 10px;
+    }
+
+
+    .credits-lightbox__artist-link {
+        width: 100%;
+    }
+
+
+    .credits-lightbox__meta {
+        grid-template-columns: 1fr;
+    }
+
+
+    .credits-lightbox__meta-item {
+        flex-direction: row;
+
+        align-items: center;
+        justify-content: space-between;
+    }
+
+
+    .credits-lightbox__watermark img {
+        width: 56%;
+    }
+
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .credits-lightbox__panel {
+        animation: none;
+    }
+
+
+    .credits-lightbox__action,
+    .credits-lightbox__navigation,
+    .credits-lightbox__artist-link {
+        transition: none;
+    }
+
+}
+
+/* =========================================================
+   CREDITS HERO
+========================================================= */
+
+.credits-hero {
+    position: relative;
+
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1.2fr)
+        minmax(280px, 0.8fr);
+
+    align-items: center;
+
+    gap: 34px;
+
+    width:
+        min(
+            1240px,
+            calc(100% - 48px)
+        );
+
+    min-height: 390px;
+
+    margin:
+        20px
+        auto
+        34px;
+
+    padding:
+        46px
+        54px;
+
+    overflow: hidden;
+
+    border:
+        1px solid
+        rgba(242, 34, 146, 0.20);
+
+    border-radius: 28px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #4b176d,
+            #922579
+        );
+
+    box-shadow:
+        0 18px 50px
+        rgba(0, 0, 0, 0.25);
+}
+
+
+.credits-hero__content {
+    position: relative;
+
+    z-index: 2;
+
+    max-width: 650px;
+}
+
+
+.credits-hero__eyebrow {
+    margin:
+        0
+        0
+        18px;
+
+    color: #22f2ef;
+
+    font-size: 0.78rem;
+    font-weight: 900;
+
+    letter-spacing: 0.14em;
+
+    text-transform: uppercase;
+}
+
+
+.credits-hero__title {
+    margin: 0;
+
+    color: #ffffff;
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    font-size:
+        clamp(
+            3rem,
+            6vw,
+            5.4rem
+        );
+
+    font-weight: 900;
+
+    line-height: 0.95;
+}
+
+
+.credits-hero__description {
+    max-width: 570px;
+
+    margin:
+        24px
+        0
+        0;
+
+    color:
+        rgba(255, 255, 255, 0.82);
+
+    font-size: 0.96rem;
+
+    line-height: 1.8;
+}
+
+
+/* =========================================================
+   HERO VISUAL
+========================================================= */
+
+.credits-hero__visual-icon {
+    position: relative;
+
+    z-index: 2;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    min-width: 0;
+}
+
+
+.credits-hero__mascot {
+    display: block;
+
+    width:
+        min(
+            100%,
+            370px
+        );
+
+    height: auto;
+
+    max-height: 370px;
+
+    object-fit: contain;
+
+    user-select: none;
+
+    pointer-events: none;
+
+    filter:
+        drop-shadow(
+            0 18px 28px
+            rgba(0, 0, 0, 0.22)
+        );
+
+    animation:
+        credits-hero-float
+        4.8s
+        ease-in-out
+        infinite;
+}
+
+
+@keyframes credits-hero-float {
+
+    0%,
+    100% {
+        transform:
+            translateY(0)
+            rotate(-0.3deg);
+    }
+
+    50% {
+        transform:
+            translateY(-12px)
+            rotate(0.3deg);
+    }
+
+}
+
+
+/* =========================================================
+   LIGHT HERO
+========================================================= */
+
+html[data-theme="light"]
+.credits-hero {
+    border-color:
+        rgba(109, 0, 163, 0.16);
+
+    background:
+        linear-gradient(
+            135deg,
+            #fff6fc,
+            #f6dff4
+        );
+
+    box-shadow:
+        0 18px 45px
+        rgba(109, 0, 163, 0.12);
+}
+
+
+html[data-theme="light"]
+.credits-hero__eyebrow {
+    color: #008e98;
+}
+
+
+html[data-theme="light"]
+.credits-hero__title {
+    color: #4f315c;
+}
+
+
+html[data-theme="light"]
+.credits-hero__description {
+    color: #6d5974;
+}
+
+
+/* =========================================================
+   FILTERS
+========================================================= */
+
+.credits-filters {
+    width:
+        min(
+            1240px,
+            calc(100% - 48px)
+        );
+
+    margin:
+        0
+        auto
+        30px;
+
+    padding:
+        26px;
+
+    border:
+        1px solid
+        rgba(242, 34, 146, 0.18);
+
+    border-radius: 22px;
+
+    background:
+        rgba(29, 18, 43, 0.82);
+
+    box-shadow:
+        0 14px 34px
+        rgba(0, 0, 0, 0.12);
+}
+
+
+.credits-filters__header {
+    margin-bottom: 18px;
+}
+
+
+.credits-filters__eyebrow {
+    margin:
+        0
+        0
+        6px;
+
+    color: #22f2ef;
+
+    font-size: 0.72rem;
+    font-weight: 900;
+
+    letter-spacing: 0.12em;
+
+    text-transform: uppercase;
+}
+
+
+.credits-filters__title {
+    margin: 0;
+
+    color: #ffffff;
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    font-size: 1.65rem;
+
+    font-weight: 900;
+}
+
+
+.credits-filters__list {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 10px;
+}
+
+
+.credits-filters__button {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 7px;
+
+    min-height: 40px;
+
+    padding:
+        9px
+        14px;
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.10);
+
+    border-radius: 999px;
+
+    background:
+        rgba(255, 255, 255, 0.05);
+
+    color:
+        rgba(255, 255, 255, 0.78);
+
+    font: inherit;
+
+    font-size: 0.76rem;
+    font-weight: 800;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.2s ease,
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease;
+}
+
+
+.credits-filters__button:hover {
+    transform:
+        translateY(-2px);
+
+    border-color:
+        rgba(242, 34, 146, 0.34);
+
+    background:
+        rgba(242, 34, 146, 0.08);
+
+    color: #ffffff;
+}
+
+
+.credits-filters__button--active {
+    border-color:
+        rgba(242, 34, 146, 0.42);
+
+    background:
+        linear-gradient(
+            135deg,
+            #6d00a3,
+            #d700a9
+        );
+
+    color: #ffffff;
+
+    box-shadow:
+        0 7px 18px
+        rgba(109, 0, 163, 0.20);
+}
+
+
+.credits-filters__icon {
+    font-size: 1rem;
+}
+
+
+/* =========================================================
+   LIGHT FILTERS
+========================================================= */
+
+html[data-theme="light"]
+.credits-filters {
+    border-color:
+        rgba(109, 0, 163, 0.14);
+
+    background:
+        rgba(255, 255, 255, 0.88);
+
+    box-shadow:
+        0 12px 30px
+        rgba(109, 0, 163, 0.08);
+}
+
+
+html[data-theme="light"]
+.credits-filters__title {
+    color: #4f315c;
+}
+
+
+html[data-theme="light"]
+.credits-filters__button {
+    border-color:
+        rgba(109, 0, 163, 0.10);
+
+    background:
+        rgba(109, 0, 163, 0.04);
+
+    color: #6d5974;
+}
+
+
+html[data-theme="light"]
+.credits-filters__button:hover {
+    color: #4f315c;
+}
+
+
+html[data-theme="light"]
+.credits-filters__button--active {
+    color: #ffffff;
+}
+
+
+/* =========================================================
+   RANDOM
+========================================================= */
+
+.credits-random {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 24px;
+
+    width:
+        min(
+            1240px,
+            calc(100% - 48px)
+        );
+
+    margin:
+        0
+        auto
+        34px;
+
+    padding:
+        22px
+        24px;
+
+    border:
+        1px solid
+        rgba(242, 34, 146, 0.20);
+
+    border-radius: 20px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(74, 22, 103, 0.76),
+            rgba(119, 27, 100, 0.72)
+        );
+
+    box-shadow:
+        0 14px 34px
+        rgba(0, 0, 0, 0.14);
+}
+
+
+.credits-random__content {
+    display: flex;
+
+    align-items: center;
+
+    gap: 16px;
+}
+
+
+.credits-random__icon {
+    display: flex;
+
+    flex:
+        0 0
+        auto;
+
+    align-items: center;
+    justify-content: center;
+
+    width: 52px;
+    height: 52px;
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.14);
+
+    border-radius: 16px;
+
+    background:
+        rgba(255, 255, 255, 0.07);
+
+    font-size: 1.5rem;
+}
+
+
+.credits-random__eyebrow {
+    margin:
+        0
+        0
+        3px;
+
+    color: #22f2ef;
+
+    font-size: 0.66rem;
+    font-weight: 900;
+
+    letter-spacing: 0.12em;
+
+    text-transform: uppercase;
+}
+
+
+.credits-random__title {
+    margin: 0;
+
+    color: #ffffff;
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    font-size: 1.35rem;
+    font-weight: 900;
+}
+
+
+.credits-random__description {
+    margin:
+        6px
+        0
+        0;
+
+    color:
+        rgba(255, 255, 255, 0.68);
+
+    font-size: 0.78rem;
+
+    line-height: 1.5;
+}
+
+
+.credits-random__button {
+    display: inline-flex;
+
+    flex:
+        0 0
+        auto;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+
+    min-height: 42px;
+
+    padding:
+        10px
+        16px;
+
+    border: 0;
+
+    border-radius: 11px;
+
+    background: #ffffff;
+
+    color: #6d00a3;
+
+    font: inherit;
+
+    font-size: 0.76rem;
+    font-weight: 900;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 8px 20px
+        rgba(0, 0, 0, 0.14);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+.credits-random__button:hover {
+    transform:
+        translateY(-2px);
+
+    box-shadow:
+        0 10px 24px
+        rgba(0, 0, 0, 0.20);
+}
+
+
+/* =========================================================
+   LIGHT RANDOM
+========================================================= */
+
+html[data-theme="light"]
+.credits-random {
+    border-color:
+        rgba(109, 0, 163, 0.14);
+
+    background:
+        linear-gradient(
+            135deg,
+            #fff2fa,
+            #f4ddf1
+        );
+
+    box-shadow:
+        0 12px 30px
+        rgba(109, 0, 163, 0.08);
+}
+
+
+html[data-theme="light"]
+.credits-random__title {
+    color: #4f315c;
+}
+
+
+html[data-theme="light"]
+.credits-random__description {
+    color: #725e79;
+}
+
+
+html[data-theme="light"]
+.credits-random__icon {
+    border-color:
+        rgba(109, 0, 163, 0.10);
+
+    background:
+        rgba(109, 0, 163, 0.05);
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 900px) {
+
+    .credits-hero {
+        grid-template-columns:
+            1fr;
+
+        padding:
+            40px
+            32px;
+
+        text-align: center;
+    }
+
+
+    .credits-hero__description {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+
+    .credits-hero__mascot {
+        width:
+            min(
+                85%,
+                330px
+            );
+    }
+
+
+    .credits-random {
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+
+    .credits-random__button {
+        width: 100%;
+    }
+
+}
+
+
+@media (max-width: 650px) {
+
+    .credits-hero,
+    .credits-filters,
+    .credits-random {
+        width:
+            calc(100% - 24px);
+    }
+
+
+    .credits-hero {
+        min-height: 0;
+
+        padding:
+            32px
+            22px;
+
+        border-radius: 20px;
+    }
+
+
+    .credits-hero__title {
+        font-size:
+            clamp(
+                2.6rem,
+                16vw,
+                4rem
+            );
+    }
+
+
+    .credits-filters {
+        padding: 18px;
+
+        border-radius: 17px;
+    }
+
+
+    .credits-filters__list {
+        gap: 8px;
+    }
+
+
+    .credits-filters__button {
+        flex:
+            1 1
+            calc(50% - 8px);
+
+        min-width: 0;
+    }
+
+
+    .credits-random {
+        padding:
+            18px;
+
+        border-radius: 17px;
+    }
+
+
+    .credits-random__content {
+        align-items: flex-start;
+    }
+
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+
+    .credits-hero__mascot {
+        animation: none;
+    }
+
+}

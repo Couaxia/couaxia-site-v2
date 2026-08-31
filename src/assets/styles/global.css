@@ -1013,3 +1013,357 @@ html {
 html[data-theme="light"] .app-loader__text {
     color: #654c70;
 }
+
+/* =========================================================
+   MASCOT WIDGET
+========================================================= */
+
+.mascot-widget {
+    position: fixed;
+
+    right: 92px;
+    bottom: 18px;
+
+    z-index: 2147483000;
+
+    display: flex;
+
+    align-items: flex-end;
+    justify-content: flex-end;
+
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   CHARACTER
+========================================================= */
+
+.mascot-widget__character {
+    position: relative;
+
+    z-index: 2;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    width: 78px;
+    height: 88px;
+
+    padding: 0;
+
+    border: 0;
+
+    background: transparent;
+
+    cursor: pointer;
+
+    pointer-events: auto;
+
+    transition:
+        transform 0.2s ease;
+}
+
+
+.mascot-widget__character:hover {
+    transform:
+        translateY(-4px)
+        scale(1.04);
+}
+
+
+.mascot-widget__image {
+    display: block;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: contain;
+
+    user-select: none;
+
+    -webkit-user-drag: none;
+
+    filter:
+        drop-shadow(
+            0 8px 14px
+            rgba(0, 0, 0, 0.30)
+        );
+}
+
+
+/* =========================================================
+   SPEECH BUBBLE
+========================================================= */
+
+.mascot-widget__bubble {
+    position: absolute;
+
+    right: 70px;
+    bottom: 62px;
+
+    z-index: 1;
+
+    width:
+        min(
+            280px,
+            calc(100vw - 120px)
+        );
+
+    padding:
+        14px
+        38px
+        14px
+        16px;
+
+    border:
+        1px solid
+        rgba(202, 81, 255, 0.50);
+
+    border-radius:
+        16px;
+
+    background:
+        rgba(18, 5, 35, 0.96);
+
+    color:
+        #ffffff;
+
+    box-shadow:
+        0 12px 32px
+        rgba(0, 0, 0, 0.28);
+
+    backdrop-filter:
+        blur(12px);
+
+    -webkit-backdrop-filter:
+        blur(12px);
+
+    pointer-events: auto;
+}
+
+
+.mascot-widget__bubble::after {
+    content: "";
+
+    position: absolute;
+
+    right: -8px;
+    bottom: 18px;
+
+    width: 16px;
+    height: 16px;
+
+    background:
+        rgba(18, 5, 35, 0.96);
+
+    border-top:
+        1px solid
+        rgba(202, 81, 255, 0.50);
+
+    border-right:
+        1px solid
+        rgba(202, 81, 255, 0.50);
+
+    transform:
+        rotate(45deg);
+}
+
+
+/* =========================================================
+   NAME
+========================================================= */
+
+.mascot-widget__name {
+    display: block;
+
+    margin-bottom: 4px;
+
+    color:
+        #f22292;
+
+    font-size: 0.72rem;
+    font-weight: 900;
+
+    letter-spacing: 0.08em;
+
+    text-transform: uppercase;
+}
+
+
+/* =========================================================
+   MESSAGE
+========================================================= */
+
+.mascot-widget__bubble p {
+    margin: 0;
+
+    color:
+        rgba(255, 255, 255, 0.86);
+
+    font-size: 0.82rem;
+
+    line-height: 1.45;
+}
+
+
+/* =========================================================
+   CLOSE
+========================================================= */
+
+.mascot-widget__close {
+    position: absolute;
+
+    top: 7px;
+    right: 8px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    width: 24px;
+    height: 24px;
+
+    padding: 0;
+
+    border: 0;
+
+    border-radius: 50%;
+
+    background:
+        rgba(255, 255, 255, 0.07);
+
+    color:
+        #ffffff;
+
+    font: inherit;
+    font-size: 1rem;
+
+    cursor: pointer;
+}
+
+
+/* =========================================================
+   LIGHT MODE
+========================================================= */
+
+html[data-theme="light"]
+.mascot-widget__bubble {
+    border-color:
+        rgba(109, 0, 163, 0.20);
+
+    background:
+        rgba(255, 248, 255, 0.98);
+
+    color:
+        #4f315c;
+
+    box-shadow:
+        0 12px 30px
+        rgba(109, 0, 163, 0.15);
+}
+
+
+html[data-theme="light"]
+.mascot-widget__bubble::after {
+    border-color:
+        rgba(109, 0, 163, 0.20);
+
+    background:
+        rgba(255, 248, 255, 0.98);
+}
+
+
+html[data-theme="light"]
+.mascot-widget__bubble p {
+    color:
+        #725e79;
+}
+
+
+html[data-theme="light"]
+.mascot-widget__close {
+    background:
+        rgba(109, 0, 163, 0.07);
+
+    color:
+        #5a3466;
+}
+
+
+/* =========================================================
+   ANIMATION
+========================================================= */
+
+.mascot-bubble-enter-active,
+.mascot-bubble-leave-active {
+    transition:
+        opacity 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+.mascot-bubble-enter-from,
+.mascot-bubble-leave-to {
+    opacity: 0;
+
+    transform:
+        translateY(8px)
+        scale(0.96);
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 700px) {
+
+    .mascot-widget {
+        right: 68px;
+        bottom: 12px;
+    }
+
+
+    .mascot-widget__character {
+        width: 62px;
+        height: 72px;
+    }
+
+
+    .mascot-widget__bubble {
+        right: 54px;
+        bottom: 52px;
+
+        width:
+            min(
+                240px,
+                calc(100vw - 90px)
+            );
+
+        padding:
+            12px
+            34px
+            12px
+            14px;
+    }
+
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .mascot-widget__character,
+    .mascot-bubble-enter-active,
+    .mascot-bubble-leave-active {
+        transition: none;
+    }
+
+}

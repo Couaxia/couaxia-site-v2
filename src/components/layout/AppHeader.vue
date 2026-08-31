@@ -1,4 +1,5 @@
 <script setup lang="ts">
+
 import {
     onMounted,
     ref
@@ -36,7 +37,8 @@ const theme =
 ========================================================= */
 
 function applyTheme(
-    value: Theme
+    value:
+        Theme
 ) {
 
     theme.value =
@@ -59,7 +61,9 @@ function applyTheme(
                 value
             );
 
-    } catch (
+    }
+
+    catch (
         error
     ) {
 
@@ -67,7 +71,9 @@ function applyTheme(
             "[Theme] localStorage indisponible :",
             error
         );
+
     }
+
 }
 
 
@@ -80,9 +86,12 @@ function toggleTheme() {
     applyTheme(
         theme.value ===
             "dark"
+
             ? "light"
+
             : "dark"
     );
+
 }
 
 
@@ -106,7 +115,9 @@ onMounted(
                         "couaxia-theme"
                     );
 
-        } catch (
+        }
+
+        catch (
             error
         ) {
 
@@ -114,16 +125,20 @@ onMounted(
                 "[Theme] Impossible de lire localStorage :",
                 error
             );
+
         }
 
 
-        /* =============================================
+        /* =================================================
            THÈME ENREGISTRÉ
-        ============================================== */
+        ================================================= */
 
         if (
             savedTheme ===
-                "light" ||
+                "light"
+
+            ||
+
             savedTheme ===
                 "dark"
         ) {
@@ -132,13 +147,15 @@ onMounted(
                 savedTheme
             );
 
+
             return;
+
         }
 
 
-        /* =============================================
-           PRÉFÉRENCE DU SYSTÈME
-        ============================================== */
+        /* =================================================
+           PRÉFÉRENCE SYSTÈME
+        ================================================= */
 
         const prefersDark =
             window.matchMedia(
@@ -151,8 +168,10 @@ onMounted(
                 ? "dark"
                 : "light"
         );
+
     }
 );
+
 </script>
 
 
@@ -170,22 +189,27 @@ onMounted(
             <RouterLink
                 to="/"
                 class="app-header__brand"
-                aria-label="Retour à l'accueil">
+                aria-label="Retour à l'accueil"
+            >
 
                 <span class="app-header__logo">
+
                     <video
                         class="app-header__logo-video"
                         autoplay
                         muted
                         loop
                         playsinline
-                        aria-label="Couaxia">
-                    
+                        aria-label="Couaxia"
+                    >
+
                         <source
-                        src="https://qudeuzkwvwprlhqtzsct.supabase.co/storage/v1/object/public/site-asset/logo/Transparents.webm"
-                        type="video/webm">
-                   
+                            src="https://qudeuzkwvwprlhqtzsct.supabase.co/storage/v1/object/public/site-asset/logo/Transparents.webm"
+                            type="video/webm"
+                        >
+
                     </video>
+
                 </span>
 
             </RouterLink>
@@ -212,7 +236,7 @@ onMounted(
                         👤
                     </span>
 
-                    <span>
+                    <span class="app-header__link-label">
                         Mes informations
                     </span>
 
@@ -221,7 +245,9 @@ onMounted(
 
                 <RouterLink
                     to="/twitch"
-                    class="app-header__link">
+                    class="app-header__link"
+                >
+
                     <span
                         class="app-header__link-icon"
                         aria-hidden="true"
@@ -229,10 +255,12 @@ onMounted(
                         📺
                     </span>
 
-                    <span>
+                    <span class="app-header__link-label">
                         Twitch
                     </span>
+
                 </RouterLink>
+
 
                 <RouterLink
                     to="/games"
@@ -246,7 +274,7 @@ onMounted(
                         🕹️
                     </span>
 
-                    <span>
+                    <span class="app-header__link-label">
                         Jeux
                     </span>
 
@@ -265,7 +293,7 @@ onMounted(
                         🗳️
                     </span>
 
-                    <span>
+                    <span class="app-header__link-label">
                         Sondages
                     </span>
 
@@ -284,7 +312,7 @@ onMounted(
                         📖
                     </span>
 
-                    <span>
+                    <span class="app-header__link-label">
                         Mon histoire
                     </span>
 
@@ -303,7 +331,7 @@ onMounted(
                         🎨
                     </span>
 
-                    <span>
+                    <span class="app-header__link-label">
                         Crédits
                     </span>
 
@@ -376,7 +404,9 @@ onMounted(
                         {{
                             theme ===
                                 "dark"
+
                                 ? "☀️"
+
                                 : "🌙"
                         }}
                     </span>
@@ -387,7 +417,9 @@ onMounted(
                         {{
                             theme ===
                                 "dark"
+
                                 ? "Mode jour"
+
                                 : "Mode nuit"
                         }}
 
@@ -584,15 +616,22 @@ onMounted(
 ========================================================= */
 
 .app-header {
-    width:
-        100%;
+
+    position: relative;
+
+    z-index: 10000;
+
+    width: 100%;
 
     padding:
-        22px
+        20px
         30px;
 
     box-sizing:
         border-box;
+
+    overflow: visible;
+
 }
 
 
@@ -601,38 +640,44 @@ onMounted(
 ========================================================= */
 
 .app-header__inner {
-    display:
-        flex;
 
-    align-items:
-        center;
+    position: relative;
 
-    justify-content:
-        space-between;
+    display: grid;
 
-    gap:
-        26px;
+    grid-template-columns:
+        100px
+        minmax(0, 1fr)
+        auto;
 
-    width:
-        100%;
+    align-items: center;
 
-    min-height:
-        120px;
+    column-gap:
+        clamp(
+            18px,
+            2vw,
+            34px
+        );
+
+    width: 100%;
+
+    min-height: 106px;
 
     padding:
-        22px
-        28px;
+        18px
+        24px;
 
     box-sizing:
         border-box;
 
+    overflow: visible;
+
     border:
-        1px
-        solid
+        1px solid
         var(--header-border);
 
     border-radius:
-        38px;
+        36px;
 
     background:
         var(--header-background);
@@ -641,25 +686,16 @@ onMounted(
         var(--header-shadow);
 
     backdrop-filter:
-        blur(
-            14px
-        );
+        blur(14px);
 
     -webkit-backdrop-filter:
-        blur(
-            14px
-        );
+        blur(14px);
 
     transition:
-        background
-        0.3s
-        ease,
-        border-color
-        0.3s
-        ease,
-        box-shadow
-        0.3s
-        ease;
+        background 0.3s ease,
+        border-color 0.3s ease,
+        box-shadow 0.3s ease;
+
 }
 
 
@@ -668,80 +704,71 @@ onMounted(
 ========================================================= */
 
 .app-header__brand {
-    display:
-        flex;
 
-    align-items:
-        center;
+    position: relative;
 
-    justify-content:
-        center;
+    z-index: 2;
 
-    flex:
-        0
-        0
-        auto;
+    display: flex;
 
-    min-width:
-        140px;
+    align-items: center;
+    justify-content: center;
 
-    color:
-        inherit;
+    width: 100px;
 
-    text-decoration:
-        none;
+    min-width: 0;
+
+    color: inherit;
+
+    text-decoration: none;
+
 }
 
 
 .app-header__logo {
-    color:
-        #f22292;
 
-    font-size:
-        clamp(
-            1.25rem,
-            2vw,
-            1.8rem
-        );
+    display: flex;
 
-    font-weight:
-        900;
+    align-items: center;
+    justify-content: center;
 
-    line-height:
-        1;
+    width: 100%;
 
-    text-shadow:
-        0
-        0
-        16px
-        rgba(
-            242,
-            34,
-            146,
-            0.30
-        );
+    overflow: visible;
 
     transition:
-        transform
-        0.25s
-        ease,
-        filter
-        0.25s
-        ease;
+        transform 0.25s ease,
+        filter 0.25s ease;
+
+}
+
+
+.app-header__logo-video {
+
+    display: block;
+
+    width: auto;
+
+    height: 70px;
+
+    max-width: 100px;
+
+    object-fit: contain;
+
+    pointer-events: none;
+
 }
 
 
 .app-header__brand:hover
 .app-header__logo {
+
     transform:
-        scale(
-            1.05
-        );
+        scale(1.05);
 
     filter:
-        brightness(
-            1.08
-        );
+        brightness(1.08);
+
 }
 
 
@@ -750,29 +777,21 @@ onMounted(
 ========================================================= */
 
 .app-header__nav {
-    display:
-        flex;
 
-    align-items:
-        center;
+    display: flex;
 
-    justify-content:
-        center;
-
-    flex:
-        1
-        1
-        auto;
+    align-items: center;
+    justify-content: center;
 
     gap:
         clamp(
-            18px,
-            2.8vw,
-            46px
+            14px,
+            1.8vw,
+            34px
         );
 
-    min-width:
-        0;
+    min-width: 0;
+
 }
 
 
@@ -781,111 +800,106 @@ onMounted(
 ========================================================= */
 
 .app-header__link {
-    position:
-        relative;
 
-    display:
-        inline-flex;
+    position: relative;
 
-    align-items:
-        center;
+    display: inline-flex;
 
-    justify-content:
-        center;
+    align-items: center;
+    justify-content: center;
 
-    gap:
-        9px;
+    gap: 8px;
 
-    min-height:
-        48px;
+    flex:
+        0
+        1
+        auto;
+
+    min-width: 0;
+
+    min-height: 46px;
 
     padding:
         8px
-        4px;
+        3px;
 
     color:
         var(--header-text);
 
     font-size:
         clamp(
-            0.9rem,
-            1vw,
-            1.05rem
+            0.82rem,
+            0.90vw,
+            1rem
         );
 
-    font-weight:
-        800;
+    font-weight: 800;
 
-    line-height:
-        1.2;
+    line-height: 1.2;
 
-    text-decoration:
-        none;
+    text-decoration: none;
 
-    white-space:
-        nowrap;
+    white-space: nowrap;
 
     transition:
-        color
-        0.25s
-        ease,
-        transform
-        0.25s
-        ease;
+        color 0.25s ease,
+        transform 0.25s ease;
+
+}
+
+
+.app-header__link-label {
+
+    min-width: 0;
+
 }
 
 
 .app-header__link-icon {
-    display:
-        inline-flex;
 
-    align-items:
-        center;
+    display: inline-flex;
 
-    justify-content:
-        center;
+    flex:
+        0
+        0
+        auto;
 
-    font-size:
-        1.05rem;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 1rem;
+
 }
 
 
 .app-header__link:hover {
+
     color:
         var(--header-hover);
 
     transform:
-        translateY(
-            -2px
-        );
+        translateY(-2px);
+
 }
 
 
 /* =========================================================
-   BARRE ACTIVE
+   ACTIVE BAR
 ========================================================= */
 
 .app-header__link::after {
-    content:
-        "";
 
-    position:
-        absolute;
+    content: "";
 
-    left:
-        50%;
+    position: absolute;
 
-    bottom:
-        0;
+    left: 50%;
+    bottom: 0;
 
-    width:
-        0;
+    width: 0;
+    height: 3px;
 
-    height:
-        3px;
-
-    border-radius:
-        999px;
+    border-radius: 999px;
 
     background:
         linear-gradient(
@@ -906,27 +920,27 @@ onMounted(
         );
 
     transform:
-        translateX(
-            -50%
-        );
+        translateX(-50%);
 
     transition:
-        width
-        0.25s
-        ease;
+        width 0.25s ease;
+
 }
 
 
 .app-header__link:hover::after,
 .app-header__link.router-link-active::after {
-    width:
-        90%;
+
+    width: 90%;
+
 }
 
 
 .app-header__link.router-link-active {
+
     color:
         var(--header-hover);
+
 }
 
 
@@ -935,22 +949,32 @@ onMounted(
 ========================================================= */
 
 .app-header__actions {
-    display:
-        flex;
 
-    align-items:
-        center;
+    position: relative;
 
-    justify-content:
-        flex-end;
+    z-index: 20;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: flex-end;
 
     gap:
-        15px;
+        clamp(
+            8px,
+            0.8vw,
+            14px
+        );
 
     flex:
         0
         0
         auto;
+
+    min-width: 0;
+
+    overflow: visible;
+
 }
 
 
@@ -959,44 +983,38 @@ onMounted(
 ========================================================= */
 
 .app-header__account {
-    display:
-        inline-flex;
 
-    flex-direction:
-        column;
+    display: inline-flex;
 
-    align-items:
-        center;
+    flex:
+        0
+        0
+        auto;
 
-    justify-content:
-        center;
+    flex-direction: column;
 
-    gap:
-        4px;
+    align-items: center;
+    justify-content: center;
 
-    min-width:
-        94px;
+    gap: 3px;
 
-    min-height:
-        76px;
+    min-width: 92px;
+    min-height: 70px;
 
     padding:
-        10px
-        18px;
+        8px
+        15px;
 
-    box-sizing:
-        border-box;
+    box-sizing: border-box;
 
     color:
         var(--header-account-text);
 
     border:
-        1px
-        solid
+        1px solid
         var(--header-button-border);
 
-    border-radius:
-        50px;
+    border-radius: 44px;
 
     background:
         var(--header-account-background);
@@ -1004,42 +1022,34 @@ onMounted(
     box-shadow:
         var(--header-button-shadow);
 
-    font-size:
-        0.92rem;
+    font-size: 0.86rem;
+    font-weight: 900;
 
-    font-weight:
-        900;
+    line-height: 1.1;
 
-    line-height:
-        1.1;
+    text-decoration: none;
 
-    text-decoration:
-        none;
+    white-space: nowrap;
 
     transition:
-        transform
-        0.25s
-        ease,
-        box-shadow
-        0.25s
-        ease;
+        transform 0.25s ease,
+        box-shadow 0.25s ease;
+
 }
 
 
 .app-header__account-icon {
-    font-size:
-        1.2rem;
+
+    font-size: 1.15rem;
+
 }
 
 
 .app-header__account:hover {
+
     transform:
-        translateY(
-            -3px
-        )
-        scale(
-            1.03
-        );
+        translateY(-3px)
+        scale(1.03);
 
     box-shadow:
         0
@@ -1051,49 +1061,45 @@ onMounted(
             163,
             0.24
         );
+
 }
 
 
 /* =========================================================
-   MODE JOUR / NUIT
+   THEME
 ========================================================= */
 
 .app-header__theme {
-    display:
-        inline-flex;
 
-    align-items:
-        center;
+    display: inline-flex;
 
-    justify-content:
-        center;
+    flex:
+        0
+        0
+        auto;
 
-    gap:
-        10px;
+    align-items: center;
+    justify-content: center;
 
-    min-width:
-        170px;
+    gap: 8px;
 
-    min-height:
-        58px;
+    min-width: 142px;
+    min-height: 54px;
 
     padding:
-        10px
-        22px;
+        9px
+        16px;
 
-    box-sizing:
-        border-box;
+    box-sizing: border-box;
 
     color:
         var(--header-text);
 
     border:
-        1px
-        solid
+        1px solid
         var(--header-button-border);
 
-    border-radius:
-        999px;
+    border-radius: 999px;
 
     background:
         var(--header-button-background);
@@ -1101,42 +1107,31 @@ onMounted(
     box-shadow:
         var(--header-button-shadow);
 
-    font:
-        inherit;
+    font: inherit;
 
-    font-size:
-        1rem;
+    font-size: 0.88rem;
+    font-weight: 900;
 
-    font-weight:
-        900;
+    white-space: nowrap;
 
-    cursor:
-        pointer;
+    cursor: pointer;
 
     transition:
-        color
-        0.25s
-        ease,
-        background
-        0.25s
-        ease,
-        transform
-        0.25s
-        ease,
-        box-shadow
-        0.25s
-        ease;
+        color 0.25s ease,
+        background 0.25s ease,
+        transform 0.25s ease,
+        box-shadow 0.25s ease;
+
 }
 
 
 .app-header__theme:hover {
+
     color:
         var(--header-hover);
 
     transform:
-        translateY(
-            -3px
-        );
+        translateY(-3px);
 
     box-shadow:
         0
@@ -1148,21 +1143,19 @@ onMounted(
             146,
             0.20
         );
+
 }
 
 
 .app-header__theme-icon {
-    display:
-        inline-flex;
 
-    align-items:
-        center;
+    display: inline-flex;
 
-    justify-content:
-        center;
+    align-items: center;
+    justify-content: center;
 
-    font-size:
-        1.35rem;
+    font-size: 1.25rem;
+
 }
 
 
@@ -1173,62 +1166,280 @@ onMounted(
 .app-header__link:focus-visible,
 .app-header__account:focus-visible,
 .app-header__theme:focus-visible {
+
     outline:
-        3px
-        solid
+        3px solid
         #22f2ef;
 
     outline-offset:
         4px;
+
 }
 
+
+/* =========================================================
+   ÉCRANS INTERMÉDIAIRES
+========================================================= */
+
+@media (max-width: 1600px) {
+
+    .app-header__inner {
+
+        grid-template-columns:
+            88px
+            minmax(0, 1fr)
+            auto;
+
+        column-gap: 16px;
+
+        padding:
+            16px
+            20px;
+
+    }
+
+
+    .app-header__brand {
+
+        width: 88px;
+
+    }
+
+
+    .app-header__logo-video {
+
+        height: 62px;
+
+        max-width: 88px;
+
+    }
+
+
+    .app-header__nav {
+
+        gap:
+            clamp(
+                10px,
+                1.2vw,
+                22px
+            );
+
+    }
+
+
+    .app-header__link {
+
+        gap: 6px;
+
+        font-size: 0.84rem;
+
+    }
+
+
+    .app-header__account {
+
+        min-width: 84px;
+
+        padding:
+            8px
+            12px;
+
+    }
+
+
+    .app-header__theme {
+
+        min-width: 126px;
+
+        padding:
+            9px
+            13px;
+
+    }
+
+}
+
+
+/* =========================================================
+   PASSAGE SUR 2 LIGNES
+========================================================= */
+
+/* =========================================================
+   ÉCRANS INTERMÉDIAIRES
+========================================================= */
+
+@media (max-width: 1600px) {
+
+    .app-header__inner {
+        grid-template-columns:
+            90px
+            minmax(0, 1fr)
+            auto;
+
+        column-gap: 12px;
+
+        padding:
+            16px
+            18px;
+    }
+
+
+    .app-header__brand {
+        width: 90px;
+    }
+
+
+    .app-header__logo-video {
+        height: 68px;
+        max-width: 90px;
+    }
+
+
+    .app-header__nav {
+        gap:
+            clamp(
+                8px,
+                1vw,
+                18px
+            );
+    }
+
+
+    .app-header__link {
+        gap: 6px;
+        font-size: 0.82rem;
+    }
+
+
+    .app-header__account {
+        min-width: 82px;
+
+        padding:
+            8px
+            11px;
+    }
+
+
+    .app-header__theme {
+        min-width: 120px;
+
+        padding:
+            9px
+            12px;
+    }
+}
+
+
+/* =========================================================
+   PASSAGE SUR DEUX LIGNES
+   seulement lorsque nécessaire
+========================================================= */
+
+@media (max-width: 1100px) {
+
+    .app-header__inner {
+        display: flex;
+
+        flex-wrap: wrap;
+
+        justify-content:
+            space-between;
+
+        row-gap: 14px;
+    }
+
+
+    .app-header__brand {
+        flex:
+            0
+            0
+            90px;
+    }
+
+
+    .app-header__actions {
+        margin-left: auto;
+    }
+
+
+    .app-header__nav {
+        order: 3;
+
+        flex:
+            1
+            0
+            100%;
+
+        width: 100%;
+
+        justify-content:
+            center;
+
+        flex-wrap: wrap;
+
+        gap:
+            6px
+            24px;
+
+        padding-top: 4px;
+    }
+}
 
 /* =========================================================
    TABLETTE
 ========================================================= */
 
-@media (max-width: 1200px) {
+@media (max-width: 900px) {
+
+    .app-header {
+
+        padding:
+            14px;
+
+    }
+
 
     .app-header__inner {
-        flex-wrap:
-            wrap;
 
-        justify-content:
-            center;
+        min-height: auto;
 
-        border-radius:
-            30px;
+        padding:
+            15px;
+
+        border-radius: 28px;
+
     }
 
 
     .app-header__brand {
-        min-width:
-            110px;
+
+        flex-basis: 80px;
+
     }
 
 
-    .app-header__nav {
-        order:
-            3;
+    .app-header__logo-video {
 
-        width:
-            100%;
+        height: 58px;
 
-        flex-basis:
-            100%;
-
-        flex-wrap:
-            wrap;
-
-        gap:
-            15px
-            28px;
     }
 
 
-    .app-header__actions {
-        margin-left:
-            auto;
+    .app-header__theme {
+
+        min-width: 54px;
+
+        width: 54px;
+
+        padding: 0;
+
+    }
+
+
+    .app-header__theme-label {
+
+        display: none;
+
     }
 
 }
@@ -1241,93 +1452,138 @@ onMounted(
 @media (max-width: 700px) {
 
     .app-header {
-        padding:
-            12px;
+
+        padding: 10px;
+
     }
 
 
     .app-header__inner {
-        min-height:
-            auto;
 
-        padding:
-            15px;
+        flex-direction: column;
 
-        gap:
-            14px;
+        align-items: stretch;
 
-        border-radius:
-            24px;
+        gap: 13px;
+
+        padding: 14px;
+
+        border-radius: 22px;
+
     }
 
 
     .app-header__brand {
-        width:
-            100%;
+
+        width: 100%;
+
+        flex-basis: auto;
+
+    }
+
+
+    .app-header__logo-video {
+
+        height: 62px;
+
     }
 
 
     .app-header__nav {
-        flex-direction:
-            column;
 
-        align-items:
-            stretch;
+        order: initial;
 
-        gap:
-            5px;
+        display: grid;
+
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(
+                    0,
+                    1fr
+                )
+            );
+
+        gap: 6px;
+
+        padding: 0;
+
     }
 
 
     .app-header__link {
-        width:
-            100%;
 
-        box-sizing:
-            border-box;
+        width: 100%;
+
+        justify-content: flex-start;
+
+        box-sizing: border-box;
 
         padding:
-            10px;
+            10px
+            12px;
+
+        border-radius: 10px;
+
+    }
+
+
+    .app-header__link:hover {
+
+        background:
+            rgba(
+                242,
+                34,
+                146,
+                0.06
+            );
+
     }
 
 
     .app-header__actions {
-        width:
-            100%;
 
-        margin:
-            0;
+        width: 100%;
 
-        justify-content:
-            center;
+        margin: 0;
 
-        flex-wrap:
-            wrap;
+        justify-content: center;
+
+        flex-wrap: wrap;
+
     }
 
 
     .app-header__account {
-        min-height:
-            54px;
 
-        flex-direction:
-            row;
+        min-height: 50px;
 
-        border-radius:
-            999px;
+        flex-direction: row;
+
+        border-radius: 999px;
+
     }
 
 
     .app-header__theme {
-        min-height:
-            54px;
 
-        min-width:
-            150px;
+        width: auto;
+
+        min-width: 130px;
+
+        min-height: 50px;
 
         padding:
-            9px
-            17px;
+            8px
+            15px;
+
+    }
+
+
+    .app-header__theme-label {
+
+        display: inline;
+
     }
 
 }
@@ -1339,16 +1595,26 @@ onMounted(
 
 @media (max-width: 430px) {
 
+    .app-header__nav {
+
+        grid-template-columns:
+            1fr;
+
+    }
+
+
     .app-header__actions {
-        flex-direction:
-            column;
+
+        flex-direction: column;
+
     }
 
 
     .app-header__account,
     .app-header__theme {
-        width:
-            100%;
+
+        width: 100%;
+
     }
 
 }
@@ -1364,35 +1630,11 @@ onMounted(
     .app-header__account,
     .app-header__theme,
     .app-header__logo {
-        transition:
-            none;
+
+        transition: none;
+
     }
 
 }
 
-/* =========================================================
-   LOGO COUAXIA
-========================================================= */
-
-.app-header__logo {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    flex-shrink: 0;
-
-    overflow: visible;
-}
-
-
-.app-header__logo-video {
-    display: block;
-
-    width: auto;
-    height: 65px;
-
-    object-fit: contain;
-
-    pointer-events: none;
-}
 </style>

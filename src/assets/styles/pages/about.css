@@ -7793,36 +7793,193 @@ html[data-theme="light"]
 
 
 /* =========================================================
-   IMAGE
+   ABOUT FINAL IMAGE — FLOATING
 ========================================================= */
 
 .about-final__image {
     position: relative;
-
     z-index: 2;
 
     display: block;
 
-    width:
-        min(100%, 360px);
+    width: 100%;
+    height: auto;
 
-    max-height:
-        450px;
+    object-fit: contain;
 
-    object-fit:
-        contain;
+    transform-origin: center center;
 
-    object-position:
-        center;
+    animation:
+        about-final-image-float
+        4.8s
+        ease-in-out
+        infinite;
 
     filter:
         drop-shadow(
-            0 18px 30px
-            rgba(0, 0, 0, 0.28)
+            0 20px 28px
+            rgba(109, 0, 163, 0.20)
+        )
+        drop-shadow(
+            0 0 28px
+            rgba(242, 34, 146, 0.12)
         );
 
-    transition:
-        transform 0.3s ease;
+    will-change: transform;
+}
+
+
+/* =========================================================
+   FLOAT ANIMATION
+========================================================= */
+
+@keyframes about-final-image-float {
+
+    0% {
+        transform:
+            translateY(0)
+            rotate(-0.4deg);
+    }
+
+    25% {
+        transform:
+            translateY(-7px)
+            rotate(0deg);
+    }
+
+    50% {
+        transform:
+            translateY(-16px)
+            rotate(0.6deg);
+    }
+
+    75% {
+        transform:
+            translateY(-7px)
+            rotate(0deg);
+    }
+
+    100% {
+        transform:
+            translateY(0)
+            rotate(-0.4deg);
+    }
+
+}
+
+
+/* =========================================================
+   IMAGE GLOW
+========================================================= */
+
+.about-final__image-glow {
+    position: absolute;
+
+    left: 50%;
+    bottom: 8%;
+
+    width: 72%;
+    height: 32%;
+
+    transform:
+        translateX(-50%);
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            ellipse at center,
+            rgba(242, 34, 146, 0.20) 0%,
+            rgba(109, 0, 163, 0.13) 42%,
+            transparent 72%
+        );
+
+    filter:
+        blur(32px);
+
+    pointer-events: none;
+
+    animation:
+        about-final-glow-pulse
+        4.8s
+        ease-in-out
+        infinite;
+}
+
+
+/* =========================================================
+   GLOW PULSE
+========================================================= */
+
+@keyframes about-final-glow-pulse {
+
+    0%,
+    100% {
+        opacity: 0.55;
+
+        transform:
+            translateX(-50%)
+            scale(0.92);
+    }
+
+    50% {
+        opacity: 0.90;
+
+        transform:
+            translateX(-50%)
+            scale(1.08);
+    }
+
+}
+
+
+/* =========================================================
+   HOVER
+========================================================= */
+
+.about-final__visual:hover
+.about-final__image {
+    animation-duration:
+        3.8s;
+
+    filter:
+        drop-shadow(
+            0 25px 32px
+            rgba(109, 0, 163, 0.27)
+        )
+        drop-shadow(
+            0 0 38px
+            rgba(242, 34, 146, 0.18)
+        );
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 768px) {
+
+    .about-final__image {
+        animation-duration:
+            5.3s;
+    }
+
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .about-final__image,
+    .about-final__image-glow {
+        animation:
+            none;
+    }
+
 }
 
 

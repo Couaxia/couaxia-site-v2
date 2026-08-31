@@ -28,6 +28,7 @@ function toggleNotifications() {
 
     isOpen.value =
         !isOpen.value;
+
 }
 
 
@@ -35,6 +36,7 @@ function closeNotifications() {
 
     isOpen.value =
         false;
+
 }
 </script>
 
@@ -42,7 +44,6 @@ function closeNotifications() {
 <template>
 
     <div class="announcement-bell">
-
 
         <!-- =================================================
              CLOCHE
@@ -68,10 +69,6 @@ function closeNotifications() {
             </span>
 
 
-            <!-- =============================================
-                 COMPTEUR
-            ============================================== -->
-
             <span
                 v-if="notificationCount > 0"
                 class="announcement-bell__count"
@@ -87,64 +84,66 @@ function closeNotifications() {
 
 
         <!-- =================================================
-             PANNEAU
+             PANNEAU TÉLÉPORTÉ DANS BODY
         ================================================== -->
 
-        <div
-            v-if="isOpen"
-            class="announcement-bell__panel"
-        >
+        <Teleport to="body">
 
-            <div class="announcement-bell__header">
+            <Transition name="announcement">
 
-                <div>
+                <div
+                    v-if="isOpen"
+                    class="announcement-bell__panel"
+                >
 
-                    <span class="announcement-bell__label">
-                        COUAXIA
-                    </span>
+                    <div class="announcement-bell__header">
 
-                    <h2>
-                        🔔 Nouveautés
-                    </h2>
+                        <div>
+
+                            <span class="announcement-bell__label">
+                                COUAXIA
+                            </span>
+
+                            <h2>
+                                🔔 Nouveautés
+                            </h2>
+
+                        </div>
+
+
+                        <button
+                            type="button"
+                            class="announcement-bell__close"
+                            aria-label="Fermer les notifications"
+                            @click="closeNotifications"
+                        >
+                            ×
+                        </button>
+
+                    </div>
+
+
+                    <div class="announcement-bell__empty">
+
+                        <span aria-hidden="true">
+                            🐙
+                        </span>
+
+                        <strong>
+                            Rien de nouveau pour le moment !
+                        </strong>
+
+                        <p>
+                            Les nouveautés du site apparaîtront ici.
+                        </p>
+
+                    </div>
 
                 </div>
 
+            </Transition>
 
-                <button
-                    type="button"
-                    class="announcement-bell__close"
-                    aria-label="Fermer les notifications"
-                    @click="closeNotifications"
-                >
-                    ×
-                </button>
-
-            </div>
-
-
-            <!-- =============================================
-                 TEMPORAIRE
-
-                 On branchera ensuite Supabase/API.
-            ============================================== -->
-
-            <div class="announcement-bell__empty">
-
-                <span aria-hidden="true">
-                    🐙
-                </span>
-
-                <strong>
-                    Rien de nouveau pour le moment !
-                </strong>
-
-                <p>
-                    Les nouveautés du site apparaîtront ici.
-                </p>
-
-            </div>
-
-        </div>
+        </Teleport>
 
     </div>
 
@@ -478,36 +477,33 @@ function closeNotifications() {
    PANNEAU
 ========================================================= */
 
+/* =========================================================
+   PANNEAU NOTIFICATIONS
+   TOUJOURS DEVANT LE SITE
+========================================================= */
+
 .announcement-bell__panel {
-    position:
-        absolute;
 
-    top:
-        calc(100% + 18px);
+    position: fixed;
 
-    right:
-        0;
+    top: 105px;
+    right: 330px;
 
-    z-index:
-        5000;
+    z-index: 2147483647;
 
-    width:
-        min(
-            390px,
-            calc(100vw - 30px)
-        );
+    width: min(
+        390px,
+        calc(100vw - 30px)
+    );
 
-    padding:
-        20px;
+    padding: 20px;
 
-    box-sizing:
-        border-box;
+    box-sizing: border-box;
 
-    border-radius:
-        24px;
+    border-radius: 24px;
 
     color:
-    var(--announcement-text);
+        var(--announcement-text);
 
     border:
         1px solid
@@ -525,8 +521,30 @@ function closeNotifications() {
     -webkit-backdrop-filter:
         blur(16px);
 }
+/* =========================================================
+   APPARITION
+========================================================= */
+
+.announcement-enter-active,
+.announcement-leave-active {
+
+    transition:
+        opacity 0.2s ease,
+        transform 0.2s ease;
+
+}
 
 
+.announcement-enter-from,
+.announcement-leave-to {
+
+    opacity: 0;
+
+    transform:
+        translateY(-10px)
+        scale(0.97);
+
+}
 /* =========================================================
    EN-TÊTE DU PANNEAU
 ========================================================= */
@@ -698,23 +716,15 @@ function closeNotifications() {
 @media (max-width: 700px) {
 
     .announcement-bell__panel {
-        position:
-            fixed;
 
-        top:
-            auto;
+        top: auto;
 
-        left:
-            12px;
+        left: 12px;
+        right: 12px;
+        bottom: 12px;
 
-        right:
-            12px;
+        width: auto;
 
-        bottom:
-            12px;
-
-        width:
-            auto;
     }
 
 }
