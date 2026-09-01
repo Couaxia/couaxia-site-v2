@@ -23,25 +23,49 @@ import type {
    TYPES
 ========================================================= */
 
+type GameFilter =
+    | "all"
+    | "poll"
+    | "no-poll";
+
+
+type GameStatus =
+    | "current"
+    | "regular"
+    | "backlog"
+    | "paused"
+    | "finished";
+
+
 interface GameForm {
 
-    twitch_game_id: string;
+    twitch_game_id:
+        string;
 
-    twitch_name: string;
+    twitch_name:
+        string;
 
-    box_art_url: string;
+    box_art_url:
+        string;
 
-    status: string;
+    status:
+        GameStatus;
 
-    tags: string;
+    tags:
+        string;
 
-    description: string;
+    description:
+        string;
 
-    rating: string;
+    rating:
+        string;
 
-    youtube_playlist: string;
+    youtube_playlist:
+        string;
 
-    poll_enabled: boolean;
+    poll_enabled:
+        boolean;
+
 }
 
 
@@ -50,15 +74,21 @@ interface GameForm {
 ========================================================= */
 
 const games =
-    ref<AdminGame[]>([]);
+    ref<AdminGame[]>(
+        []
+    );
 
 
 const loading =
-    ref(true);
+    ref(
+        true
+    );
 
 
 const saving =
-    ref(false);
+    ref(
+        false
+    );
 
 
 const deletingGameId =
@@ -74,35 +104,39 @@ const selectedGame =
 
 
 const editing =
-    ref(false);
+    ref(
+        false
+    );
 
 
 const formOpen =
-    ref(false);
+    ref(
+        false
+    );
 
 
 const search =
-    ref("");
+    ref(
+        ""
+    );
 
 
 const filter =
-    ref<
-        "all"
-        |
-        "poll"
-        |
-        "no-poll"
-    >(
+    ref<GameFilter>(
         "all"
     );
 
 
 const errorMessage =
-    ref("");
+    ref(
+        ""
+    );
 
 
 const successMessage =
-    ref("");
+    ref(
+        ""
+    );
 
 
 /* =========================================================
@@ -124,7 +158,7 @@ function createEmptyForm():
             "",
 
         status:
-            "active",
+            "backlog",
 
         tags:
             "",
@@ -153,7 +187,83 @@ const form =
 
 
 /* =========================================================
-   COMPUTED — FILTERED GAMES
+   NORMALIZE TAGS
+========================================================= */
+
+function getTagsText(
+    value:
+        unknown
+):
+    string {
+
+    /*
+     * Supabase text[]
+     */
+
+    if (
+        Array.isArray(
+            value
+        )
+    ) {
+
+        return value
+            .map(
+                tag =>
+                    String(
+                        tag
+                    ).trim()
+            )
+            .filter(
+                Boolean
+            )
+            .join(
+                ", "
+            );
+
+    }
+
+
+    /*
+     * Anciennes données string
+     */
+
+    if (
+        typeof value
+        ===
+        "string"
+    ) {
+
+        return value;
+
+    }
+
+
+    return "";
+
+}
+
+
+/* =========================================================
+   NORMALIZE SEARCH TEXT
+========================================================= */
+
+function normalizeSearchText(
+    value:
+        unknown
+):
+    string {
+
+    return getTagsText(
+        value
+    )
+        .toLowerCase()
+        .trim();
+
+}
+
+
+/* =========================================================
+   FILTERED GAMES
 ========================================================= */
 
 const filteredGames =
@@ -169,36 +279,37 @@ const filteredGames =
             return games.value.filter(
                 game => {
 
-                    /* =========================================
-                       SEARCH
-                    ========================================= */
-
                     const name =
-                        game.twitch_name
-                            ?.toLowerCase()
-                        ??
-                        "";
+                        String(
+                            game.twitch_name
+                            ??
+                            ""
+                        )
+                            .toLowerCase();
 
 
                     const description =
-                        game.description
-                            ?.toLowerCase()
-                        ??
-                        "";
+                        String(
+                            game.description
+                            ??
+                            ""
+                        )
+                            .toLowerCase();
 
 
                     const tags =
-                        game.tags
-                            ?.toLowerCase()
-                        ??
-                        "";
+                        normalizeSearchText(
+                            game.tags
+                        );
 
 
                     const status =
-                        game.status
-                            ?.toLowerCase()
-                        ??
-                        "";
+                        String(
+                            game.status
+                            ??
+                            ""
+                        )
+                            .toLowerCase();
 
 
                     const matchesSearch =
@@ -220,10 +331,6 @@ const filteredGames =
                             query
                         );
 
-
-                    /* =========================================
-                       FILTER
-                    ========================================= */
 
                     let matchesFilter =
                         true;
@@ -274,6 +381,18 @@ const filteredGames =
    STATS
 ========================================================= */
 
+const currentGamesCount =
+    computed(
+        () =>
+            games.value.filter(
+                game =>
+                    game.status
+                    ===
+                    "current"
+            ).length
+    );
+
+
 const pollGamesCount =
     computed(
         () =>
@@ -282,18 +401,6 @@ const pollGamesCount =
                     game.poll_enabled
                     ===
                     true
-            ).length
-    );
-
-
-const activeGamesCount =
-    computed(
-        () =>
-            games.value.filter(
-                game =>
-                    game.status
-                    ===
-                    "active"
             ).length
     );
 
@@ -328,7 +435,8 @@ const canSave =
 
 
             if (
-                !form.value.twitch_name.trim()
+                !form.value.twitch_name
+                    .trim()
             ) {
 
                 return false;
@@ -349,7 +457,8 @@ const canSave =
 function getGameImage(
     game:
         AdminGame
-): string | null {
+):
+    string | null {
 
     if (
         !game.box_art_url
@@ -363,11 +472,11 @@ function getGameImage(
     return game.box_art_url
         .replace(
             "{width}",
-            "285"
+            "600"
         )
         .replace(
             "{height}",
-            "380"
+            "338"
         );
 
 }
@@ -393,15 +502,108 @@ const formImage =
             return form.value.box_art_url
                 .replace(
                     "{width}",
-                    "285"
+                    "400"
                 )
                 .replace(
                     "{height}",
-                    "380"
+                    "533"
                 );
 
         }
     );
+
+
+/* =========================================================
+   STATUS LABEL
+========================================================= */
+
+function getStatusLabel(
+    status:
+        string | null
+):
+    string {
+
+    switch (
+        status
+    ) {
+
+        case "current":
+
+            return "En cours";
+
+
+        case "regular":
+
+            return "Régulier";
+
+
+        case "backlog":
+
+            return "À faire";
+
+
+        case "paused":
+
+            return "En pause";
+
+
+        case "finished":
+
+            return "Terminé";
+
+
+        default:
+
+            return status
+                ||
+                "Non défini";
+
+    }
+
+}
+
+
+/* =========================================================
+   STATUS CLASS
+========================================================= */
+
+function getStatusClass(
+    status:
+        string | null
+):
+    string {
+
+    switch (
+        status
+    ) {
+
+        case "current":
+
+            return "admin-game-status--current";
+
+
+        case "regular":
+
+            return "admin-game-status--regular";
+
+
+        case "finished":
+
+            return "admin-game-status--finished";
+
+
+        case "paused":
+
+            return "admin-game-status--paused";
+
+
+        default:
+
+            return "admin-game-status--backlog";
+
+    }
+
+}
 
 
 /* =========================================================
@@ -423,7 +625,10 @@ async function loadGames() {
         games.value =
             await getAdminGames();
 
-    } catch (error) {
+    }
+    catch (
+        error
+    ) {
 
         console.error(
             "Erreur chargement jeux admin :",
@@ -436,7 +641,8 @@ async function loadGames() {
                 ? error.message
                 : "Impossible de charger les jeux.";
 
-    } finally {
+    }
+    finally {
 
         loading.value =
             false;
@@ -521,14 +727,16 @@ function openEdit(
             "",
 
         status:
-            game.status
-            ??
-            "active",
+            (
+                game.status
+                ??
+                "backlog"
+            ) as GameStatus,
 
         tags:
-            game.tags
-            ??
-            "",
+            getTagsText(
+                game.tags
+            ),
 
         description:
             game.description
@@ -539,9 +747,11 @@ function openEdit(
             game.rating
             !==
             null
+
                 ? String(
                     game.rating
                 )
+
                 : "",
 
         youtube_playlist:
@@ -604,7 +814,8 @@ function parseRating():
     number | null {
 
     const value =
-        form.value.rating.trim();
+        form.value.rating
+            .trim();
 
 
     if (
@@ -637,6 +848,28 @@ function parseRating():
 
 
     return rating;
+
+}
+
+
+/* =========================================================
+   PARSE TAGS
+========================================================= */
+
+function parseTags():
+    string[] {
+
+    return form.value.tags
+        .split(
+            ","
+        )
+        .map(
+            tag =>
+                tag.trim()
+        )
+        .filter(
+            Boolean
+        );
 
 }
 
@@ -677,13 +910,28 @@ async function saveGame() {
         if (
             form.value.rating.trim()
             &&
-            rating
-            ===
-            null
+            rating === null
         ) {
 
             throw new Error(
                 "La note doit être un nombre valide."
+            );
+
+        }
+
+
+        if (
+            rating !== null
+            &&
+            (
+                rating < 0
+                ||
+                rating > 10
+            )
+        ) {
+
+            throw new Error(
+                "La note doit être comprise entre 0 et 10."
             );
 
         }
@@ -694,7 +942,9 @@ async function saveGame() {
 
             twitch_game_id:
                 form.value.twitch_game_id
-                    .trim(),
+                    .trim()
+                ||
+                null,
 
             twitch_name:
                 form.value.twitch_name
@@ -707,16 +957,10 @@ async function saveGame() {
                 null,
 
             status:
-                form.value.status
-                    .trim()
-                ||
-                null,
+                form.value.status,
 
             tags:
-                form.value.tags
-                    .trim()
-                ||
-                null,
+                parseTags(),
 
             description:
                 form.value.description
@@ -738,10 +982,6 @@ async function saveGame() {
         };
 
 
-        /* =================================================
-           UPDATE
-        ================================================== */
-
         if (
             editing.value
             &&
@@ -758,11 +998,6 @@ async function saveGame() {
                 "Le jeu a bien été modifié. 🎮";
 
         }
-
-        /* =================================================
-           CREATE
-        ================================================== */
-
         else {
 
             await createAdminGame(
@@ -781,7 +1016,10 @@ async function saveGame() {
 
         closeForm();
 
-    } catch (error) {
+    }
+    catch (
+        error
+    ) {
 
         console.error(
             "Erreur sauvegarde jeu :",
@@ -794,7 +1032,8 @@ async function saveGame() {
                 ? error.message
                 : "Impossible d'enregistrer le jeu.";
 
-    } finally {
+    }
+    finally {
 
         saving.value =
             false;
@@ -827,8 +1066,10 @@ async function togglePollEnabled(
             await updateAdminGame(
                 game.id,
                 {
+
                     poll_enabled:
                         !game.poll_enabled
+
                 }
             );
 
@@ -843,9 +1084,7 @@ async function togglePollEnabled(
 
 
         if (
-            index
-            >=
-            0
+            index >= 0
         ) {
 
             games.value[index] =
@@ -857,11 +1096,14 @@ async function togglePollEnabled(
         successMessage.value =
             updatedGame.poll_enabled
 
-                ? `${updatedGame.twitch_name ?? "Le jeu"} peut maintenant être utilisé dans les sondages.`
+                ? `${updatedGame.twitch_name ?? "Le jeu"} peut maintenant apparaître dans les sondages.`
 
                 : `${updatedGame.twitch_name ?? "Le jeu"} a été retiré des sondages.`;
 
-    } catch (error) {
+    }
+    catch (
+        error
+    ) {
 
         console.error(
             "Erreur modification poll_enabled :",
@@ -949,7 +1191,10 @@ async function removeGame(
         successMessage.value =
             `${gameName} a été supprimé.`;
 
-    } catch (error) {
+    }
+    catch (
+        error
+    ) {
 
         console.error(
             "Erreur suppression jeu :",
@@ -962,7 +1207,8 @@ async function removeGame(
                 ? error.message
                 : "Impossible de supprimer le jeu.";
 
-    } finally {
+    }
+    finally {
 
         deletingGameId.value =
             null;
@@ -979,15 +1225,14 @@ async function removeGame(
 function formatRating(
     rating:
         number | null
-): string {
+):
+    string {
 
     if (
-        rating
-        ===
-        null
+        rating === null
     ) {
 
-        return "Non noté";
+        return "—";
 
     }
 
@@ -1037,9 +1282,8 @@ onMounted(
 
 
                 <p>
-                    Gère les jeux présents sur ton site
-                    et choisis ceux qui peuvent apparaître
-                    dans les sondages.
+                    Gère les jeux présents sur ton site et choisis
+                    ceux qui peuvent apparaître dans les sondages.
                 </p>
 
             </div>
@@ -1051,7 +1295,9 @@ onMounted(
                     admin-button
                     admin-button--primary
                 "
-                @click="openCreate"
+                @click="
+                    openCreate
+                "
             >
                 ＋ Ajouter un jeu
             </button>
@@ -1098,7 +1344,6 @@ onMounted(
                 🎮
             </span>
 
-
             <strong>
                 Chargement des jeux...
             </strong>
@@ -1119,13 +1364,12 @@ onMounted(
             ============================================== -->
 
             <div
-                class="admin-mini-stats"
+                class="admin-games-stats"
             >
 
                 <article
-                    class="admin-mini-stat"
+                    class="admin-games-stat"
                 >
-
                     <span>
                         Jeux
                     </span>
@@ -1133,29 +1377,25 @@ onMounted(
                     <strong>
                         {{ games.length }}
                     </strong>
-
                 </article>
 
 
                 <article
-                    class="admin-mini-stat"
+                    class="admin-games-stat"
                 >
-
                     <span>
-                        Actifs
+                        En cours
                     </span>
 
                     <strong>
-                        {{ activeGamesCount }}
+                        {{ currentGamesCount }}
                     </strong>
-
                 </article>
 
 
                 <article
-                    class="admin-mini-stat"
+                    class="admin-games-stat"
                 >
-
                     <span>
                         Sondages
                     </span>
@@ -1163,14 +1403,12 @@ onMounted(
                     <strong>
                         {{ pollGamesCount }}
                     </strong>
-
                 </article>
 
 
                 <article
-                    class="admin-mini-stat"
+                    class="admin-games-stat"
                 >
-
                     <span>
                         Notés
                     </span>
@@ -1178,7 +1416,6 @@ onMounted(
                     <strong>
                         {{ gamesWithRatingCount }}
                     </strong>
-
                 </article>
 
             </div>
@@ -1193,10 +1430,12 @@ onMounted(
             >
 
                 <div
-                    class="admin-search"
+                    class="admin-games-search"
                 >
 
-                    <span>
+                    <span
+                        aria-hidden="true"
+                    >
                         🔎
                     </span>
 
@@ -1209,58 +1448,65 @@ onMounted(
 
                 </div>
 
-
-                <div
-                    class="admin-games-filters"
-                >
-
-                    <button
-                        type="button"
-                        :class="{
-                            'admin-games-filter--active':
-                                filter === 'all'
-                        }"
-                        @click="filter = 'all'"
-                    >
-                        Tous
-                    </button>
-
-
-                    <button
-                        type="button"
-                        :class="{
-                            'admin-games-filter--active':
-                                filter === 'poll'
-                        }"
-                        @click="filter = 'poll'"
-                    >
-                        🗳️ Sondages
-                    </button>
-
-
-                    <button
-                        type="button"
-                        :class="{
-                            'admin-games-filter--active':
-                                filter === 'no-poll'
-                        }"
-                        @click="filter = 'no-poll'"
-                    >
-                        Hors sondage
-                    </button>
-
-                </div>
-
             </div>
 
 
             <!-- =============================================
-                 COUNT
+                 FILTERS
             ============================================== -->
+
+            <div
+                class="admin-games-filters"
+            >
+
+                <button
+                    type="button"
+                    :class="{
+                        'admin-games-filter--active':
+                            filter === 'all'
+                    }"
+                    @click="
+                        filter = 'all'
+                    "
+                >
+                    Tous
+                </button>
+
+
+                <button
+                    type="button"
+                    :class="{
+                        'admin-games-filter--active':
+                            filter === 'poll'
+                    }"
+                    @click="
+                        filter = 'poll'
+                    "
+                >
+                    🗳️ Sondages
+                </button>
+
+
+                <button
+                    type="button"
+                    :class="{
+                        'admin-games-filter--active':
+                            filter === 'no-poll'
+                    }"
+                    @click="
+                        filter = 'no-poll'
+                    "
+                >
+                    Hors sondage
+                </button>
+
+            </div>
+
 
             <div
                 class="admin-games-count"
             >
+
                 {{ filteredGames.length }}
 
                 jeu{{
@@ -1268,6 +1514,7 @@ onMounted(
                         ? "x"
                         : ""
                 }}
+
             </div>
 
 
@@ -1277,11 +1524,9 @@ onMounted(
 
             <div
                 v-if="
-                    filteredGames.length
-                    ===
-                    0
+                    filteredGames.length === 0
                 "
-                class="admin-empty"
+                class="admin-games-empty"
             >
 
                 <span>
@@ -1295,8 +1540,7 @@ onMounted(
 
 
                 <p>
-                    Aucun jeu ne correspond
-                    à tes critères.
+                    Aucun jeu ne correspond à tes critères.
                 </p>
 
             </div>
@@ -1317,21 +1561,31 @@ onMounted(
                         in
                         filteredGames
                     "
-                    :key="game.id"
+                    :key="
+                        game.id
+                    "
                     class="admin-game-card"
                 >
 
-                    <!-- =====================================
-                         IMAGE
-                    ====================================== -->
+                    <!-- IMAGE -->
 
                     <div
                         class="admin-game-card__image"
                     >
 
                         <img
-                            v-if="getGameImage(game)"
-                            :src="getGameImage(game) ?? ''"
+                            v-if="
+                                getGameImage(
+                                    game
+                                )
+                            "
+                            :src="
+                                getGameImage(
+                                    game
+                                )
+                                ??
+                                ''
+                            "
                             :alt="
                                 game.twitch_name
                                 ||
@@ -1342,19 +1596,35 @@ onMounted(
 
                         <div
                             v-else
-                            class="
-                                admin-game-card__placeholder
-                            "
+                            class="admin-game-card__placeholder"
                         >
                             🎮
                         </div>
 
 
                         <span
-                            v-if="game.poll_enabled"
                             class="
-                                admin-game-card__poll-badge
+                                admin-game-status
                             "
+                            :class="
+                                getStatusClass(
+                                    game.status
+                                )
+                            "
+                        >
+                            {{
+                                getStatusLabel(
+                                    game.status
+                                )
+                            }}
+                        </span>
+
+
+                        <span
+                            v-if="
+                                game.poll_enabled
+                            "
+                            class="admin-game-card__poll-badge"
                         >
                             🗳️ Sondage
                         </span>
@@ -1362,18 +1632,14 @@ onMounted(
                     </div>
 
 
-                    <!-- =====================================
-                         CONTENT
-                    ====================================== -->
+                    <!-- CONTENT -->
 
                     <div
                         class="admin-game-card__content"
                     >
 
                         <div
-                            class="
-                                admin-game-card__title-row
-                            "
+                            class="admin-game-card__title-row"
                         >
 
                             <h3>
@@ -1386,9 +1652,7 @@ onMounted(
 
 
                             <span
-                                class="
-                                    admin-game-card__rating
-                                "
+                                class="admin-game-card__rating"
                             >
                                 ⭐
                                 {{
@@ -1402,10 +1666,10 @@ onMounted(
 
 
                         <p
-                            v-if="game.description"
-                            class="
-                                admin-game-card__description
+                            v-if="
+                                game.description
                             "
+                            class="admin-game-card__description"
                         >
                             {{ game.description }}
                         </p>
@@ -1423,23 +1687,44 @@ onMounted(
 
 
                         <div
-                            v-if="game.tags"
-                            class="
-                                admin-game-card__tags
+                            v-if="
+                                getTagsText(
+                                    game.tags
+                                )
                             "
+                            class="admin-game-card__tags"
                         >
-                            {{ game.tags }}
+
+                            <span
+                                v-for="
+                                    tag
+                                    in
+                                    getTagsText(
+                                        game.tags
+                                    )
+                                        .split(',')
+                                        .map(
+                                            item =>
+                                                item.trim()
+                                        )
+                                        .filter(
+                                            Boolean
+                                        )
+                                "
+                                :key="
+                                    tag
+                                "
+                            >
+                                {{ tag }}
+                            </span>
+
                         </div>
 
 
-                        <!-- =================================
-                             POLL SWITCH
-                        ================================== -->
+                        <!-- POLL -->
 
                         <label
-                            class="
-                                admin-game-card__poll-toggle
-                            "
+                            class="admin-game-card__poll-toggle"
                         >
 
                             <div>
@@ -1452,7 +1737,9 @@ onMounted(
                                 <span>
                                     {{
                                         game.poll_enabled
+
                                             ? "Ce jeu peut être proposé."
+
                                             : "Ce jeu n'apparaît pas dans les sondages."
                                     }}
                                 </span>
@@ -1475,21 +1762,17 @@ onMounted(
                         </label>
 
 
-                        <!-- =================================
-                             ACTIONS
-                        ================================== -->
+                        <!-- ACTIONS -->
 
                         <div
-                            class="
-                                admin-game-card__actions
-                            "
+                            class="admin-game-card__actions"
                         >
 
                             <button
                                 type="button"
                                 class="
-                                    admin-button
-                                    admin-button--secondary
+                                    admin-game-button
+                                    admin-game-button--edit
                                 "
                                 @click="
                                     openEdit(
@@ -1497,20 +1780,18 @@ onMounted(
                                     )
                                 "
                             >
-                                ✎ Modifier
+                                ✏️ Modifier
                             </button>
 
 
                             <button
                                 type="button"
                                 class="
-                                    admin-button
-                                    admin-button--danger
+                                    admin-game-button
+                                    admin-game-button--delete
                                 "
                                 :disabled="
-                                    deletingGameId
-                                    ===
-                                    game.id
+                                    deletingGameId === game.id
                                 "
                                 @click="
                                     removeGame(
@@ -1520,11 +1801,9 @@ onMounted(
                             >
 
                                 {{
-                                    deletingGameId
-                                    ===
-                                    game.id
-                                        ? "Suppression..."
-                                        : "🗑"
+                                    deletingGameId === game.id
+                                        ? "..."
+                                        : "🗑️"
                                 }}
 
                             </button>
@@ -1549,31 +1828,26 @@ onMounted(
         >
 
             <div
-                v-if="formOpen"
-                class="admin-modal"
-                @click.self="closeForm"
+                v-if="
+                    formOpen
+                "
+                class="admin-game-modal"
+                @click.self="
+                    closeForm
+                "
             >
 
                 <div
-                    class="
-                        admin-modal__dialog
-                        admin-modal__dialog--large
-                    "
+                    class="admin-game-modal__dialog"
                 >
 
-                    <!-- =====================================
-                         HEADER
-                    ====================================== -->
-
                     <header
-                        class="admin-modal__header"
+                        class="admin-game-modal__header"
                     >
 
                         <div>
 
-                            <span
-                                class="admin-modal__eyebrow"
-                            >
+                            <span>
                                 🎮 JEU
                             </span>
 
@@ -1591,9 +1865,13 @@ onMounted(
 
                         <button
                             type="button"
-                            class="admin-modal__close"
-                            :disabled="saving"
-                            @click="closeForm"
+                            class="admin-game-modal__close"
+                            :disabled="
+                                saving
+                            "
+                            @click="
+                                closeForm
+                            "
                         >
                             ×
                         </button>
@@ -1601,46 +1879,31 @@ onMounted(
                     </header>
 
 
-                    <!-- =====================================
-                         FORM
-                    ====================================== -->
-
                     <form
-                        class="
-                            admin-form
-                            admin-game-form
+                        class="admin-game-form"
+                        @submit.prevent="
+                            saveGame
                         "
-                        @submit.prevent="saveGame"
                     >
 
-                        <!-- =================================
-                             PREVIEW + INFO
-                        ================================== -->
-
                         <div
-                            class="
-                                admin-game-form__layout
-                            "
+                            class="admin-game-form__layout"
                         >
 
-                            <!-- =============================
-                                 PREVIEW
-                            ============================== -->
+                            <!-- PREVIEW -->
 
                             <aside
-                                class="
-                                    admin-game-form__preview
-                                "
+                                class="admin-game-form__preview"
                             >
 
                                 <div
-                                    class="
-                                        admin-game-form__cover
-                                    "
+                                    class="admin-game-form__cover"
                                 >
 
                                     <img
-                                        v-if="formImage"
+                                        v-if="
+                                            formImage
+                                        "
                                         :src="
                                             formImage
                                             ??
@@ -1679,18 +1942,14 @@ onMounted(
                             </aside>
 
 
-                            <!-- =============================
-                                 FIELDS
-                            ============================== -->
+                            <!-- FIELDS -->
 
                             <div
-                                class="
-                                    admin-game-form__fields
-                                "
+                                class="admin-game-form__fields"
                             >
 
                                 <div
-                                    class="admin-field"
+                                    class="admin-game-field"
                                 >
 
                                     <label
@@ -1714,7 +1973,7 @@ onMounted(
 
 
                                 <div
-                                    class="admin-field"
+                                    class="admin-game-field"
                                 >
 
                                     <label
@@ -1737,7 +1996,7 @@ onMounted(
 
 
                                 <div
-                                    class="admin-field"
+                                    class="admin-game-field"
                                 >
 
                                     <label
@@ -1752,7 +2011,7 @@ onMounted(
                                         v-model="
                                             form.box_art_url
                                         "
-                                        type="text"
+                                        type="url"
                                         placeholder="https://..."
                                     >
 
@@ -1763,16 +2022,12 @@ onMounted(
                         </div>
 
 
-                        <!-- =================================
-                             STATUS + RATING
-                        ================================== -->
-
                         <div
-                            class="admin-form__row"
+                            class="admin-game-form__row"
                         >
 
                             <div
-                                class="admin-field"
+                                class="admin-game-field"
                             >
 
                                 <label
@@ -1789,20 +2044,38 @@ onMounted(
                                     "
                                 >
 
-                                    <option value="active">
-                                        Actif
+                                    <option
+                                        value="current"
+                                    >
+                                        🔥 En cours
                                     </option>
 
-                                    <option value="inactive">
-                                        Inactif
+
+                                    <option
+                                        value="regular"
+                                    >
+                                        🔁 Régulier
                                     </option>
 
-                                    <option value="completed">
-                                        Terminé
+
+                                    <option
+                                        value="backlog"
+                                    >
+                                        📚 À faire
                                     </option>
 
-                                    <option value="wishlist">
-                                        À jouer
+
+                                    <option
+                                        value="paused"
+                                    >
+                                        ⏸️ En pause
+                                    </option>
+
+
+                                    <option
+                                        value="finished"
+                                    >
+                                        🏆 Terminé
                                     </option>
 
                                 </select>
@@ -1811,7 +2084,7 @@ onMounted(
 
 
                             <div
-                                class="admin-field"
+                                class="admin-game-field"
                             >
 
                                 <label
@@ -1838,12 +2111,8 @@ onMounted(
                         </div>
 
 
-                        <!-- =================================
-                             TAGS
-                        ================================== -->
-
                         <div
-                            class="admin-field"
+                            class="admin-game-field"
                         >
 
                             <label
@@ -1865,12 +2134,8 @@ onMounted(
                         </div>
 
 
-                        <!-- =================================
-                             DESCRIPTION
-                        ================================== -->
-
                         <div
-                            class="admin-field"
+                            class="admin-game-field"
                         >
 
                             <label
@@ -1892,12 +2157,8 @@ onMounted(
                         </div>
 
 
-                        <!-- =================================
-                             YOUTUBE
-                        ================================== -->
-
                         <div
-                            class="admin-field"
+                            class="admin-game-field"
                         >
 
                             <label
@@ -1919,15 +2180,8 @@ onMounted(
                         </div>
 
 
-                        <!-- =================================
-                             POLL
-                        ================================== -->
-
                         <label
-                            class="
-                                admin-switch-row
-                                admin-game-form__poll
-                            "
+                            class="admin-game-form__poll"
                         >
 
                             <div>
@@ -1955,22 +2209,19 @@ onMounted(
                         </label>
 
 
-                        <!-- =================================
-                             ACTIONS
-                        ================================== -->
-
                         <footer
-                            class="admin-form__actions"
+                            class="admin-game-form__actions"
                         >
 
                             <button
                                 type="button"
-                                class="
-                                    admin-button
-                                    admin-button--secondary
+                                class="admin-game-form__cancel"
+                                :disabled="
+                                    saving
                                 "
-                                :disabled="saving"
-                                @click="closeForm"
+                                @click="
+                                    closeForm
+                                "
                             >
                                 Annuler
                             </button>
@@ -1978,10 +2229,7 @@ onMounted(
 
                             <button
                                 type="submit"
-                                class="
-                                    admin-button
-                                    admin-button--primary
-                                "
+                                class="admin-game-form__save"
                                 :disabled="
                                     !canSave
                                 "
@@ -2010,3 +2258,1389 @@ onMounted(
     </section>
 
 </template>
+
+
+<style scoped>
+
+/* =========================================================
+   ROOT
+========================================================= */
+
+.admin-games {
+    width: 100%;
+
+    --pink: #ff2ca8;
+    --purple: #8d2cff;
+    --cyan: #22f2ef;
+
+    --panel: #180a23;
+    --panel-dark: #100618;
+
+    --border: rgba(255, 255, 255, 0.08);
+    --muted: rgba(255, 255, 255, 0.5);
+
+    color: #ffffff;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.admin-section-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+
+    gap: 25px;
+
+    margin-bottom: 28px;
+}
+
+
+.admin-section-header__eyebrow {
+    color: var(--cyan);
+
+    font-size: 0.7rem;
+    font-weight: 900;
+
+    letter-spacing: 0.16em;
+}
+
+
+.admin-section-header h2 {
+    margin: 5px 0 0;
+
+    color: #ffffff;
+
+    font-size: clamp(1.8rem, 3vw, 2.8rem);
+    font-weight: 950;
+}
+
+
+.admin-section-header p {
+    max-width: 650px;
+
+    margin: 9px 0 0;
+
+    color: var(--muted);
+
+    line-height: 1.6;
+}
+
+
+/* =========================================================
+   GLOBAL BUTTON
+========================================================= */
+
+.admin-button {
+    min-height: 44px;
+
+    padding: 10px 18px;
+
+    color: #ffffff;
+
+    border-radius: 13px;
+
+    font: inherit;
+    font-weight: 900;
+
+    cursor: pointer;
+}
+
+
+.admin-button--primary {
+    background:
+        linear-gradient(
+            135deg,
+            var(--purple),
+            var(--pink)
+        );
+
+    border:
+        1px solid
+        rgba(255, 44, 168, 0.45);
+}
+
+
+/* =========================================================
+   MESSAGES
+========================================================= */
+
+.admin-message {
+    margin-bottom: 20px;
+
+    padding: 14px 17px;
+
+    border-radius: 14px;
+
+    font-weight: 800;
+}
+
+
+.admin-message--success {
+    color: #8ff4bb;
+
+    background:
+        rgba(42, 200, 113, 0.08);
+
+    border:
+        1px solid
+        rgba(42, 200, 113, 0.23);
+}
+
+
+.admin-message--error {
+    color: #ff9db4;
+
+    background:
+        rgba(255, 62, 103, 0.08);
+
+    border:
+        1px solid
+        rgba(255, 62, 103, 0.23);
+}
+
+
+/* =========================================================
+   LOADING
+========================================================= */
+
+.admin-loading,
+.admin-games-empty {
+    min-height: 220px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    gap: 10px;
+
+    padding: 30px;
+
+    text-align: center;
+
+    background:
+        rgba(255, 255, 255, 0.025);
+
+    border:
+        1px dashed
+        rgba(255, 255, 255, 0.09);
+
+    border-radius: 20px;
+}
+
+
+/* =========================================================
+   STATS
+========================================================= */
+
+.admin-games-stats {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            4,
+            minmax(0, 1fr)
+        );
+
+    gap: 18px;
+
+    margin-bottom: 28px;
+}
+
+
+.admin-games-stat {
+    min-height: 128px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    padding: 24px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(31, 12, 45, 0.94),
+            rgba(15, 6, 23, 0.98)
+        );
+
+    border:
+        1px solid
+        var(--border);
+
+    border-radius: 21px;
+}
+
+
+.admin-games-stat span {
+    color: var(--muted);
+
+    font-size: 0.82rem;
+    font-weight: 800;
+}
+
+
+.admin-games-stat strong {
+    margin-top: 8px;
+
+    color: #ffffff;
+
+    font-size: 2.5rem;
+    font-weight: 950;
+}
+
+
+/* =========================================================
+   SEARCH
+========================================================= */
+
+.admin-games-toolbar {
+    display: flex;
+
+    margin-bottom: 13px;
+}
+
+
+.admin-games-search {
+    width: min(100%, 620px);
+    min-height: 54px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 0 17px;
+
+    background:
+        rgba(29, 12, 42, 0.92);
+
+    border:
+        1px solid
+        rgba(184, 70, 255, 0.2);
+
+    border-radius: 18px;
+}
+
+
+.admin-games-search:focus-within {
+    border-color:
+        rgba(255, 44, 168, 0.55);
+
+    box-shadow:
+        0 0 0 3px
+        rgba(255, 44, 168, 0.08);
+}
+
+
+.admin-games-search input {
+    width: 100%;
+
+    padding: 15px 0;
+
+    color: #ffffff;
+
+    background: transparent;
+
+    border: 0;
+
+    outline: 0;
+
+    font: inherit;
+}
+
+
+.admin-games-search input::placeholder {
+    color:
+        rgba(255, 255, 255, 0.3);
+}
+
+
+/* =========================================================
+   FILTERS
+========================================================= */
+
+.admin-games-filters {
+    display: flex;
+    flex-wrap: wrap;
+
+    gap: 10px;
+
+    margin-bottom: 14px;
+}
+
+
+.admin-games-filters button {
+    appearance: none;
+
+    min-height: 42px;
+
+    padding: 9px 17px;
+
+    color:
+        rgba(255, 255, 255, 0.64);
+
+    background:
+        rgba(255, 255, 255, 0.035);
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.09);
+
+    border-radius: 999px;
+
+    font: inherit;
+    font-size: 0.83rem;
+    font-weight: 850;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+}
+
+
+.admin-games-filters button:hover {
+    color: #ffffff;
+
+    border-color:
+        rgba(255, 44, 168, 0.35);
+
+    background:
+        rgba(255, 44, 168, 0.08);
+}
+
+
+.admin-games-filter--active {
+    color: #ffffff !important;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(141, 44, 255, 0.45),
+            rgba(255, 44, 168, 0.25)
+        ) !important;
+
+    border-color:
+        rgba(255, 44, 168, 0.5) !important;
+}
+
+
+.admin-games-count {
+    margin-bottom: 18px;
+
+    color: var(--muted);
+
+    font-size: 0.8rem;
+}
+
+
+/* =========================================================
+   GRID
+========================================================= */
+
+.admin-games-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fill,
+            minmax(280px, 1fr)
+        );
+
+    align-items: stretch;
+
+    gap: 22px;
+}
+
+
+/* =========================================================
+   CARD
+========================================================= */
+
+.admin-game-card {
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    overflow: hidden;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(31, 12, 45, 0.96),
+            rgba(15, 6, 23, 0.99)
+        );
+
+    border:
+        1px solid
+        var(--border);
+
+    border-radius: 22px;
+
+    box-shadow:
+        0 18px 45px
+        rgba(0, 0, 0, 0.22);
+
+    transition:
+        transform 0.22s ease,
+        border-color 0.22s ease;
+}
+
+
+.admin-game-card:hover {
+    transform:
+        translateY(-4px);
+
+    border-color:
+        rgba(255, 44, 168, 0.35);
+}
+
+
+/* =========================================================
+   IMAGE
+========================================================= */
+
+.admin-game-card__image {
+    position: relative;
+
+    width: 100%;
+
+    aspect-ratio: 16 / 9;
+
+    overflow: hidden;
+
+    background: #12091a;
+}
+
+
+.admin-game-card__image img {
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    object-fit: cover;
+}
+
+
+.admin-game-card__placeholder {
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 3rem;
+}
+
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+.admin-game-status {
+    position: absolute;
+
+    top: 12px;
+    right: 12px;
+
+    padding: 6px 10px;
+
+    border-radius: 999px;
+
+    font-size: 0.67rem;
+    font-weight: 900;
+
+    backdrop-filter: blur(10px);
+}
+
+
+.admin-game-status--current {
+    color: #ff9bba;
+
+    background:
+        rgba(255, 44, 168, 0.18);
+
+    border:
+        1px solid
+        rgba(255, 44, 168, 0.35);
+}
+
+
+.admin-game-status--regular {
+    color: #8cf9f6;
+
+    background:
+        rgba(34, 242, 239, 0.12);
+
+    border:
+        1px solid
+        rgba(34, 242, 239, 0.3);
+}
+
+
+.admin-game-status--backlog {
+    color: #d4b4ff;
+
+    background:
+        rgba(141, 44, 255, 0.15);
+
+    border:
+        1px solid
+        rgba(141, 44, 255, 0.3);
+}
+
+
+.admin-game-status--paused {
+    color: #ffd58a;
+
+    background:
+        rgba(255, 190, 80, 0.12);
+
+    border:
+        1px solid
+        rgba(255, 190, 80, 0.3);
+}
+
+
+.admin-game-status--finished {
+    color: #90f3b6;
+
+    background:
+        rgba(50, 200, 110, 0.12);
+
+    border:
+        1px solid
+        rgba(50, 200, 110, 0.3);
+}
+
+
+.admin-game-card__poll-badge {
+    position: absolute;
+
+    left: 12px;
+    bottom: 12px;
+
+    padding: 6px 10px;
+
+    color: var(--cyan);
+
+    background:
+        rgba(5, 12, 20, 0.83);
+
+    border:
+        1px solid
+        rgba(34, 242, 239, 0.27);
+
+    border-radius: 999px;
+
+    font-size: 0.67rem;
+    font-weight: 900;
+}
+
+
+/* =========================================================
+   CONTENT
+========================================================= */
+
+.admin-game-card__content {
+    display: flex;
+    flex-direction: column;
+
+    flex: 1;
+
+    padding: 20px;
+}
+
+
+.admin-game-card__title-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+
+    gap: 12px;
+}
+
+
+.admin-game-card__title-row h3 {
+    margin: 0;
+
+    color: #ffffff;
+
+    font-size: 1.05rem;
+    font-weight: 950;
+
+    line-height: 1.3;
+}
+
+
+.admin-game-card__rating {
+    flex-shrink: 0;
+
+    padding: 5px 8px;
+
+    color: #ffd66f;
+
+    background:
+        rgba(255, 200, 70, 0.07);
+
+    border:
+        1px solid
+        rgba(255, 200, 70, 0.17);
+
+    border-radius: 999px;
+
+    font-size: 0.7rem;
+    font-weight: 900;
+}
+
+
+/* =========================================================
+   DESCRIPTION
+========================================================= */
+
+.admin-game-card__description {
+    display: -webkit-box;
+
+    margin: 14px 0 0;
+
+    overflow: hidden;
+
+    color:
+        rgba(255, 255, 255, 0.58);
+
+    font-size: 0.81rem;
+
+    line-height: 1.55;
+
+    
+    -webkit-box-orient: vertical;
+}
+
+
+.admin-game-card__description--empty {
+    color:
+        rgba(255, 255, 255, 0.3);
+
+    font-style: italic;
+}
+
+
+/* =========================================================
+   TAGS
+========================================================= */
+
+.admin-game-card__tags {
+    display: flex;
+    flex-wrap: wrap;
+
+    gap: 6px;
+
+    margin-top: 15px;
+}
+
+
+.admin-game-card__tags span {
+    padding: 5px 8px;
+
+    color: #d9b7ff;
+
+    background:
+        rgba(141, 44, 255, 0.1);
+
+    border:
+        1px solid
+        rgba(141, 44, 255, 0.18);
+
+    border-radius: 999px;
+
+    font-size: 0.68rem;
+    font-weight: 750;
+}
+
+
+/* =========================================================
+   POLL
+========================================================= */
+
+.admin-game-card__poll-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 15px;
+
+    margin-top: 17px;
+
+    padding: 13px;
+
+    background:
+        rgba(255, 255, 255, 0.025);
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.07);
+
+    border-radius: 14px;
+
+    cursor: pointer;
+}
+
+
+.admin-game-card__poll-toggle div {
+    display: flex;
+    flex-direction: column;
+
+    gap: 3px;
+}
+
+
+.admin-game-card__poll-toggle strong {
+    color: #ffffff;
+
+    font-size: 0.76rem;
+}
+
+
+.admin-game-card__poll-toggle span {
+    color:
+        rgba(255, 255, 255, 0.4);
+
+    font-size: 0.67rem;
+}
+
+
+.admin-game-card__poll-toggle input,
+.admin-game-form__poll input {
+    appearance: none;
+
+    width: 24px;
+    height: 24px;
+
+    flex-shrink: 0;
+
+    position: relative;
+
+    background:
+        rgba(255, 255, 255, 0.06);
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.2);
+
+    border-radius: 7px;
+
+    cursor: pointer;
+}
+
+
+.admin-game-card__poll-toggle input:checked,
+.admin-game-form__poll input:checked {
+    background:
+        linear-gradient(
+            135deg,
+            var(--purple),
+            var(--pink)
+        );
+
+    border-color: var(--pink);
+}
+
+
+.admin-game-card__poll-toggle input:checked::after,
+.admin-game-form__poll input:checked::after {
+    content: "✓";
+
+    position: absolute;
+
+    inset: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #ffffff;
+
+    font-size: 0.8rem;
+    font-weight: 950;
+}
+
+
+/* =========================================================
+   ACTIONS
+========================================================= */
+
+.admin-game-card__actions {
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1fr)
+        48px;
+
+    gap: 10px;
+
+    margin-top: auto;
+
+    padding-top: 18px;
+}
+
+
+.admin-game-button {
+    min-height: 46px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 7px;
+
+    border-radius: 13px;
+
+    font: inherit;
+    font-size: 0.8rem;
+    font-weight: 900;
+
+    cursor: pointer;
+}
+
+
+.admin-game-button--edit {
+    color: #ffffff;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(141, 44, 255, 0.3),
+            rgba(255, 44, 168, 0.12)
+        );
+
+    border:
+        1px solid
+        rgba(190, 90, 255, 0.25);
+}
+
+
+.admin-game-button--delete {
+    color: #ff8caa;
+
+    background:
+        rgba(255, 60, 110, 0.08);
+
+    border:
+        1px solid
+        rgba(255, 60, 110, 0.2);
+}
+
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+.admin-game-modal {
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 9999;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 24px;
+
+    background:
+        rgba(4, 1, 8, 0.82);
+
+    backdrop-filter:
+        blur(10px);
+}
+
+
+.admin-game-modal__dialog {
+    width: min(100%, 950px);
+    max-height: calc(100vh - 48px);
+
+    overflow-y: auto;
+
+    color: #ffffff;
+
+    background:
+        linear-gradient(
+            145deg,
+            #1d0d2a,
+            #0f0717
+        );
+
+    border:
+        1px solid
+        rgba(255, 44, 168, 0.22);
+
+    border-radius: 24px;
+
+    box-shadow:
+        0 30px 100px
+        rgba(0, 0, 0, 0.55);
+}
+
+
+.admin-game-modal__header {
+    position: sticky;
+
+    top: 0;
+
+    z-index: 2;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    padding: 22px 25px;
+
+    background:
+        rgba(20, 8, 30, 0.97);
+
+    border-bottom:
+        1px solid
+        rgba(255, 255, 255, 0.07);
+
+    backdrop-filter:
+        blur(12px);
+}
+
+
+.admin-game-modal__header span {
+    color: var(--cyan);
+
+    font-size: 0.68rem;
+    font-weight: 900;
+
+    letter-spacing: 0.15em;
+}
+
+
+.admin-game-modal__header h2 {
+    margin: 4px 0 0;
+
+    color: #ffffff;
+}
+
+
+.admin-game-modal__close {
+    width: 42px;
+    height: 42px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #ffffff;
+
+    background:
+        rgba(255, 255, 255, 0.05);
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.1);
+
+    border-radius: 50%;
+
+    font-size: 1.5rem;
+
+    cursor: pointer;
+}
+
+
+/* =========================================================
+   FORM
+========================================================= */
+
+.admin-game-form {
+    padding: 26px;
+}
+
+
+.admin-game-form__layout {
+    display: grid;
+
+    grid-template-columns:
+        210px
+        minmax(0, 1fr);
+
+    gap: 28px;
+
+    margin-bottom: 22px;
+}
+
+
+.admin-game-form__preview {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    gap: 9px;
+
+    text-align: center;
+}
+
+
+.admin-game-form__cover {
+    width: 100%;
+
+    aspect-ratio: 3 / 4;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    overflow: hidden;
+
+    background: #12091a;
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.08);
+
+    border-radius: 18px;
+}
+
+
+.admin-game-form__cover img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+}
+
+
+.admin-game-form__cover span {
+    font-size: 3rem;
+}
+
+
+.admin-game-form__row {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0, 1fr)
+        );
+
+    gap: 18px;
+}
+
+
+.admin-game-field {
+    margin-bottom: 19px;
+}
+
+
+.admin-game-field label {
+    display: block;
+
+    margin-bottom: 7px;
+
+    color: #ffffff;
+
+    font-size: 0.8rem;
+    font-weight: 850;
+}
+
+
+.admin-game-field input,
+.admin-game-field textarea,
+.admin-game-field select {
+    width: 100%;
+
+    box-sizing: border-box;
+
+    padding: 12px 14px;
+
+    color: #ffffff;
+
+    background:
+        rgba(5, 2, 10, 0.55);
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.09);
+
+    border-radius: 12px;
+
+    outline: 0;
+
+    font: inherit;
+}
+
+
+.admin-game-field select {
+    cursor: pointer;
+}
+
+
+.admin-game-field textarea {
+    resize: vertical;
+
+    min-height: 110px;
+}
+
+
+.admin-game-field input:focus,
+.admin-game-field textarea:focus,
+.admin-game-field select:focus {
+    border-color:
+        rgba(255, 44, 168, 0.55);
+
+    box-shadow:
+        0 0 0 3px
+        rgba(255, 44, 168, 0.07);
+}
+
+
+/* =========================================================
+   FORM POLL
+========================================================= */
+
+.admin-game-form__poll {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 18px;
+
+    padding: 16px;
+
+    background:
+        rgba(255, 255, 255, 0.025);
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.07);
+
+    border-radius: 14px;
+
+    cursor: pointer;
+}
+
+
+.admin-game-form__poll div {
+    display: flex;
+    flex-direction: column;
+
+    gap: 4px;
+}
+
+
+.admin-game-form__poll strong {
+    color: #ffffff;
+}
+
+
+.admin-game-form__poll span {
+    color:
+        rgba(255, 255, 255, 0.44);
+
+    font-size: 0.75rem;
+}
+
+
+/* =========================================================
+   FORM ACTIONS
+========================================================= */
+
+.admin-game-form__actions {
+    display: flex;
+    justify-content: flex-end;
+
+    gap: 10px;
+
+    margin-top: 25px;
+
+    padding-top: 20px;
+
+    border-top:
+        1px solid
+        rgba(255, 255, 255, 0.06);
+}
+
+
+.admin-game-form__cancel,
+.admin-game-form__save {
+    min-height: 44px;
+
+    padding: 10px 18px;
+
+    border-radius: 12px;
+
+    font: inherit;
+    font-weight: 900;
+
+    cursor: pointer;
+}
+
+
+.admin-game-form__cancel {
+    color:
+        rgba(255, 255, 255, 0.8);
+
+    background:
+        rgba(255, 255, 255, 0.04);
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.09);
+}
+
+
+.admin-game-form__save {
+    color: #ffffff;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--purple),
+            var(--pink)
+        );
+
+    border:
+        1px solid
+        rgba(255, 44, 168, 0.4);
+}
+
+
+.admin-game-form__save:disabled {
+    opacity: 0.45;
+
+    cursor: not-allowed;
+}
+
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media screen and (max-width: 1050px) {
+
+    .admin-games-stats {
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(0, 1fr)
+            );
+    }
+
+
+    .admin-games-grid {
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(0, 1fr)
+            );
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media screen and (max-width: 700px) {
+
+    .admin-section-header {
+        flex-direction: column;
+
+        align-items: stretch;
+    }
+
+
+    .admin-games-stats {
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(0, 1fr)
+            );
+
+        gap: 11px;
+    }
+
+
+    .admin-games-stat {
+        min-height: 105px;
+
+        padding: 17px;
+    }
+
+
+    .admin-games-grid {
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .admin-games-filters {
+        display: grid;
+
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .admin-games-filters button {
+        width: 100%;
+    }
+
+
+    .admin-game-form__layout,
+    .admin-game-form__row {
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .admin-game-form__preview {
+        width: min(100%, 220px);
+
+        margin: 0 auto;
+    }
+
+
+    .admin-game-form__actions {
+        flex-direction: column-reverse;
+    }
+
+
+    .admin-game-form__actions button {
+        width: 100%;
+    }
+
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media screen and (max-width: 450px) {
+
+    .admin-games-stats {
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .admin-game-card__content {
+        padding: 17px;
+    }
+
+}
+
+</style>

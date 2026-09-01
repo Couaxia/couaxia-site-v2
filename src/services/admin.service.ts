@@ -435,7 +435,7 @@ export interface AdminArtwork {
     tags:
         string[];
 
-    image_message:
+    image_messages:
         string[];
 
     artist_url:
@@ -444,7 +444,7 @@ export interface AdminArtwork {
     button_text:
         string;
 
-    button_message:
+    button_messages:
         string[];
 
     sensitive:
@@ -494,7 +494,7 @@ export interface ArtworkPayload {
     tags?:
         string[];
 
-    image_message?:
+    image_messages?:
         string[];
 
     artist_url?:
@@ -503,7 +503,7 @@ export interface ArtworkPayload {
     button_text?:
         string;
 
-    button_message?:
+    button_messages?:
         string[];
 
     sensitive?:
@@ -3195,9 +3195,9 @@ function normalizeAdminArtwork(
                 artwork.tags
             ),
 
-        image_message:
+        image_messages:
             normalizeStringArray(
-                artwork.image_message
+                artwork.image_messages
             ),
 
         artist_url:
@@ -3212,9 +3212,9 @@ function normalizeAdminArtwork(
                 "Voir son profil"
             ),
 
-        button_message:
+        button_messages:
             normalizeStringArray(
-                artwork.button_message
+                artwork.button_messages
             ),
 
         sensitive:
@@ -3286,10 +3286,10 @@ export async function getAdminArtworks():
                 image_alt,
                 media_type,
                 tags,
-                image_message,
+                image_messages,
                 artist_url,
                 button_text,
-                button_message,
+                button_messages,
                 sensitive,
                 favorite_enabled,
                 visible,
@@ -3398,8 +3398,8 @@ export async function createAdminArtwork(
                     ??
                     [],
 
-                image_message:
-                    payload.image_message
+                image_messages:
+                    payload.image_messages
                     ??
                     [],
 
@@ -3413,8 +3413,8 @@ export async function createAdminArtwork(
                     ??
                     "Voir son profil",
 
-                button_message:
-                    payload.button_message
+                button_messages:
+                    payload.button_messages
                     ??
                     [],
 

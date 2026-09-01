@@ -18,6 +18,7 @@ import type {
     ArtworkPayload
 } from "../../services/admin.service";
 
+
 /* =========================================================
    TYPES
 ========================================================= */
@@ -28,39 +29,63 @@ type ArtworkMediaType =
     | "gif";
 
 
+type ArtworkFilter =
+    | "all"
+    | "visible"
+    | "hidden"
+    | "sensitive"
+    | "favorites";
+
+
 interface ArtworkForm {
 
-    art_id: string;
+    art_id:
+        string;
 
-    artist: string;
+    artist:
+        string;
 
-    artist_role: string;
+    artist_role:
+        string;
 
-    description: string;
+    description:
+        string;
 
-    image_url: string;
+    image_url:
+        string;
 
-    image_alt: string;
+    image_alt:
+        string;
 
-    media_type: ArtworkMediaType;
+    media_type:
+        ArtworkMediaType;
 
-    tags: string;
+    tags:
+        string;
 
-    image_message: string;
+    image_messages:
+        string;
 
-    artist_url: string;
+    artist_url:
+        string;
 
-    button_text: string;
+    button_text:
+        string;
 
-    button_message: string;
+    button_messages:
+        string;
 
-    sensitive: boolean;
+    sensitive:
+        boolean;
 
-    favorite_enabled: boolean;
+    favorite_enabled:
+        boolean;
 
-    visible: boolean;
+    visible:
+        boolean;
 
-    sort_order: number;
+    sort_order:
+        number;
 
 }
 
@@ -74,11 +99,15 @@ const artworks =
 
 
 const loading =
-    ref(true);
+    ref(
+        true
+    );
 
 
 const saving =
-    ref(false);
+    ref(
+        false
+    );
 
 
 const deletingArtworkId =
@@ -94,39 +123,39 @@ const selectedArtwork =
 
 
 const editing =
-    ref(false);
+    ref(
+        false
+    );
 
 
 const formOpen =
-    ref(false);
+    ref(
+        false
+    );
 
 
 const search =
-    ref("");
+    ref(
+        ""
+    );
 
 
 const filter =
-    ref<
-        "all"
-        |
-        "visible"
-        |
-        "hidden"
-        |
-        "sensitive"
-        |
-        "favorites"
-    >(
+    ref<ArtworkFilter>(
         "all"
     );
 
 
 const errorMessage =
-    ref("");
+    ref(
+        ""
+    );
 
 
 const successMessage =
-    ref("");
+    ref(
+        ""
+    );
 
 
 /* =========================================================
@@ -162,7 +191,7 @@ function createEmptyForm():
         tags:
             "",
 
-        image_message:
+        image_messages:
             "",
 
         artist_url:
@@ -171,7 +200,7 @@ function createEmptyForm():
         button_text:
             "Voir son profil",
 
-        button_message:
+        button_messages:
             "",
 
         sensitive:
@@ -195,6 +224,61 @@ const form =
     ref<ArtworkForm>(
         createEmptyForm()
     );
+
+
+/* =========================================================
+   NORMALIZE TEXT ARRAY
+========================================================= */
+
+function normalizeTextArray(
+    value:
+        unknown
+): string[] {
+
+    if (
+        Array.isArray(
+            value
+        )
+    ) {
+
+        return value
+            .map(
+                item =>
+                    String(
+                        item
+                    ).trim()
+            )
+            .filter(
+                Boolean
+            );
+
+    }
+
+
+    if (
+        typeof value
+        ===
+        "string"
+    ) {
+
+        return value
+            .split(
+                ","
+            )
+            .map(
+                item =>
+                    item.trim()
+            )
+            .filter(
+                Boolean
+            );
+
+    }
+
+
+    return [];
+
+}
 
 
 /* =========================================================
@@ -236,13 +320,14 @@ const filteredArtworks =
 
 
                     const tags =
-                    (
-                        artwork.tags
-                        ??
-                        []
-                    )
-                        .join(" ")
-                        .toLowerCase();
+                        normalizeTextArray(
+                            artwork.tags
+                        )
+                            .join(
+                                " "
+                            )
+                            .toLowerCase();
+
 
                     const matchesSearch =
                         !query
@@ -353,16 +438,42 @@ const displayedArtworks =
                     second
                 ) => {
 
-                    return (
+                    const firstOrder =
                         first.sort_order
                         ??
-                        0
-                    )
-                    -
-                    (
+                        0;
+
+
+                    const secondOrder =
                         second.sort_order
                         ??
-                        0
+                        0;
+
+
+                    if (
+                        firstOrder
+                        !==
+                        secondOrder
+                    ) {
+
+                        return (
+                            firstOrder
+                            -
+                            secondOrder
+                        );
+
+                    }
+
+
+                    return (
+                        first.artist
+                            ??
+                            ""
+                    ).localeCompare(
+                        second.artist
+                        ??
+                        "",
+                        "fr"
                     );
 
                 }
@@ -412,6 +523,18 @@ const sensitiveCount =
     );
 
 
+const favoriteCount =
+    computed(
+        () =>
+            artworks.value.filter(
+                artwork =>
+                    artwork.favorite_enabled
+                    ===
+                    true
+            ).length
+    );
+
+
 /* =========================================================
    CAN SAVE
 ========================================================= */
@@ -430,7 +553,8 @@ const canSave =
 
 
             if (
-                !form.value.artist.trim()
+                !form.value.artist
+                    .trim()
             ) {
 
                 return false;
@@ -439,7 +563,8 @@ const canSave =
 
 
             if (
-                !form.value.image_url.trim()
+                !form.value.image_url
+                    .trim()
             ) {
 
                 return false;
@@ -486,6 +611,22 @@ function isImage(
 
 
 /* =========================================================
+   TAGS
+========================================================= */
+
+function getArtworkTags(
+    artwork:
+        AdminArtwork
+): string[] {
+
+    return normalizeTextArray(
+        artwork.tags
+    );
+
+}
+
+
+/* =========================================================
    FORM PREVIEW
 ========================================================= */
 
@@ -516,7 +657,10 @@ async function loadArtworks() {
         artworks.value =
             await getAdminArtworks();
 
-    } catch (error) {
+    }
+    catch (
+        error
+    ) {
 
         console.error(
             "Erreur chargement artworks admin :",
@@ -529,7 +673,8 @@ async function loadArtworks() {
                 ? error.message
                 : "Impossible de charger les créations.";
 
-    } finally {
+    }
+    finally {
 
         loading.value =
             false;
@@ -596,103 +741,106 @@ function openEdit(
         "";
 
 
-   form.value = {
+    form.value = {
 
-    art_id:
-        artwork.art_id
-        ??
-        "",
+        art_id:
+            artwork.art_id
+            ??
+            "",
 
-    artist:
-        artwork.artist
-        ??
-        "",
+        artist:
+            artwork.artist
+            ??
+            "",
 
-    artist_role:
-        artwork.artist_role
-        ??
-        "",
+        artist_role:
+            artwork.artist_role
+            ??
+            "",
 
-    description:
-        artwork.description
-        ??
-        "",
+        description:
+            artwork.description
+            ??
+            "",
 
-    image_url:
-        artwork.image_url
-        ??
-        "",
+        image_url:
+            artwork.image_url
+            ??
+            "",
 
-    image_alt:
-        artwork.image_alt
-        ??
-        "",
+        image_alt:
+            artwork.image_alt
+            ??
+            "",
 
-    media_type:
-        (
-            artwork.media_type
+        media_type:
+            (
+                artwork.media_type
+                ===
+                "video"
+                ||
+                artwork.media_type
+                ===
+                "gif"
+            )
+                ? artwork.media_type
+                : "image",
+
+        tags:
+            normalizeTextArray(
+                artwork.tags
+            )
+                .join(
+                    ", "
+                ),
+
+        image_messages:
+            normalizeTextArray(
+                artwork.image_messages
+            )
+                .join(
+                    "\n"
+                ),
+
+        artist_url:
+            artwork.artist_url
+            ??
+            "",
+
+        button_text:
+            artwork.button_text
+            ??
+            "Voir son profil",
+
+        button_messages:
+            normalizeTextArray(
+                artwork.button_messages
+            )
+                .join(
+                    "\n"
+                ),
+
+        sensitive:
+            artwork.sensitive
             ===
-            "video"
-            ||
-            artwork.media_type
-            ===
-            "gif"
-        )
-            ? artwork.media_type
-            : "image",
+            true,
 
-    tags:
-        (
-            artwork.tags
+        favorite_enabled:
+            artwork.favorite_enabled
+            !==
+            false,
+
+        visible:
+            artwork.visible
+            !==
+            false,
+
+        sort_order:
+            artwork.sort_order
             ??
-            []
-        ).join(", "),
+            0
 
-    image_message:
-        (
-            artwork.image_message
-            ??
-            []
-        ).join("\n"),
-
-    artist_url:
-        artwork.artist_url
-        ??
-        "",
-
-    button_text:
-        artwork.button_text
-        ??
-        "Voir son profil",
-
-    button_message:
-        (
-            artwork.button_message
-            ??
-            []
-        ).join("\n"),
-
-    sensitive:
-        artwork.sensitive
-        ===
-        true,
-
-    favorite_enabled:
-        artwork.favorite_enabled
-        !==
-        false,
-
-    visible:
-        artwork.visible
-        !==
-        false,
-
-    sort_order:
-        artwork.sort_order
-        ??
-        0
-
-};
+    };
 
 
     formOpen.value =
@@ -743,7 +891,9 @@ function createPayload():
 
     const tags =
         form.value.tags
-            .split(",")
+            .split(
+                ","
+            )
             .map(
                 tag =>
                     tag.trim()
@@ -753,9 +903,11 @@ function createPayload():
             );
 
 
-    const imageMessage =
-        form.value.image_message
-            .split("\n")
+    const imageMessages =
+        form.value.image_messages
+            .split(
+                "\n"
+            )
             .map(
                 message =>
                     message.trim()
@@ -765,9 +917,11 @@ function createPayload():
             );
 
 
-    const buttonMessage =
-        form.value.button_message
-            .split("\n")
+    const buttonMessages =
+        form.value.button_messages
+            .split(
+                "\n"
+            )
             .map(
                 message =>
                     message.trim()
@@ -814,8 +968,8 @@ function createPayload():
 
         tags,
 
-        image_message:
-            imageMessage,
+        image_messages:
+            imageMessages,
 
         artist_url:
             form.value.artist_url
@@ -829,8 +983,8 @@ function createPayload():
             ||
             "Voir son profil",
 
-        button_message:
-            buttonMessage,
+        button_messages:
+            buttonMessages,
 
         sensitive:
             form.value.sensitive,
@@ -907,6 +1061,7 @@ async function saveArtwork() {
 
         }
 
+
         /* =================================================
            CREATE
         ================================================== */
@@ -929,7 +1084,10 @@ async function saveArtwork() {
 
         closeForm();
 
-    } catch (error) {
+    }
+    catch (
+        error
+    ) {
 
         console.error(
             "Erreur sauvegarde artwork :",
@@ -942,7 +1100,8 @@ async function saveArtwork() {
                 ? error.message
                 : "Impossible d'enregistrer la création.";
 
-    } finally {
+    }
+    finally {
 
         saving.value =
             false;
@@ -961,16 +1120,26 @@ async function toggleVisibility(
         AdminArtwork
 ) {
 
+    errorMessage.value =
+        "";
+
+
+    successMessage.value =
+        "";
+
+
     try {
 
         const updated =
             await updateAdminArtwork(
                 artwork.id,
                 {
+
                     visible:
                         artwork.visible
                         !==
                         true
+
                 }
             );
 
@@ -998,12 +1167,13 @@ async function toggleVisibility(
 
         successMessage.value =
             updated.visible
-
                 ? "La création est maintenant visible."
-
                 : "La création est maintenant masquée.";
 
-    } catch (error) {
+    }
+    catch (
+        error
+    ) {
 
         console.error(
             "Erreur visibilité artwork :",
@@ -1030,16 +1200,26 @@ async function toggleFavorites(
         AdminArtwork
 ) {
 
+    errorMessage.value =
+        "";
+
+
+    successMessage.value =
+        "";
+
+
     try {
 
         const updated =
             await updateAdminArtwork(
                 artwork.id,
                 {
+
                     favorite_enabled:
                         artwork.favorite_enabled
                         !==
                         true
+
                 }
             );
 
@@ -1064,7 +1244,16 @@ async function toggleFavorites(
 
         }
 
-    } catch (error) {
+
+        successMessage.value =
+            updated.favorite_enabled
+                ? "Les favoris sont activés pour cette création."
+                : "Les favoris sont désactivés pour cette création.";
+
+    }
+    catch (
+        error
+    ) {
 
         console.error(
             "Erreur favoris artwork :",
@@ -1129,6 +1318,10 @@ async function removeArtwork(
         "";
 
 
+    successMessage.value =
+        "";
+
+
     try {
 
         await deleteAdminArtwork(
@@ -1148,7 +1341,10 @@ async function removeArtwork(
         successMessage.value =
             "La création a été supprimée.";
 
-    } catch (error) {
+    }
+    catch (
+        error
+    ) {
 
         console.error(
             "Erreur suppression artwork :",
@@ -1161,7 +1357,8 @@ async function removeArtwork(
                 ? error.message
                 : "Impossible de supprimer la création.";
 
-    } finally {
+    }
+    finally {
 
         deletingArtworkId.value =
             null;
@@ -1224,7 +1421,9 @@ onMounted(
                     admin-button
                     admin-button--primary
                 "
-                @click="openCreate"
+                @click="
+                    openCreate
+                "
             >
                 ＋ Ajouter un art
             </button>
@@ -1237,7 +1436,9 @@ onMounted(
         ================================================== -->
 
         <div
-            v-if="successMessage"
+            v-if="
+                successMessage
+            "
             class="
                 admin-message
                 admin-message--success
@@ -1248,7 +1449,9 @@ onMounted(
 
 
         <div
-            v-if="errorMessage"
+            v-if="
+                errorMessage
+            "
             class="
                 admin-message
                 admin-message--error
@@ -1263,13 +1466,16 @@ onMounted(
         ================================================== -->
 
         <div
-            v-if="loading"
+            v-if="
+                loading
+            "
             class="admin-loading"
         >
 
             <span>
                 🎨
             </span>
+
 
             <strong>
                 Chargement des créations...
@@ -1297,52 +1503,80 @@ onMounted(
                 <article
                     class="admin-mini-stat"
                 >
+
                     <span>
                         Créations
                     </span>
 
+
                     <strong>
                         {{ artworks.length }}
                     </strong>
+
                 </article>
 
 
                 <article
                     class="admin-mini-stat"
                 >
+
                     <span>
                         Visibles
                     </span>
 
+
                     <strong>
                         {{ visibleCount }}
                     </strong>
+
                 </article>
 
 
                 <article
                     class="admin-mini-stat"
                 >
+
                     <span>
                         Masquées
                     </span>
 
+
                     <strong>
                         {{ hiddenCount }}
                     </strong>
+
                 </article>
 
 
                 <article
                     class="admin-mini-stat"
                 >
+
                     <span>
                         Sensibles
                     </span>
 
+
                     <strong>
                         {{ sensitiveCount }}
                     </strong>
+
+                </article>
+
+
+                <article
+                    class="admin-mini-stat"
+                >
+
+                    <span>
+                        Favoris
+                    </span>
+
+
+                    <strong>
+                        {{ favoriteCount }}
+                    </strong>
+
                 </article>
 
             </div>
@@ -1356,23 +1590,31 @@ onMounted(
                 class="admin-artworks-toolbar"
             >
 
+                <!-- SEARCH -->
+
                 <div
                     class="admin-search"
                 >
 
-                    <span>
+                    <span
+                        aria-hidden="true"
+                    >
                         🔎
                     </span>
 
 
                     <input
-                        v-model="search"
+                        v-model="
+                            search
+                        "
                         type="search"
                         placeholder="Artiste, description, tags..."
                     >
 
                 </div>
 
+
+                <!-- FILTERS -->
 
                 <div
                     class="admin-artworks-filters"
@@ -1384,7 +1626,9 @@ onMounted(
                             'admin-artworks-filter--active':
                                 filter === 'all'
                         }"
-                        @click="filter = 'all'"
+                        @click="
+                            filter = 'all'
+                        "
                     >
                         Tous
                     </button>
@@ -1396,7 +1640,9 @@ onMounted(
                             'admin-artworks-filter--active':
                                 filter === 'visible'
                         }"
-                        @click="filter = 'visible'"
+                        @click="
+                            filter = 'visible'
+                        "
                     >
                         👁 Visibles
                     </button>
@@ -1408,7 +1654,9 @@ onMounted(
                             'admin-artworks-filter--active':
                                 filter === 'hidden'
                         }"
-                        @click="filter = 'hidden'"
+                        @click="
+                            filter = 'hidden'
+                        "
                     >
                         🙈 Masqués
                     </button>
@@ -1420,7 +1668,9 @@ onMounted(
                             'admin-artworks-filter--active':
                                 filter === 'sensitive'
                         }"
-                        @click="filter = 'sensitive'"
+                        @click="
+                            filter = 'sensitive'
+                        "
                     >
                         🔞 Sensibles
                     </button>
@@ -1432,7 +1682,9 @@ onMounted(
                             'admin-artworks-filter--active':
                                 filter === 'favorites'
                         }"
-                        @click="filter = 'favorites'"
+                        @click="
+                            filter = 'favorites'
+                        "
                     >
                         💜 Favoris
                     </button>
@@ -1449,12 +1701,15 @@ onMounted(
             <p
                 class="admin-artworks-count"
             >
+
                 {{ displayedArtworks.length }}
+
                 création{{
                     displayedArtworks.length > 1
                         ? "s"
                         : ""
                 }}
+
             </p>
 
 
@@ -1475,13 +1730,14 @@ onMounted(
                     🎨
                 </span>
 
+
                 <strong>
                     Aucune création
                 </strong>
 
+
                 <p>
-                    Aucun art ne correspond
-                    à ta recherche.
+                    Aucun art ne correspond à ta recherche.
                 </p>
 
             </div>
@@ -1502,7 +1758,9 @@ onMounted(
                         in
                         displayedArtworks
                     "
-                    :key="artwork.id"
+                    :key="
+                        artwork.id
+                    "
                     class="admin-artwork-card"
                     :class="{
                         'admin-artwork-card--hidden':
@@ -1526,7 +1784,8 @@ onMounted(
                             "
                             :src="
                                 artwork.image_url
-                                ?? ''
+                                ??
+                                ''
                             "
                             muted
                             loop
@@ -1543,7 +1802,8 @@ onMounted(
                             "
                             :src="
                                 artwork.image_url
-                                ?? ''
+                                ??
+                                ''
                             "
                             :alt="
                                 artwork.image_alt
@@ -1558,14 +1818,14 @@ onMounted(
                         <!-- BADGES -->
 
                         <div
-                            class="
-                                admin-artwork-card__badges
-                            "
+                            class="admin-artwork-card__badges"
                         >
 
                             <span
                                 v-if="
-                                    artwork.visible !== true
+                                    artwork.visible
+                                    !==
+                                    true
                                 "
                                 class="
                                     admin-artwork-badge
@@ -1578,7 +1838,9 @@ onMounted(
 
                             <span
                                 v-if="
-                                    artwork.sensitive === true
+                                    artwork.sensitive
+                                    ===
+                                    true
                                 "
                                 class="
                                     admin-artwork-badge
@@ -1591,12 +1853,15 @@ onMounted(
 
                             <span
                                 v-if="
-                                    artwork.favorite_enabled === true
+                                    artwork.favorite_enabled
+                                    ===
+                                    true
                                 "
                                 class="
                                     admin-artwork-badge
                                     admin-artwork-badge--favorite
                                 "
+                                title="Favoris autorisés"
                             >
                                 💜
                             </span>
@@ -1611,57 +1876,57 @@ onMounted(
                     ====================================== -->
 
                     <div
-                        class="
-                            admin-artwork-card__content
-                        "
+                        class="admin-artwork-card__content"
                     >
 
                         <div
-                            class="
-                                admin-artwork-card__heading
-                            "
+                            class="admin-artwork-card__heading"
                         >
 
                             <div>
 
                                 <span>
+
                                     {{
                                         artwork.artist_role
                                         ||
                                         "Artiste"
                                     }}
+
                                 </span>
 
 
                                 <h3>
+
                                     {{
                                         artwork.artist
                                         ||
                                         "Artiste inconnu"
                                     }}
+
                                 </h3>
 
                             </div>
 
 
                             <strong
-                                class="
-                                    admin-artwork-card__order
-                                "
+                                class="admin-artwork-card__order"
                             >
+
                                 #{{ artwork.sort_order ?? 0 }}
+
                             </strong>
 
                         </div>
 
 
+                        <!-- DESCRIPTION -->
+
                         <p
                             v-if="
                                 artwork.description
                             "
-                            class="
-                                admin-artwork-card__description
-                            "
+                            class="admin-artwork-card__description"
                         >
                             {{ artwork.description }}
                         </p>
@@ -1678,15 +1943,32 @@ onMounted(
                         </p>
 
 
+                        <!-- TAGS -->
+
                         <div
                             v-if="
-                                artwork.tags
+                                getArtworkTags(
+                                    artwork
+                                ).length
                             "
-                            class="
-                                admin-artwork-card__tags
-                            "
+                            class="admin-artwork-card__tags"
                         >
-                            {{ artwork.tags }}
+
+                            <span
+                                v-for="
+                                    tag
+                                    in
+                                    getArtworkTags(
+                                        artwork
+                                    )
+                                "
+                                :key="
+                                    tag
+                                "
+                            >
+                                {{ tag }}
+                            </span>
+
                         </div>
 
 
@@ -1695,9 +1977,7 @@ onMounted(
                         ================================== -->
 
                         <div
-                            class="
-                                admin-artwork-card__switches
-                            "
+                            class="admin-artwork-card__switches"
                         >
 
                             <label>
@@ -1706,10 +1986,13 @@ onMounted(
                                     Visible
                                 </span>
 
+
                                 <input
                                     type="checkbox"
                                     :checked="
-                                        artwork.visible === true
+                                        artwork.visible
+                                        ===
+                                        true
                                     "
                                     @change="
                                         toggleVisibility(
@@ -1727,10 +2010,13 @@ onMounted(
                                     Favoris
                                 </span>
 
+
                                 <input
                                     type="checkbox"
                                     :checked="
-                                        artwork.favorite_enabled === true
+                                        artwork.favorite_enabled
+                                        ===
+                                        true
                                     "
                                     @change="
                                         toggleFavorites(
@@ -1749,9 +2035,7 @@ onMounted(
                         ================================== -->
 
                         <div
-                            class="
-                                admin-artwork-card__actions
-                            "
+                            class="admin-artwork-card__actions"
                         >
 
                             <button
@@ -1787,13 +2071,17 @@ onMounted(
                                     )
                                 "
                             >
+
                                 {{
                                     deletingArtworkId
                                     ===
                                     artwork.id
+
                                         ? "..."
+
                                         : "🗑"
                                 }}
+
                             </button>
 
                         </div>
@@ -1816,9 +2104,13 @@ onMounted(
         >
 
             <div
-                v-if="formOpen"
+                v-if="
+                    formOpen
+                "
                 class="admin-modal"
-                @click.self="closeForm"
+                @click.self="
+                    closeForm
+                "
             >
 
                 <div
@@ -1828,7 +2120,9 @@ onMounted(
                     "
                 >
 
-                    <!-- HEADER -->
+                    <!-- =====================================
+                         HEADER
+                    ====================================== -->
 
                     <header
                         class="admin-modal__header"
@@ -1844,11 +2138,13 @@ onMounted(
 
 
                             <h2>
+
                                 {{
                                     editing
                                         ? "Modifier l'art"
                                         : "Ajouter un art"
                                 }}
+
                             </h2>
 
                         </div>
@@ -1857,8 +2153,12 @@ onMounted(
                         <button
                             type="button"
                             class="admin-modal__close"
-                            :disabled="saving"
-                            @click="closeForm"
+                            :disabled="
+                                saving
+                            "
+                            @click="
+                                closeForm
+                            "
                         >
                             ×
                         </button>
@@ -1885,21 +2185,15 @@ onMounted(
                         ================================== -->
 
                         <div
-                            class="
-                                admin-artwork-form__layout
-                            "
+                            class="admin-artwork-form__layout"
                         >
 
                             <aside
-                                class="
-                                    admin-artwork-form__preview
-                                "
+                                class="admin-artwork-form__preview"
                             >
 
                                 <div
-                                    class="
-                                        admin-artwork-form__media
-                                    "
+                                    class="admin-artwork-form__media"
                                 >
 
                                     <video
@@ -1910,7 +2204,9 @@ onMounted(
                                             ===
                                             'video'
                                         "
-                                        :src="previewUrl"
+                                        :src="
+                                            previewUrl
+                                        "
                                         controls
                                         muted
                                         loop
@@ -1921,7 +2217,9 @@ onMounted(
                                         v-else-if="
                                             previewUrl
                                         "
-                                        :src="previewUrl"
+                                        :src="
+                                            previewUrl
+                                        "
                                         :alt="
                                             form.image_alt
                                             ||
@@ -1940,11 +2238,13 @@ onMounted(
 
 
                                 <strong>
+
                                     {{
                                         form.artist
                                         ||
                                         "Artiste"
                                     }}
+
                                 </strong>
 
 
@@ -1960,9 +2260,7 @@ onMounted(
                             ============================== -->
 
                             <div
-                                class="
-                                    admin-artwork-form__fields
-                                "
+                                class="admin-artwork-form__fields"
                             >
 
                                 <div
@@ -1973,11 +2271,15 @@ onMounted(
                                         class="admin-field"
                                     >
 
-                                        <label>
+                                        <label
+                                            for="artwork-artist"
+                                        >
                                             Artiste *
                                         </label>
 
+
                                         <input
+                                            id="artwork-artist"
                                             v-model="
                                                 form.artist
                                             "
@@ -1993,11 +2295,15 @@ onMounted(
                                         class="admin-field"
                                     >
 
-                                        <label>
+                                        <label
+                                            for="artwork-role"
+                                        >
                                             Rôle
                                         </label>
 
+
                                         <input
+                                            id="artwork-role"
                                             v-model="
                                                 form.artist_role
                                             "
@@ -2014,11 +2320,38 @@ onMounted(
                                     class="admin-field"
                                 >
 
-                                    <label>
+                                    <label
+                                        for="artwork-id"
+                                    >
+                                        ID de l'art
+                                    </label>
+
+
+                                    <input
+                                        id="artwork-id"
+                                        v-model="
+                                            form.art_id
+                                        "
+                                        type="text"
+                                        placeholder="couaxia-model-01"
+                                    >
+
+                                </div>
+
+
+                                <div
+                                    class="admin-field"
+                                >
+
+                                    <label
+                                        for="artwork-url"
+                                    >
                                         URL de l'image *
                                     </label>
 
+
                                     <input
+                                        id="artwork-url"
                                         v-model="
                                             form.image_url
                                         "
@@ -2038,26 +2371,40 @@ onMounted(
                                         class="admin-field"
                                     >
 
-                                        <label>
+                                        <label
+                                            for="artwork-media-type"
+                                        >
                                             Type
                                         </label>
 
+
                                         <select
+                                            id="artwork-media-type"
                                             v-model="
                                                 form.media_type
                                             "
                                         >
-                                            <option value="image">
+
+                                            <option
+                                                value="image"
+                                            >
                                                 Image
                                             </option>
 
-                                            <option value="gif">
+
+                                            <option
+                                                value="gif"
+                                            >
                                                 GIF
                                             </option>
 
-                                            <option value="video">
+
+                                            <option
+                                                value="video"
+                                            >
                                                 Vidéo
                                             </option>
+
                                         </select>
 
                                     </div>
@@ -2067,11 +2414,15 @@ onMounted(
                                         class="admin-field"
                                     >
 
-                                        <label>
+                                        <label
+                                            for="artwork-order"
+                                        >
                                             Ordre
                                         </label>
 
+
                                         <input
+                                            id="artwork-order"
                                             v-model.number="
                                                 form.sort_order
                                             "
@@ -2096,11 +2447,15 @@ onMounted(
                             class="admin-field"
                         >
 
-                            <label>
+                            <label
+                                for="artwork-alt"
+                            >
                                 Texte alternatif
                             </label>
 
+
                             <input
+                                id="artwork-alt"
                                 v-model="
                                     form.image_alt
                                 "
@@ -2119,11 +2474,15 @@ onMounted(
                             class="admin-field"
                         >
 
-                            <label>
+                            <label
+                                for="artwork-description"
+                            >
                                 Description
                             </label>
 
+
                             <textarea
+                                id="artwork-description"
                                 v-model="
                                     form.description
                                 "
@@ -2142,17 +2501,26 @@ onMounted(
                             class="admin-field"
                         >
 
-                            <label>
+                            <label
+                                for="artwork-tags"
+                            >
                                 Tags
                             </label>
 
+
                             <input
+                                id="artwork-tags"
                                 v-model="
                                     form.tags
                                 "
                                 type="text"
                                 placeholder="VTuber, Couaxia, Chibi..."
                             >
+
+
+                            <small>
+                                Sépare les tags avec une virgule.
+                            </small>
 
                         </div>
 
@@ -2169,11 +2537,15 @@ onMounted(
                                 class="admin-field"
                             >
 
-                                <label>
+                                <label
+                                    for="artwork-artist-url"
+                                >
                                     Lien artiste
                                 </label>
 
+
                                 <input
+                                    id="artwork-artist-url"
                                     v-model="
                                         form.artist_url
                                     "
@@ -2188,11 +2560,15 @@ onMounted(
                                 class="admin-field"
                             >
 
-                                <label>
+                                <label
+                                    for="artwork-button-text"
+                                >
                                     Texte du bouton
                                 </label>
 
+
                                 <input
+                                    id="artwork-button-text"
                                     v-model="
                                         form.button_text
                                     "
@@ -2206,47 +2582,65 @@ onMounted(
 
 
                         <!-- =================================
-                             IMAGE MESSAGE
+                             IMAGE MESSAGES
                         ================================== -->
 
                         <div
                             class="admin-field"
                         >
 
-                            <label>
-                                Message de l'image
+                            <label
+                                for="artwork-image-messages"
+                            >
+                                Messages de l'image
                             </label>
 
-                            <input
+
+                            <textarea
+                                id="artwork-image-messages"
                                 v-model="
-                                    form.image_message
+                                    form.image_messages
                                 "
-                                type="text"
-                                placeholder="Message optionnel..."
-                            >
+                                rows="4"
+                                placeholder="Un message par ligne..."
+                            ></textarea>
+
+
+                            <small>
+                                Un message par ligne.
+                            </small>
 
                         </div>
 
 
                         <!-- =================================
-                             BUTTON MESSAGE
+                             BUTTON MESSAGES
                         ================================== -->
 
                         <div
                             class="admin-field"
                         >
 
-                            <label>
-                                Message du bouton
+                            <label
+                                for="artwork-button-messages"
+                            >
+                                Messages du bouton
                             </label>
 
-                            <input
+
+                            <textarea
+                                id="artwork-button-messages"
                                 v-model="
-                                    form.button_message
+                                    form.button_messages
                                 "
-                                type="text"
-                                placeholder="Message optionnel..."
-                            >
+                                rows="4"
+                                placeholder="Un message par ligne..."
+                            ></textarea>
+
+
+                            <small>
+                                Un message par ligne.
+                            </small>
 
                         </div>
 
@@ -2256,15 +2650,13 @@ onMounted(
                         ================================== -->
 
                         <div
-                            class="
-                                admin-form-settings
-                            "
+                            class="admin-form-settings"
                         >
 
+                            <!-- VISIBLE -->
+
                             <label
-                                class="
-                                    admin-switch-row
-                                "
+                                class="admin-switch-row"
                             >
 
                                 <div>
@@ -2273,9 +2665,9 @@ onMounted(
                                         👁 Visible
                                     </strong>
 
+
                                     <span>
-                                        Afficher cet art
-                                        sur le site.
+                                        Afficher cet art sur le site.
                                     </span>
 
                                 </div>
@@ -2291,10 +2683,10 @@ onMounted(
                             </label>
 
 
+                            <!-- FAVORITES -->
+
                             <label
-                                class="
-                                    admin-switch-row
-                                "
+                                class="admin-switch-row"
                             >
 
                                 <div>
@@ -2302,6 +2694,7 @@ onMounted(
                                     <strong>
                                         💜 Favoris
                                     </strong>
+
 
                                     <span>
                                         Autoriser les favoris.
@@ -2320,10 +2713,10 @@ onMounted(
                             </label>
 
 
+                            <!-- SENSITIVE -->
+
                             <label
-                                class="
-                                    admin-switch-row
-                                "
+                                class="admin-switch-row"
                             >
 
                                 <div>
@@ -2331,6 +2724,7 @@ onMounted(
                                     <strong>
                                         🔞 Contenu sensible
                                     </strong>
+
 
                                     <span>
                                         Afficher un avertissement.
@@ -2356,9 +2750,7 @@ onMounted(
                         ================================== -->
 
                         <footer
-                            class="
-                                admin-form__actions
-                            "
+                            class="admin-form__actions"
                         >
 
                             <button
@@ -2367,7 +2759,9 @@ onMounted(
                                     admin-button
                                     admin-button--secondary
                                 "
-                                :disabled="saving"
+                                :disabled="
+                                    saving
+                                "
                                 @click="
                                     closeForm
                                 "
