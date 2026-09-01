@@ -1,4 +1,6 @@
-import { supabase } from "../lib/supabase";
+import {
+    supabase
+} from "../lib/supabase";
 
 
 /* =========================================================
@@ -23,21 +25,29 @@ export type SuggestionStatus =
 
 export interface AdminProfile {
 
-    id: string;
+    id:
+        string;
 
-    username: string;
+    username:
+        string;
 
-    display_name: string | null;
+    display_name:
+        string | null;
 
-    avatar_url: string | null;
+    avatar_url:
+        string | null;
 
-    bio: string | null;
+    bio:
+        string | null;
 
-    role: UserRole;
+    role:
+        UserRole;
 
-    created_at: string;
+    created_at:
+        string;
 
-    updated_at: string;
+    updated_at:
+        string;
 
 }
 
@@ -84,60 +94,85 @@ export interface AdminDashboardStats {
 
 export interface AdminPoll {
 
-    id: string;
+    id:
+        string;
 
-    slug: string | null;
+    slug:
+        string | null;
 
-    question: string | null;
+    question:
+        string | null;
 
-    status: string;
+    status:
+        string;
 
-    title: string | null;
+    title:
+        string | null;
 
-    description: string | null;
+    description:
+        string | null;
 
-    category: string | null;
+    category:
+        string | null;
 
-    starts_at: string | null;
+    starts_at:
+        string | null;
 
-    ends_at: string | null;
+    ends_at:
+        string | null;
 
-    results_visible: boolean;
+    results_visible:
+        boolean;
 
-    allow_suggestions: boolean;
+    allow_suggestions:
+        boolean;
 
-    winner: string | null;
+    winner:
+        string | null;
 
-    created_at: string;
+    created_at:
+        string;
 
-    updated_at: string;
+    updated_at:
+        string;
 
 }
 
 
 export interface CreatePollPayload {
 
-    slug?: string | null;
+    slug?:
+        string | null;
 
-    question?: string | null;
+    question?:
+        string | null;
 
-    status?: string;
+    status?:
+        string;
 
-    title?: string | null;
+    title?:
+        string | null;
 
-    description?: string | null;
+    description?:
+        string | null;
 
-    category?: string | null;
+    category?:
+        string | null;
 
-    starts_at?: string | null;
+    starts_at?:
+        string | null;
 
-    ends_at?: string | null;
+    ends_at?:
+        string | null;
 
-    results_visible?: boolean;
+    results_visible?:
+        boolean;
 
-    allow_suggestions?: boolean;
+    allow_suggestions?:
+        boolean;
 
-    winner?: string | null;
+    winner?:
+        string | null;
 
 }
 
@@ -152,28 +187,37 @@ export type UpdatePollPayload =
 
 export interface AdminPollOption {
 
-    id: string;
+    id:
+        string;
 
-    poll_id: string;
+    poll_id:
+        string;
 
-    game_id: string;
+    game_id:
+        string;
 
-    position: number;
+    position:
+        number;
 
-    created_at: string;
+    created_at:
+        string;
 
-    game?: AdminGame | null;
+    game?:
+        AdminGame | null;
 
 }
 
 
 export interface CreatePollOptionPayload {
 
-    poll_id: string;
+    poll_id:
+        string;
 
-    game_id: string;
+    game_id:
+        string;
 
-    position?: number;
+    position?:
+        number;
 
 }
 
@@ -182,211 +226,178 @@ export interface CreatePollOptionPayload {
    GAMES
 ========================================================= */
 
+/*
+ * IMPORTANT :
+ *
+ * Dans Supabase, tags peut être un text[].
+ *
+ * Mais AdminGames.vue travaille actuellement avec une chaîne
+ * pour la recherche et le formulaire.
+ *
+ * Le service transforme donc :
+ *
+ * ["Horreur", "Coop"]
+ *
+ * en :
+ *
+ * "Horreur, Coop"
+ *
+ * lorsqu'il RENVOIE un AdminGame.
+ *
+ * Et il fait l'inverse lors d'un INSERT / UPDATE.
+ */
+
 export interface AdminGame {
 
-    id: string;
+    id:
+        string;
 
-    twitch_game_id: string;
+    twitch_game_id:
+        string;
 
-    twitch_name: string | null;
+    twitch_name:
+        string | null;
 
-    box_art_url: string | null;
+    box_art_url:
+        string | null;
 
-    status: string | null;
+    status:
+        string | null;
 
-    tags: string | null;
+    tags:
+        string;
 
-    description: string | null;
+    description:
+        string | null;
 
-    rating: number | null;
+    rating:
+        number | null;
 
-    youtube_playlist: string | null;
+    youtube_playlist:
+        string | null;
 
-    poll_enabled: boolean | null;
+    poll_enabled:
+        boolean | null;
 
-    created_at: string;
+    created_at:
+        string;
 
-    updated_at: string;
+    updated_at:
+        string;
 
 }
 
 
 export interface UpdateGamePayload {
 
-    twitch_name?: string | null;
+    twitch_name?:
+        string | null;
 
-    box_art_url?: string | null;
+    box_art_url?:
+        string | null;
 
-    status?: string | null;
+    status?:
+        string | null;
 
-    tags?: string | null;
+    tags?:
+        string | string[] | null;
 
-    description?: string | null;
+    description?:
+        string | null;
 
-    rating?: number | null;
+    rating?:
+        number | null;
 
-    youtube_playlist?: string | null;
+    youtube_playlist?:
+        string | null;
 
-    poll_enabled?: boolean;
+    poll_enabled?:
+        boolean;
 
 }
 
-/* =========================================================
-   CREATE GAME PAYLOAD
-========================================================= */
 
 export interface CreateGamePayload {
 
-    twitch_game_id?: string | null;
+    twitch_game_id?:
+        string | null;
 
-    twitch_name?: string | null;
+    twitch_name?:
+        string | null;
 
-    box_art_url?: string | null;
+    box_art_url?:
+        string | null;
 
-    status?: string | null;
+    status?:
+        string | null;
 
-    tags?: string | null;
+    tags?:
+        string | string[] | null;
 
-    description?: string | null;
+    description?:
+        string | null;
 
-    rating?: number | null;
+    rating?:
+        number | null;
 
-    youtube_playlist?: string | null;
+    youtube_playlist?:
+        string | null;
 
-    poll_enabled?: boolean;
-
-}
-/* =========================================================
-   CREATE ADMIN GAME
-========================================================= */
-
-export async function createAdminGame(
-    payload: CreateGamePayload
-): Promise<AdminGame> {
-
-    const {
-        data,
-        error
-    } =
-        await supabase
-            .from("games")
-            .insert({
-                twitch_game_id:
-                    payload.twitch_game_id ?? "",
-
-                twitch_name:
-                    payload.twitch_name ?? null,
-
-                box_art_url:
-                    payload.box_art_url ?? null,
-
-                status:
-                    payload.status ?? "active",
-
-                tags:
-                    payload.tags ?? null,
-
-                description:
-                    payload.description ?? null,
-
-                rating:
-                    payload.rating ?? null,
-
-                youtube_playlist:
-                    payload.youtube_playlist ?? null,
-
-                poll_enabled:
-                    payload.poll_enabled ?? false
-            })
-            .select()
-            .single();
-
-
-    if (
-        error
-    ) {
-
-        console.error(
-            "Erreur création jeu admin :",
-            error
-        );
-
-        throw error;
-
-    }
-
-
-    return data as AdminGame;
+    poll_enabled?:
+        boolean;
 
 }
 
-/* =========================================================
-   DELETE ADMIN GAME
-========================================================= */
 
-export async function deleteAdminGame(
-    gameId: string
-): Promise<void> {
-
-    const {
-        error
-    } =
-        await supabase
-            .from("games")
-            .delete()
-            .eq(
-                "id",
-                gameId
-            );
-
-
-    if (
-        error
-    ) {
-
-        console.error(
-            "Erreur suppression jeu admin :",
-            error
-        );
-
-        throw error;
-
-    }
-
-}
 /* =========================================================
    SUGGESTIONS
 ========================================================= */
 
+export interface AdminSuggestionProfile {
+
+    id:
+        string;
+
+    username:
+        string;
+
+    display_name:
+        string | null;
+
+    avatar_url:
+        string | null;
+
+}
+
+
 export interface AdminSuggestion {
 
-    id: string;
+    id:
+        string;
 
-    category: string;
+    category:
+        string;
 
-    question: string;
+    question:
+        string;
 
-    description: string;
+    description:
+        string | null;
 
-    user_id: string | null;
+    user_id:
+        string | null;
 
-    status: string;
+    status:
+        string;
 
-    created_at: string;
+    created_at:
+        string;
 
-    updated_at: string;
+    updated_at:
+        string;
 
-    profile?: {
-
-        id: string;
-
-        username: string;
-
-        display_name: string | null;
-
-        avatar_url: string | null;
-
-    } | null;
+    profile?:
+        AdminSuggestionProfile | null;
 
 }
 
@@ -397,86 +408,688 @@ export interface AdminSuggestion {
 
 export interface AdminArtwork {
 
-    id: string;
+    id:
+        string;
 
-    art_id: string;
+    art_id:
+        string;
 
-    artist: string;
+    artist:
+        string;
 
-    artist_role: string | null;
+    artist_role:
+        string | null;
 
-    description: string | null;
+    description:
+        string | null;
 
-    image_url: string;
+    image_url:
+        string;
 
-    image_alt: string | null;
+    image_alt:
+        string | null;
 
-    media_type: string;
+    media_type:
+        string;
 
-    tags: string[];
+    tags:
+        string[];
 
-    image_message: string[];
+    image_message:
+        string[];
 
-    artist_url: string | null;
+    artist_url:
+        string | null;
 
-    button_text: string;
+    button_text:
+        string;
 
-    button_message: string[];
+    button_message:
+        string[];
 
-    sensitive: boolean;
+    sensitive:
+        boolean;
 
-    favorite_enabled: boolean;
+    favorite_enabled:
+        boolean;
 
-    visible: boolean;
+    visible:
+        boolean;
 
-    sort_order: number;
+    sort_order:
+        number;
 
-    created_at: string;
+    created_at:
+        string;
 
-    updated_at: string;
+    updated_at:
+        string;
 
 }
 
 
 export interface ArtworkPayload {
 
-    art_id: string;
+    art_id:
+        string;
 
-    artist: string;
+    artist:
+        string;
 
-    artist_role?: string | null;
+    artist_role?:
+        string | null;
 
-    description?: string | null;
+    description?:
+        string | null;
 
-    image_url: string;
+    image_url:
+        string;
 
-    image_alt?: string | null;
+    image_alt?:
+        string | null;
 
-    media_type?: string;
+    media_type?:
+        string;
 
-    tags?: string[];
+    tags?:
+        string[];
 
-    image_message?: string[];
+    image_message?:
+        string[];
 
-    artist_url?: string | null;
+    artist_url?:
+        string | null;
 
-    button_text?: string;
+    button_text?:
+        string;
 
-    button_message?: string[];
+    button_message?:
+        string[];
 
-    sensitive?: boolean;
+    sensitive?:
+        boolean;
 
-    favorite_enabled?: boolean;
+    favorite_enabled?:
+        boolean;
 
-    visible?: boolean;
+    visible?:
+        boolean;
 
-    sort_order?: number;
+    sort_order?:
+        number;
 
 }
 
 
 export type UpdateArtworkPayload =
     Partial<ArtworkPayload>;
+
+
+/* =========================================================
+   HELPERS — STRINGS
+========================================================= */
+
+function cleanString(
+    value:
+        unknown
+): string {
+
+    if (
+        value === null
+        ||
+        value === undefined
+    ) {
+
+        return "";
+
+    }
+
+
+    return String(
+        value
+    ).trim();
+
+}
+
+
+/* =========================================================
+   HELPERS — GAME TAGS TO ARRAY
+========================================================= */
+
+function normalizeGameTagsForDatabase(
+    value:
+        string | string[] | null | undefined
+): string[] {
+
+    if (
+        Array.isArray(
+            value
+        )
+    ) {
+
+        return value
+            .map(
+                tag =>
+                    String(
+                        tag
+                    ).trim()
+            )
+            .filter(
+                Boolean
+            );
+
+    }
+
+
+    if (
+        typeof value
+        !==
+        "string"
+    ) {
+
+        return [];
+
+    }
+
+
+    const clean =
+        value.trim();
+
+
+    if (
+        !clean
+    ) {
+
+        return [];
+
+    }
+
+
+    /*
+     * Supporte aussi :
+     *
+     * ["Horreur", "Coop"]
+     */
+
+    if (
+        clean.startsWith("[")
+        &&
+        clean.endsWith("]")
+    ) {
+
+        try {
+
+            const parsed =
+                JSON.parse(
+                    clean
+                );
+
+
+            if (
+                Array.isArray(
+                    parsed
+                )
+            ) {
+
+                return parsed
+                    .map(
+                        tag =>
+                            String(
+                                tag
+                            ).trim()
+                    )
+                    .filter(
+                        Boolean
+                    );
+
+            }
+
+        }
+        catch {
+
+            /*
+             * Si ce n'est pas du JSON valide,
+             * on continue avec le split.
+             */
+
+        }
+
+    }
+
+
+    return clean
+        .split(",")
+        .map(
+            tag =>
+                tag.trim()
+        )
+        .filter(
+            Boolean
+        );
+
+}
+
+
+/* =========================================================
+   HELPERS — GAME TAGS TO TEXT
+========================================================= */
+
+function normalizeGameTagsForAdmin(
+    value:
+        unknown
+): string {
+
+    if (
+        Array.isArray(
+            value
+        )
+    ) {
+
+        return value
+            .map(
+                tag =>
+                    String(
+                        tag
+                    ).trim()
+            )
+            .filter(
+                Boolean
+            )
+            .join(", ");
+
+    }
+
+
+    if (
+        typeof value
+        ===
+        "string"
+    ) {
+
+        return value;
+
+    }
+
+
+    return "";
+
+}
+
+
+/* =========================================================
+   HELPERS — ADMIN GAME
+========================================================= */
+
+function normalizeAdminGame(
+    value:
+        any
+): AdminGame {
+
+    return {
+
+        id:
+            String(
+                value.id
+                ??
+                ""
+            ),
+
+        twitch_game_id:
+            String(
+                value.twitch_game_id
+                ??
+                ""
+            ),
+
+        twitch_name:
+            value.twitch_name
+            ??
+            null,
+
+        box_art_url:
+            value.box_art_url
+            ??
+            null,
+
+        status:
+            value.status
+            ??
+            null,
+
+        tags:
+            normalizeGameTagsForAdmin(
+                value.tags
+            ),
+
+        description:
+            value.description
+            ??
+            null,
+
+        rating:
+            value.rating === null
+            ||
+            value.rating === undefined
+
+                ? null
+
+                : Number(
+                    value.rating
+                ),
+
+        youtube_playlist:
+            value.youtube_playlist
+            ??
+            null,
+
+        poll_enabled:
+            value.poll_enabled
+            ??
+            false,
+
+        created_at:
+            String(
+                value.created_at
+                ??
+                ""
+            ),
+
+        updated_at:
+            String(
+                value.updated_at
+                ??
+                ""
+            )
+
+    };
+
+}
+
+
+/* =========================================================
+   HELPERS — NORMALIZE GAME PAYLOAD
+========================================================= */
+
+function normalizeGamePayload(
+    payload:
+        UpdateGamePayload
+) {
+
+    const result:
+        Record<
+            string,
+            unknown
+        > = {};
+
+
+    if (
+        payload.twitch_name
+        !==
+        undefined
+    ) {
+
+        result.twitch_name =
+            payload.twitch_name;
+
+    }
+
+
+    if (
+        payload.box_art_url
+        !==
+        undefined
+    ) {
+
+        result.box_art_url =
+            payload.box_art_url;
+
+    }
+
+
+    if (
+        payload.status
+        !==
+        undefined
+    ) {
+
+        result.status =
+            payload.status;
+
+    }
+
+
+    if (
+        payload.tags
+        !==
+        undefined
+    ) {
+
+        result.tags =
+            normalizeGameTagsForDatabase(
+                payload.tags
+            );
+
+    }
+
+
+    if (
+        payload.description
+        !==
+        undefined
+    ) {
+
+        result.description =
+            payload.description;
+
+    }
+
+
+    if (
+        payload.rating
+        !==
+        undefined
+    ) {
+
+        result.rating =
+            payload.rating;
+
+    }
+
+
+    if (
+        payload.youtube_playlist
+        !==
+        undefined
+    ) {
+
+        result.youtube_playlist =
+            payload.youtube_playlist;
+
+    }
+
+
+    if (
+        payload.poll_enabled
+        !==
+        undefined
+    ) {
+
+        result.poll_enabled =
+            payload.poll_enabled;
+
+    }
+
+
+    return result;
+
+}
+
+
+/* =========================================================
+   HELPERS — SLUG
+========================================================= */
+
+function normalizeSlug(
+    value:
+        string
+): string {
+
+    return value
+        .normalize(
+            "NFD"
+        )
+        .replace(
+            /[\u0300-\u036f]/g,
+            ""
+        )
+        .toLowerCase()
+        .trim()
+        .replace(
+            /[^a-z0-9]+/g,
+            "-"
+        )
+        .replace(
+            /^-+|-+$/g,
+            ""
+        );
+
+}
+
+
+/* =========================================================
+   HELPERS — UNIQUE POLL SLUG
+========================================================= */
+
+async function getUniquePollSlug(
+    requestedSlug:
+        string | null | undefined,
+
+    title:
+        string | null | undefined,
+
+    excludedPollId?:
+        string
+): Promise<string | null> {
+
+    const source =
+        cleanString(
+            requestedSlug
+        )
+        ||
+        cleanString(
+            title
+        );
+
+
+    if (
+        !source
+    ) {
+
+        return null;
+
+    }
+
+
+    const baseSlug =
+        normalizeSlug(
+            source
+        );
+
+
+    if (
+        !baseSlug
+    ) {
+
+        return null;
+
+    }
+
+
+    let candidate =
+        baseSlug;
+
+
+    let suffix =
+        2;
+
+
+    while (
+        true
+    ) {
+
+        let query =
+            supabase
+                .from(
+                    "polls"
+                )
+                .select(
+                    "id"
+                )
+                .eq(
+                    "slug",
+                    candidate
+                )
+                .limit(
+                    1
+                );
+
+
+        if (
+            excludedPollId
+        ) {
+
+            query =
+                query.neq(
+                    "id",
+                    excludedPollId
+                );
+
+        }
+
+
+        const {
+            data,
+            error
+        } =
+            await query;
+
+
+        if (
+            error
+        ) {
+
+            console.error(
+                "Erreur vérification slug sondage :",
+                error
+            );
+
+
+            throw error;
+
+        }
+
+
+        if (
+            !data
+            ||
+            data.length === 0
+        ) {
+
+            return candidate;
+
+        }
+
+
+        candidate =
+            `${baseSlug}-${suffix}`;
+
+
+        suffix +=
+            1;
+
+    }
+
+}
 
 
 /* =========================================================
@@ -490,9 +1103,12 @@ export async function getCurrentAdmin():
         data: {
             user
         },
-        error: authError
+        error:
+            authError
     } =
-        await supabase.auth.getUser();
+        await supabase
+            .auth
+            .getUser();
 
 
     if (
@@ -531,12 +1147,15 @@ export async function getCurrentAdmin():
             .maybeSingle();
 
 
-    if (error) {
+    if (
+        error
+    ) {
 
         console.error(
             "Erreur récupération admin :",
             error
         );
+
 
         throw error;
 
@@ -546,7 +1165,9 @@ export async function getCurrentAdmin():
     if (
         !data
         ||
-        data.role !== "admin"
+        data.role
+        !==
+        "admin"
     ) {
 
         return null;
@@ -628,7 +1249,9 @@ export async function getAdminDashboardStats():
         await Promise.all([
 
             supabase
-                .from("profiles")
+                .from(
+                    "profiles"
+                )
                 .select(
                     "id",
                     {
@@ -642,7 +1265,9 @@ export async function getAdminDashboardStats():
 
 
             supabase
-                .from("games")
+                .from(
+                    "games"
+                )
                 .select(
                     "id",
                     {
@@ -656,7 +1281,9 @@ export async function getAdminDashboardStats():
 
 
             supabase
-                .from("games")
+                .from(
+                    "games"
+                )
                 .select(
                     "id",
                     {
@@ -674,7 +1301,9 @@ export async function getAdminDashboardStats():
 
 
             supabase
-                .from("polls")
+                .from(
+                    "polls"
+                )
                 .select(
                     "id",
                     {
@@ -688,7 +1317,9 @@ export async function getAdminDashboardStats():
 
 
             supabase
-                .from("polls")
+                .from(
+                    "polls"
+                )
                 .select(
                     "id",
                     {
@@ -706,7 +1337,9 @@ export async function getAdminDashboardStats():
 
 
             supabase
-                .from("poll_votes")
+                .from(
+                    "poll_votes"
+                )
                 .select(
                     "id",
                     {
@@ -720,7 +1353,9 @@ export async function getAdminDashboardStats():
 
 
             supabase
-                .from("poll_suggestions")
+                .from(
+                    "poll_suggestions"
+                )
                 .select(
                     "id",
                     {
@@ -738,7 +1373,9 @@ export async function getAdminDashboardStats():
 
 
             supabase
-                .from("artworks")
+                .from(
+                    "artworks"
+                )
                 .select(
                     "id",
                     {
@@ -752,7 +1389,9 @@ export async function getAdminDashboardStats():
 
 
             supabase
-                .from("artworks")
+                .from(
+                    "artworks"
+                )
                 .select(
                     "id",
                     {
@@ -772,6 +1411,7 @@ export async function getAdminDashboardStats():
 
 
     const results = [
+
         usersResult,
         gamesResult,
         pollGamesResult,
@@ -781,6 +1421,7 @@ export async function getAdminDashboardStats():
         suggestionsResult,
         artworksResult,
         visibleArtworksResult
+
     ];
 
 
@@ -799,6 +1440,7 @@ export async function getAdminDashboardStats():
             "Erreur statistiques admin :",
             firstError
         );
+
 
         throw firstError;
 
@@ -903,6 +1545,7 @@ export async function getAdminUsers():
             error
         );
 
+
         throw error;
 
     }
@@ -922,24 +1565,25 @@ export async function getAdminUsers():
 ========================================================= */
 
 export async function updateUserRole(
-    userId: string,
-    role: UserRole
+    userId:
+        string,
+
+    role:
+        UserRole
 ): Promise<AdminProfile> {
 
     const admin =
         await requireAdmin();
 
 
-    /*
-     * Petite sécurité front supplémentaire :
-     * évite qu'un admin retire son propre rôle
-     * accidentellement.
-     */
-
     if (
-        admin.id === userId
+        admin.id
+        ===
+        userId
         &&
-        role !== "admin"
+        role
+        !==
+        "admin"
     ) {
 
         throw new Error(
@@ -991,6 +1635,7 @@ export async function updateUserRole(
             "Erreur modification rôle :",
             error
         );
+
 
         throw error;
 
@@ -1054,6 +1699,7 @@ export async function getAdminPolls():
             error
         );
 
+
         throw error;
 
     }
@@ -1073,10 +1719,18 @@ export async function getAdminPolls():
 ========================================================= */
 
 export async function createAdminPoll(
-    payload: CreatePollPayload
+    payload:
+        CreatePollPayload
 ): Promise<AdminPoll> {
 
     await requireAdmin();
+
+
+    const slug =
+        await getUniquePollSlug(
+            payload.slug,
+            payload.title
+        );
 
 
     const {
@@ -1089,10 +1743,7 @@ export async function createAdminPoll(
             )
             .insert({
 
-                slug:
-                    payload.slug
-                    ??
-                    null,
+                slug,
 
                 question:
                     payload.question
@@ -1158,6 +1809,7 @@ export async function createAdminPoll(
             error
         );
 
+
         throw error;
 
     }
@@ -1173,11 +1825,133 @@ export async function createAdminPoll(
 ========================================================= */
 
 export async function updateAdminPoll(
-    pollId: string,
-    payload: UpdatePollPayload
+    pollId:
+        string,
+
+    payload:
+        UpdatePollPayload
 ): Promise<AdminPoll> {
 
     await requireAdmin();
+
+
+    const updateData:
+        Record<
+            string,
+            unknown
+        > = {
+
+            ...payload,
+
+            updated_at:
+                new Date()
+                    .toISOString()
+
+        };
+
+
+    /*
+     * Si le slug ou le titre est modifié,
+     * on s'assure que le slug reste unique.
+     */
+
+    if (
+        payload.slug
+        !==
+        undefined
+        ||
+        payload.title
+        !==
+        undefined
+    ) {
+
+        let currentSlug:
+            string | null =
+                null;
+
+
+        let currentTitle:
+            string | null =
+                null;
+
+
+        const {
+            data:
+                currentPoll,
+            error:
+                currentPollError
+        } =
+            await supabase
+                .from(
+                    "polls"
+                )
+                .select(
+                    "slug, title"
+                )
+                .eq(
+                    "id",
+                    pollId
+                )
+                .maybeSingle();
+
+
+        if (
+            currentPollError
+        ) {
+
+            console.error(
+                "Erreur récupération sondage :",
+                currentPollError
+            );
+
+
+            throw currentPollError;
+
+        }
+
+
+        if (
+            currentPoll
+        ) {
+
+            currentSlug =
+                currentPoll.slug
+                ??
+                null;
+
+
+            currentTitle =
+                currentPoll.title
+                ??
+                null;
+
+        }
+
+
+        updateData.slug =
+            await getUniquePollSlug(
+
+                payload.slug
+                !==
+                undefined
+
+                    ? payload.slug
+
+                    : currentSlug,
+
+                payload.title
+                !==
+                undefined
+
+                    ? payload.title
+
+                    : currentTitle,
+
+                pollId
+
+            );
+
+    }
 
 
     const {
@@ -1188,15 +1962,9 @@ export async function updateAdminPoll(
             .from(
                 "polls"
             )
-            .update({
-
-                ...payload,
-
-                updated_at:
-                    new Date()
-                        .toISOString()
-
-            })
+            .update(
+                updateData
+            )
             .eq(
                 "id",
                 pollId
@@ -1214,6 +1982,7 @@ export async function updateAdminPoll(
             error
         );
 
+
         throw error;
 
     }
@@ -1229,7 +1998,8 @@ export async function updateAdminPoll(
 ========================================================= */
 
 export async function deleteAdminPoll(
-    pollId: string
+    pollId:
+        string
 ): Promise<void> {
 
     await requireAdmin();
@@ -1258,6 +2028,7 @@ export async function deleteAdminPoll(
             error
         );
 
+
         throw error;
 
     }
@@ -1270,7 +2041,8 @@ export async function deleteAdminPoll(
 ========================================================= */
 
 export async function getAdminPollOptions(
-    pollId: string
+    pollId:
+        string
 ): Promise<AdminPollOption[]> {
 
     await requireAdmin();
@@ -1328,6 +2100,7 @@ export async function getAdminPollOptions(
             error
         );
 
+
         throw error;
 
     }
@@ -1337,7 +2110,55 @@ export async function getAdminPollOptions(
         data
         ??
         []
-    ) as unknown as AdminPollOption[];
+    ).map(
+        (option: any) => ({
+
+            id:
+                String(
+                    option.id
+                    ??
+                    ""
+                ),
+
+            poll_id:
+                String(
+                    option.poll_id
+                    ??
+                    ""
+                ),
+
+            game_id:
+                String(
+                    option.game_id
+                    ??
+                    ""
+                ),
+
+            position:
+                Number(
+                    option.position
+                    ??
+                    0
+                ),
+
+            created_at:
+                String(
+                    option.created_at
+                    ??
+                    ""
+                ),
+
+            game:
+                option.game
+
+                    ? normalizeAdminGame(
+                        option.game
+                    )
+
+                    : null
+
+        })
+    );
 
 }
 
@@ -1347,7 +2168,8 @@ export async function getAdminPollOptions(
 ========================================================= */
 
 export async function addAdminPollOption(
-    payload: CreatePollOptionPayload
+    payload:
+        CreatePollOptionPayload
 ): Promise<AdminPollOption> {
 
     await requireAdmin();
@@ -1388,6 +2210,7 @@ export async function addAdminPollOption(
             error
         );
 
+
         throw error;
 
     }
@@ -1403,7 +2226,8 @@ export async function addAdminPollOption(
 ========================================================= */
 
 export async function deleteAdminPollOption(
-    optionId: string
+    optionId:
+        string
 ): Promise<void> {
 
     await requireAdmin();
@@ -1431,6 +2255,7 @@ export async function deleteAdminPollOption(
             "Erreur suppression option :",
             error
         );
+
 
         throw error;
 
@@ -1489,6 +2314,7 @@ export async function getAdminGames():
             error
         );
 
+
         throw error;
 
     }
@@ -1498,18 +2324,23 @@ export async function getAdminGames():
         data
         ??
         []
-    ) as AdminGame[];
+    ).map(
+        game =>
+            normalizeAdminGame(
+                game
+            )
+    );
 
 }
 
 
 /* =========================================================
-   GAMES — UPDATE
+   GAMES — CREATE
 ========================================================= */
 
-export async function updateAdminGame(
-    gameId: string,
-    payload: UpdateGamePayload
+export async function createAdminGame(
+    payload:
+        CreateGamePayload
 ): Promise<AdminGame> {
 
     await requireAdmin();
@@ -1523,15 +2354,119 @@ export async function updateAdminGame(
             .from(
                 "games"
             )
-            .update({
+            .insert({
 
-                ...payload,
+                twitch_game_id:
+                    payload.twitch_game_id
+                    ??
+                    "",
 
-                updated_at:
-                    new Date()
-                        .toISOString()
+                twitch_name:
+                    payload.twitch_name
+                    ??
+                    null,
+
+                box_art_url:
+                    payload.box_art_url
+                    ??
+                    null,
+
+                status:
+                    payload.status
+                    ??
+                    "backlog",
+
+                tags:
+                    normalizeGameTagsForDatabase(
+                        payload.tags
+                    ),
+
+                description:
+                    payload.description
+                    ??
+                    null,
+
+                rating:
+                    payload.rating
+                    ??
+                    null,
+
+                youtube_playlist:
+                    payload.youtube_playlist
+                    ??
+                    null,
+
+                poll_enabled:
+                    payload.poll_enabled
+                    ??
+                    false
 
             })
+            .select()
+            .single();
+
+
+    if (
+        error
+    ) {
+
+        console.error(
+            "Erreur création jeu admin :",
+            error
+        );
+
+
+        throw error;
+
+    }
+
+
+    return normalizeAdminGame(
+        data
+    );
+
+}
+
+
+/* =========================================================
+   GAMES — UPDATE
+========================================================= */
+
+export async function updateAdminGame(
+    gameId:
+        string,
+
+    payload:
+        UpdateGamePayload
+): Promise<AdminGame> {
+
+    await requireAdmin();
+
+
+    const updateData = {
+
+        ...normalizeGamePayload(
+            payload
+        ),
+
+        updated_at:
+            new Date()
+                .toISOString()
+
+    };
+
+
+    const {
+        data,
+        error
+    } =
+        await supabase
+            .from(
+                "games"
+            )
+            .update(
+                updateData
+            )
             .eq(
                 "id",
                 gameId
@@ -1549,12 +2484,15 @@ export async function updateAdminGame(
             error
         );
 
+
         throw error;
 
     }
 
 
-    return data as AdminGame;
+    return normalizeAdminGame(
+        data
+    );
 
 }
 
@@ -1564,8 +2502,11 @@ export async function updateAdminGame(
 ========================================================= */
 
 export async function toggleGamePollEnabled(
-    gameId: string,
-    enabled: boolean
+    gameId:
+        string,
+
+    enabled:
+        boolean
 ): Promise<AdminGame> {
 
     return updateAdminGame(
@@ -1580,6 +2521,266 @@ export async function toggleGamePollEnabled(
 
 
 /* =========================================================
+   GAMES — DELETE
+========================================================= */
+
+export async function deleteAdminGame(
+    gameId:
+        string
+): Promise<void> {
+
+    await requireAdmin();
+
+
+    const {
+        error
+    } =
+        await supabase
+            .from(
+                "games"
+            )
+            .delete()
+            .eq(
+                "id",
+                gameId
+            );
+
+
+    if (
+        error
+    ) {
+
+        console.error(
+            "Erreur suppression jeu admin :",
+            error
+        );
+
+
+        throw error;
+
+    }
+
+}
+
+
+/* =========================================================
+   SUGGESTIONS — PROFILE MAP
+========================================================= */
+
+async function getSuggestionProfiles(
+    userIds:
+        string[]
+): Promise<
+    Map<
+        string,
+        AdminSuggestionProfile
+    >
+> {
+
+    const uniqueUserIds =
+        [
+            ...new Set(
+                userIds.filter(
+                    Boolean
+                )
+            )
+        ];
+
+
+    const profileMap =
+        new Map<
+            string,
+            AdminSuggestionProfile
+        >();
+
+
+    if (
+        uniqueUserIds.length
+        ===
+        0
+    ) {
+
+        return profileMap;
+
+    }
+
+
+    const {
+        data,
+        error
+    } =
+        await supabase
+            .from(
+                "profiles"
+            )
+            .select(`
+                id,
+                username,
+                display_name,
+                avatar_url
+            `)
+            .in(
+                "id",
+                uniqueUserIds
+            );
+
+
+    if (
+        error
+    ) {
+
+        /*
+         * Les suggestions restent utilisables
+         * même si le profil associé ne peut pas
+         * être récupéré.
+         */
+
+        console.warn(
+            "Impossible de récupérer les profils des suggestions :",
+            error
+        );
+
+
+        return profileMap;
+
+    }
+
+
+    for (
+        const profile
+        of
+        data
+        ??
+        []
+    ) {
+
+        profileMap.set(
+            profile.id,
+            {
+
+                id:
+                    profile.id,
+
+                username:
+                    profile.username
+                    ??
+                    "poup",
+
+                display_name:
+                    profile.display_name
+                    ??
+                    null,
+
+                avatar_url:
+                    profile.avatar_url
+                    ??
+                    null
+
+            }
+        );
+
+    }
+
+
+    return profileMap;
+
+}
+
+
+/* =========================================================
+   SUGGESTIONS — NORMALIZE
+========================================================= */
+
+function normalizeSuggestion(
+    suggestion:
+        any,
+
+    profileMap?:
+        Map<
+            string,
+            AdminSuggestionProfile
+        >
+): AdminSuggestion {
+
+    const userId =
+        suggestion.user_id
+        ??
+        null;
+
+
+    return {
+
+        id:
+            String(
+                suggestion.id
+                ??
+                ""
+            ),
+
+        category:
+            String(
+                suggestion.category
+                ??
+                ""
+            ),
+
+        question:
+            String(
+                suggestion.question
+                ??
+                ""
+            ),
+
+        description:
+            suggestion.description
+            ??
+            null,
+
+        user_id:
+            userId,
+
+        status:
+            String(
+                suggestion.status
+                ??
+                "pending"
+            ),
+
+        created_at:
+            String(
+                suggestion.created_at
+                ??
+                ""
+            ),
+
+        updated_at:
+            String(
+                suggestion.updated_at
+                ??
+                ""
+            ),
+
+        profile:
+            userId
+            &&
+            profileMap
+
+                ? (
+                    profileMap.get(
+                        userId
+                    )
+                    ??
+                    null
+                )
+
+                : null
+
+    };
+
+}
+
+
+/* =========================================================
    SUGGESTIONS — GET
 ========================================================= */
 
@@ -1588,6 +2789,19 @@ export async function getAdminSuggestions():
 
     await requireAdmin();
 
+
+    /*
+     * IMPORTANT :
+     *
+     * On ne fait PAS :
+     *
+     * profile:profiles(...)
+     *
+     * dans cette requête.
+     *
+     * Comme ça elle fonctionne même si user_id n'a
+     * pas de contrainte FK déclarée vers profiles.id.
+     */
 
     const {
         data,
@@ -1605,14 +2819,7 @@ export async function getAdminSuggestions():
                 user_id,
                 status,
                 created_at,
-                updated_at,
-
-                profile:profiles (
-                    id,
-                    username,
-                    display_name,
-                    avatar_url
-                )
+                updated_at
             `)
             .order(
                 "created_at",
@@ -1632,16 +2839,47 @@ export async function getAdminSuggestions():
             error
         );
 
+
         throw error;
 
     }
 
 
-    return (
+    const suggestions =
         data
         ??
-        []
-    ) as unknown as AdminSuggestion[];
+        [];
+
+
+    const userIds =
+        suggestions
+            .map(
+                suggestion =>
+                    suggestion.user_id
+            )
+            .filter(
+                (
+                    value
+                ): value is string =>
+                    Boolean(
+                        value
+                    )
+            );
+
+
+    const profileMap =
+        await getSuggestionProfiles(
+            userIds
+        );
+
+
+    return suggestions.map(
+        suggestion =>
+            normalizeSuggestion(
+                suggestion,
+                profileMap
+            )
+    );
 
 }
 
@@ -1651,8 +2889,11 @@ export async function getAdminSuggestions():
 ========================================================= */
 
 export async function updateSuggestionStatus(
-    suggestionId: string,
-    status: SuggestionStatus
+    suggestionId:
+        string,
+
+    status:
+        SuggestionStatus
 ): Promise<AdminSuggestion> {
 
     await requireAdmin();
@@ -1679,7 +2920,16 @@ export async function updateSuggestionStatus(
                 "id",
                 suggestionId
             )
-            .select()
+            .select(`
+                id,
+                category,
+                question,
+                description,
+                user_id,
+                status,
+                created_at,
+                updated_at
+            `)
             .single();
 
 
@@ -1692,12 +2942,35 @@ export async function updateSuggestionStatus(
             error
         );
 
+
         throw error;
 
     }
 
 
-    return data as AdminSuggestion;
+    let profileMap:
+        Map<
+            string,
+            AdminSuggestionProfile
+        > | undefined;
+
+
+    if (
+        data.user_id
+    ) {
+
+        profileMap =
+            await getSuggestionProfiles([
+                data.user_id
+            ]);
+
+    }
+
+
+    return normalizeSuggestion(
+        data,
+        profileMap
+    );
 
 }
 
@@ -1707,7 +2980,8 @@ export async function updateSuggestionStatus(
 ========================================================= */
 
 export async function deleteAdminSuggestion(
-    suggestionId: string
+    suggestionId:
+        string
 ): Promise<void> {
 
     await requireAdmin();
@@ -1736,9 +3010,250 @@ export async function deleteAdminSuggestion(
             error
         );
 
+
         throw error;
 
     }
+
+}
+
+
+/* =========================================================
+   ARTWORKS — NORMALIZE STRING ARRAY
+========================================================= */
+
+function normalizeStringArray(
+    value:
+        unknown
+): string[] {
+
+    if (
+        Array.isArray(
+            value
+        )
+    ) {
+
+        return value
+            .map(
+                item =>
+                    String(
+                        item
+                    ).trim()
+            )
+            .filter(
+                Boolean
+            );
+
+    }
+
+
+    if (
+        typeof value
+        ===
+        "string"
+    ) {
+
+        const clean =
+            value.trim();
+
+
+        if (
+            !clean
+    ) {
+
+            return [];
+
+        }
+
+
+        if (
+            clean.startsWith("[")
+            &&
+            clean.endsWith("]")
+        ) {
+
+            try {
+
+                const parsed =
+                    JSON.parse(
+                        clean
+                    );
+
+
+                if (
+                    Array.isArray(
+                        parsed
+                    )
+                ) {
+
+                    return parsed
+                        .map(
+                            item =>
+                                String(
+                                    item
+                                ).trim()
+                        )
+                        .filter(
+                            Boolean
+                        );
+
+                }
+
+            }
+            catch {
+
+                /*
+                 * Continue avec split.
+                 */
+
+            }
+
+        }
+
+
+        return clean
+            .split(",")
+            .map(
+                item =>
+                    item.trim()
+            )
+            .filter(
+                Boolean
+            );
+
+    }
+
+
+    return [];
+
+}
+
+
+/* =========================================================
+   ARTWORKS — NORMALIZE
+========================================================= */
+
+function normalizeAdminArtwork(
+    artwork:
+        any
+): AdminArtwork {
+
+    return {
+
+        id:
+            String(
+                artwork.id
+                ??
+                ""
+            ),
+
+        art_id:
+            String(
+                artwork.art_id
+                ??
+                ""
+            ),
+
+        artist:
+            String(
+                artwork.artist
+                ??
+                ""
+            ),
+
+        artist_role:
+            artwork.artist_role
+            ??
+            null,
+
+        description:
+            artwork.description
+            ??
+            null,
+
+        image_url:
+            String(
+                artwork.image_url
+                ??
+                ""
+            ),
+
+        image_alt:
+            artwork.image_alt
+            ??
+            null,
+
+        media_type:
+            String(
+                artwork.media_type
+                ??
+                "image"
+            ),
+
+        tags:
+            normalizeStringArray(
+                artwork.tags
+            ),
+
+        image_message:
+            normalizeStringArray(
+                artwork.image_message
+            ),
+
+        artist_url:
+            artwork.artist_url
+            ??
+            null,
+
+        button_text:
+            String(
+                artwork.button_text
+                ??
+                "Voir son profil"
+            ),
+
+        button_message:
+            normalizeStringArray(
+                artwork.button_message
+            ),
+
+        sensitive:
+            artwork.sensitive
+            ===
+            true,
+
+        favorite_enabled:
+            artwork.favorite_enabled
+            !==
+            false,
+
+        visible:
+            artwork.visible
+            !==
+            false,
+
+        sort_order:
+            Number(
+                artwork.sort_order
+                ??
+                0
+            ),
+
+        created_at:
+            String(
+                artwork.created_at
+                ??
+                ""
+            ),
+
+        updated_at:
+            String(
+                artwork.updated_at
+                ??
+                ""
+            )
+
+    };
 
 }
 
@@ -1807,6 +3322,7 @@ export async function getAdminArtworks():
             error
         );
 
+
         throw error;
 
     }
@@ -1816,7 +3332,12 @@ export async function getAdminArtworks():
         data
         ??
         []
-    ) as AdminArtwork[];
+    ).map(
+        artwork =>
+            normalizeAdminArtwork(
+                artwork
+            )
+    );
 
 }
 
@@ -1826,7 +3347,8 @@ export async function getAdminArtworks():
 ========================================================= */
 
 export async function createAdminArtwork(
-    payload: ArtworkPayload
+    payload:
+        ArtworkPayload
 ): Promise<AdminArtwork> {
 
     await requireAdmin();
@@ -1930,12 +3452,15 @@ export async function createAdminArtwork(
             error
         );
 
+
         throw error;
 
     }
 
 
-    return data as AdminArtwork;
+    return normalizeAdminArtwork(
+        data
+    );
 
 }
 
@@ -1945,8 +3470,11 @@ export async function createAdminArtwork(
 ========================================================= */
 
 export async function updateAdminArtwork(
-    artworkId: string,
-    payload: UpdateArtworkPayload
+    artworkId:
+        string,
+
+    payload:
+        UpdateArtworkPayload
 ): Promise<AdminArtwork> {
 
     await requireAdmin();
@@ -1986,12 +3514,15 @@ export async function updateAdminArtwork(
             error
         );
 
+
         throw error;
 
     }
 
 
-    return data as AdminArtwork;
+    return normalizeAdminArtwork(
+        data
+    );
 
 }
 
@@ -2001,8 +3532,11 @@ export async function updateAdminArtwork(
 ========================================================= */
 
 export async function toggleArtworkVisibility(
-    artworkId: string,
-    visible: boolean
+    artworkId:
+        string,
+
+    visible:
+        boolean
 ): Promise<AdminArtwork> {
 
     return updateAdminArtwork(
@@ -2020,8 +3554,11 @@ export async function toggleArtworkVisibility(
 ========================================================= */
 
 export async function toggleArtworkFavorite(
-    artworkId: string,
-    enabled: boolean
+    artworkId:
+        string,
+
+    enabled:
+        boolean
 ): Promise<AdminArtwork> {
 
     return updateAdminArtwork(
@@ -2040,7 +3577,8 @@ export async function toggleArtworkFavorite(
 ========================================================= */
 
 export async function deleteAdminArtwork(
-    artworkId: string
+    artworkId:
+        string
 ): Promise<void> {
 
     await requireAdmin();
@@ -2069,6 +3607,7 @@ export async function deleteAdminArtwork(
             error
         );
 
+
         throw error;
 
     }
@@ -2089,19 +3628,24 @@ const ARTWORK_BUCKET =
 ========================================================= */
 
 export async function uploadAdminArtworkFile(
-    file: File,
+    file:
+        File,
+
     folder:
-        string = "uploads"
+        string =
+            "uploads"
 ): Promise<string> {
 
     await requireAdmin();
 
 
     const allowedTypes = [
+
         "image/png",
         "image/jpeg",
         "image/webp",
         "image/gif"
+
     ];
 
 
@@ -2118,9 +3662,9 @@ export async function uploadAdminArtworkFile(
     }
 
 
-    /*
-     * 10 Mo maximum pour un artwork.
-     */
+    /* =====================================================
+       MAX 10 MO
+    ====================================================== */
 
     const maxSize =
         10
@@ -2131,7 +3675,9 @@ export async function uploadAdminArtworkFile(
 
 
     if (
-        file.size > maxSize
+        file.size
+        >
+        maxSize
     ) {
 
         throw new Error(
@@ -2156,7 +3702,9 @@ export async function uploadAdminArtworkFile(
             .replace(
                 /[^a-zA-Z0-9_-]/g,
                 "-"
-            );
+            )
+        ||
+        "uploads";
 
 
     const filename =
@@ -2170,7 +3718,8 @@ export async function uploadAdminArtworkFile(
     const {
         error
     } =
-        await supabase.storage
+        await supabase
+            .storage
             .from(
                 ARTWORK_BUCKET
             )
@@ -2178,6 +3727,7 @@ export async function uploadAdminArtworkFile(
                 path,
                 file,
                 {
+
                     cacheControl:
                         "3600",
 
@@ -2186,6 +3736,7 @@ export async function uploadAdminArtworkFile(
 
                     contentType:
                         file.type
+
                 }
             );
 
@@ -2199,6 +3750,7 @@ export async function uploadAdminArtworkFile(
             error
         );
 
+
         throw error;
 
     }
@@ -2207,7 +3759,8 @@ export async function uploadAdminArtworkFile(
     const {
         data
     } =
-        supabase.storage
+        supabase
+            .storage
             .from(
                 ARTWORK_BUCKET
             )
@@ -2226,21 +3779,36 @@ export async function uploadAdminArtworkFile(
 ========================================================= */
 
 export async function deleteAdminArtworkFile(
-    path: string
+    path:
+        string
 ): Promise<void> {
 
     await requireAdmin();
 
 
+    const cleanPath =
+        path.trim();
+
+
+    if (
+        !cleanPath
+    ) {
+
+        return;
+
+    }
+
+
     const {
         error
     } =
-        await supabase.storage
+        await supabase
+            .storage
             .from(
                 ARTWORK_BUCKET
             )
             .remove([
-                path
+                cleanPath
             ]);
 
 
@@ -2252,6 +3820,7 @@ export async function deleteAdminArtworkFile(
             "Erreur suppression fichier artwork :",
             error
         );
+
 
         throw error;
 
