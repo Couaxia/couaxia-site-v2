@@ -3,6 +3,8 @@ import {
     createWebHistory
 } from "vue-router";
 
+import { supabase } from "../lib/supabase";
+
 
 /* =========================================================
    VIEWS
@@ -27,6 +29,7 @@ import ProfileView from "../views/Profile.vue";
 import AdminView from "../views/Admin.vue";
 
 import TwitchView from "../views/Twitch.vue";
+
 
 /* =========================================================
    ROUTES
@@ -182,7 +185,7 @@ const routes = [
 
 
     /* =====================================================
-        Twitch
+       TWITCH
     ====================================================== */
 
     {
@@ -193,7 +196,10 @@ const routes = [
         component:
             TwitchView
     }
+
 ];
+
+
 /* =========================================================
    ROUTER
 ========================================================= */
@@ -207,6 +213,76 @@ const router =
         routes
 
     });
+
+
+/* =========================================================
+   AUTH GUARD
+========================================================= */
+
+router.beforeEach(
+    async (
+        to
+    ) => {
+
+        const {
+            data: {
+                session
+            }
+        } =
+            await supabase.auth.getSession();
+
+
+        const isAuthenticated =
+            Boolean(
+                session?.user
+            );
+
+
+        /* =====================================================
+           AUTH REQUIRED
+        ====================================================== */
+
+        if (
+            to.meta.requiresAuth
+            &&
+            !isAuthenticated
+        ) {
+
+            return {
+                name:
+                    "login",
+
+                query: {
+                    redirect:
+                        to.fullPath
+                }
+            };
+
+        }
+
+
+        /* =====================================================
+           GUEST ONLY
+        ====================================================== */
+
+        if (
+            to.meta.guestOnly
+            &&
+            isAuthenticated
+        ) {
+
+            return {
+                name:
+                    "profile"
+            };
+
+        }
+
+
+        return true;
+
+    }
+);
 
 
 /* =========================================================
