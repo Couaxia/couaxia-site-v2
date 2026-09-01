@@ -1,66 +1,196 @@
-import { supabase } from "../lib/supabase";
+import {
+    supabase
+} from "../lib/supabase";
 
 
 /* =========================================================
-   TYPES
+   CONSTANTES
+========================================================= */
+
+const AVATAR_BUCKET =
+    "avatars";
+
+
+const OFFICIAL_AVATAR_FOLDER =
+    "official";
+
+
+const USER_AVATAR_FOLDER =
+    "users";
+
+
+const MAX_AVATAR_SIZE =
+    2 * 1024 * 1024;
+
+
+/* =========================================================
+   TYPES — ROLE
+========================================================= */
+
+export type ProfileRole =
+    | "user"
+    | "moderator"
+    | "admin";
+
+
+/* =========================================================
+   TYPES — PROFILE
 ========================================================= */
 
 export interface Profile {
-  id: string;
 
-  username: string;
+    id:
+        string;
 
-  display_name: string | null;
+    username:
+        string | null;
 
-  avatar_url: string | null;
+    display_name:
+        string | null;
 
-  bio: string | null;
+    avatar_url:
+        string | null;
 
-  created_at: string;
+    bio:
+        string | null;
 
-  updated_at: string;
-}
+    role:
+        ProfileRole;
 
+    created_at:
+        string;
 
-export interface UpdateProfilePayload {
-  username?: string;
+    updated_at:
+        string;
 
-  display_name?: string | null;
-
-  avatar_url?: string | null;
-
-  bio?: string | null;
 }
 
 
 /* =========================================================
-   USERNAME RULES
+   TYPES — UPDATE PROFILE
 ========================================================= */
 
-const USERNAME_MIN_LENGTH =
-  3;
+export interface UpdateProfilePayload {
 
-const USERNAME_MAX_LENGTH =
-  30;
+    username?:
+        string;
 
-const DISPLAY_NAME_MAX_LENGTH =
-  40;
+    display_name?:
+        string | null;
 
-const BIO_MAX_LENGTH =
-  500;
+    bio?:
+        string | null;
+
+}
+
+
+/* =========================================================
+   TYPES — OFFICIAL AVATAR
+========================================================= */
+
+export interface OfficialAvatar {
+
+    name:
+        string;
+
+    path:
+        string;
+
+    url:
+        string;
+
+}
+
+
+/* =========================================================
+   PROFILE SELECT
+========================================================= */
+
+const PROFILE_SELECT = `
+    id,
+    username,
+    display_name,
+    avatar_url,
+    bio,
+    role,
+    created_at,
+    updated_at
+`;
+
+
+/* =========================================================
+   GET CURRENT USER
+========================================================= */
+
+async function getCurrentUser() {
+
+    const {
+        data: {
+            user
+        },
+        error
+    } =
+        await supabase.auth.getUser();
+
+
+    if (
+        error
+    ) {
+
+        console.error(
+            "Erreur récupération utilisateur :",
+            error
+        );
+
+
+        throw error;
+
+    }
+
+
+    return user;
+
+}
+
+
+/* =========================================================
+   REQUIRE CURRENT USER
+========================================================= */
+
+async function requireCurrentUser() {
+
+    const user =
+        await getCurrentUser();
+
+
+    if (
+        !user
+    ) {
+
+        throw new Error(
+            "Tu dois être connecté pour effectuer cette action."
+        );
+
+    }
+
+
+    return user;
+
+}
 
 
 /* =========================================================
    NORMALIZE USERNAME
 ========================================================= */
 
-export function normalizeUsername(
-  value: string
+function normalizeUsername(
+    value:
+        string
 ): string {
 
-  return value
-    .trim()
-    .toLowerCase();
+    return value
+        .trim()
+        .toLowerCase();
 
 }
 
@@ -69,614 +199,57 @@ export function normalizeUsername(
    VALIDATE USERNAME
 ========================================================= */
 
-export function validateUsername(
-  value: string
-): {
-  valid: boolean;
-  message: string;
-} {
-
-  const username =
-    normalizeUsername(
-      value
-    );
-
-
-  if (!username) {
-
-    return {
-      valid: false,
-      message:
-        "Le pseudo est obligatoire."
-    };
-
-  }
-
-
-  if (
-    username.length
-    <
-    USERNAME_MIN_LENGTH
-  ) {
-
-    return {
-      valid: false,
-      message:
-        `Le pseudo doit contenir au moins ${USERNAME_MIN_LENGTH} caractères.`
-    };
-
-  }
-
-
-  if (
-    username.length
-    >
-    USERNAME_MAX_LENGTH
-  ) {
-
-    return {
-      valid: false,
-      message:
-        `Le pseudo ne peut pas dépasser ${USERNAME_MAX_LENGTH} caractères.`
-    };
-
-  }
-
-
-  const usernameRegex =
-    /^[a-z0-9_-]+$/;
-
-
-  if (
-    !usernameRegex.test(
-      username
-    )
-  ) {
-
-    return {
-      valid: false,
-      message:
-        "Le pseudo peut uniquement contenir des lettres, chiffres, _ et -."
-    };
-
-  }
-
-
-  return {
-    valid: true,
-    message: ""
-  };
-
-}
-
-/* =========================================================
-   AVATAR STORAGE
-========================================================= */
-
-const AVATAR_BUCKET =
-  "avatars";
-
-const MAX_AVATAR_SIZE =
-  2 * 1024 * 1024;
-
-const ALLOWED_AVATAR_TYPES = [
-  "image/jpeg",
-  "image/png",
-  "image/webp"
-];
-
-
-/* =========================================================
-   VALIDATE AVATAR FILE
-========================================================= */
-
-export function validateAvatarFile(
-  file: File
-): {
-  valid: boolean;
-  message: string;
-} {
-
-  if (
-    !ALLOWED_AVATAR_TYPES.includes(
-      file.type
-    )
-  ) {
-    return {
-      valid: false,
-      message:
-        "Format non autorisé. Utilise une image PNG, JPG ou WebP."
-    };
-  }
-
-
-  if (
-    file.size >
-    MAX_AVATAR_SIZE
-  ) {
-    return {
-      valid: false,
-      message:
-        "L'image ne peut pas dépasser 2 Mo."
-    };
-  }
-
-
-  return {
-    valid: true,
-    message: ""
-  };
-}
-
-
-/* =========================================================
-   UPLOAD MY AVATAR
-========================================================= */
-
-export async function uploadMyAvatar(
-  file: File
-): Promise<string> {
-
-  const validation =
-    validateAvatarFile(
-      file
-    );
-
-
-  if (!validation.valid) {
-    throw new Error(
-      validation.message
-    );
-  }
-
-
-  const user =
-    await getCurrentUser();
-
-
-  if (!user) {
-    throw new Error(
-      "Tu dois être connecté pour modifier ton avatar."
-    );
-  }
-
-
-  let extension =
-    "webp";
-
-
-  if (
-    file.type ===
-    "image/png"
-  ) {
-    extension =
-      "png";
-  }
-
-
-  if (
-    file.type ===
-    "image/jpeg"
-  ) {
-    extension =
-      "jpg";
-  }
-
-
-  const filePath =
-    `users/${user.id}/avatar.${extension}`;
-
-
-  /*
-   * Supprime d'abord les variantes existantes
-   * pour éviter d'accumuler plusieurs avatars.
-   */
-
-  await supabase.storage
-    .from(
-      AVATAR_BUCKET
-    )
-    .remove([
-      `users/${user.id}/avatar.webp`,
-      `users/${user.id}/avatar.png`,
-      `users/${user.id}/avatar.jpg`,
-      `users/${user.id}/avatar.jpeg`
-    ]);
-
-
-  const {
-    error: uploadError
-  } =
-    await supabase.storage
-      .from(
-        AVATAR_BUCKET
-      )
-      .upload(
-        filePath,
-        file,
-        {
-          cacheControl:
-            "3600",
-
-          upsert:
-            true,
-
-          contentType:
-            file.type
-        }
-      );
-
-
-  if (uploadError) {
-
-    console.error(
-      "Erreur upload avatar :",
-      uploadError
-    );
-
-    throw uploadError;
-  }
-
-
-  const {
-    data
-  } =
-    supabase.storage
-      .from(
-        AVATAR_BUCKET
-      )
-      .getPublicUrl(
-        filePath
-      );
-
-
-  const publicUrl =
-    data.publicUrl;
-
-
-  await updateMyProfile({
-    avatar_url:
-      publicUrl
-  });
-
-
-  return publicUrl;
-}
-
-
-/* =========================================================
-   DELETE MY AVATAR
-========================================================= */
-
-export async function deleteMyAvatar():
-  Promise<void> {
-
-  const user =
-    await getCurrentUser();
-
-
-  if (!user) {
-    throw new Error(
-      "Tu dois être connecté."
-    );
-  }
-
-
-  const {
-    data: files,
-    error: listError
-  } =
-    await supabase.storage
-      .from(
-        AVATAR_BUCKET
-      )
-      .list(
-        `users/${user.id}`
-      );
-
-
-  if (listError) {
-
-    console.error(
-      "Erreur lecture avatar :",
-      listError
-    );
-
-    throw listError;
-  }
-
-
-  const paths =
-    (
-      files
-      ??
-      []
-    ).map(
-      file =>
-        `users/${user.id}/${file.name}`
-    );
-
-
-  if (
-    paths.length > 0
-  ) {
-
-    const {
-      error
-    } =
-      await supabase.storage
-        .from(
-          AVATAR_BUCKET
-        )
-        .remove(
-          paths
+function validateUsername(
+    value:
+        string
+): string {
+
+    const username =
+        normalizeUsername(
+            value
         );
 
 
-    if (error) {
-      throw error;
+    if (
+        username.length
+        <
+        3
+    ) {
+
+        throw new Error(
+            "Le pseudo doit contenir au moins 3 caractères."
+        );
+
     }
 
-  }
-
-
-  await updateMyProfile({
-    avatar_url:
-      null
-  });
-}
-
-
-/* =========================================================
-   OFFICIAL AVATARS
-========================================================= */
-
-export interface OfficialAvatar {
-  name: string;
-  path: string;
-  url: string;
-}
-
-
-export async function getOfficialAvatars():
-  Promise<OfficialAvatar[]> {
-
-  const {
-    data,
-    error
-  } =
-    await supabase.storage
-      .from(
-        AVATAR_BUCKET
-      )
-      .list(
-        "official",
-        {
-          limit:
-            100,
-
-          sortBy: {
-            column:
-              "name",
-
-            order:
-              "asc"
-          }
-        }
-      );
-
-
-  if (error) {
-
-    console.error(
-      "Erreur récupération avatars officiels :",
-      error
-    );
-
-    throw error;
-  }
-
-
-  return (
-    data
-    ??
-    []
-  )
-    .filter(
-      file =>
-        file.name
-        &&
-        !file.name.startsWith(
-          "."
-        )
-    )
-    .map(
-      file => {
-
-        const path =
-          `official/${file.name}`;
-
-
-        const {
-          data: urlData
-        } =
-          supabase.storage
-            .from(
-              AVATAR_BUCKET
-            )
-            .getPublicUrl(
-              path
-            );
-
-
-        return {
-          name:
-            file.name,
-
-          path,
-
-          url:
-            urlData.publicUrl
-        };
-
-      }
-    );
-}
-
-
-/* =========================================================
-   SELECT OFFICIAL AVATAR
-========================================================= */
-
-export async function selectOfficialAvatar(
-  avatarUrl: string
-): Promise<Profile> {
-
-  return updateMyProfile({
-    avatar_url:
-      avatarUrl
-  });
-}
-/* =========================================================
-   VALIDATE DISPLAY NAME
-========================================================= */
-
-export function validateDisplayName(
-  value:
-    string | null | undefined
-): {
-  valid: boolean;
-  message: string;
-} {
-
-  if (
-    value === null
-    ||
-    value === undefined
-  ) {
-
-    return {
-      valid: true,
-      message: ""
-    };
-
-  }
-
-
-  const displayName =
-    value.trim();
-
-
-  if (
-    displayName.length
-    >
-    DISPLAY_NAME_MAX_LENGTH
-  ) {
-
-    return {
-      valid: false,
-      message:
-        `Le nom affiché ne peut pas dépasser ${DISPLAY_NAME_MAX_LENGTH} caractères.`
-    };
-
-  }
-
-
-  return {
-    valid: true,
-    message: ""
-  };
-
-}
-
-
-/* =========================================================
-   VALIDATE BIO
-========================================================= */
-
-export function validateBio(
-  value:
-    string | null | undefined
-): {
-  valid: boolean;
-  message: string;
-} {
-
-  if (
-    value === null
-    ||
-    value === undefined
-  ) {
-
-    return {
-      valid: true,
-      message: ""
-    };
-
-  }
-
-
-  if (
-    value.length
-    >
-    BIO_MAX_LENGTH
-  ) {
-
-    return {
-      valid: false,
-      message:
-        `La bio ne peut pas dépasser ${BIO_MAX_LENGTH} caractères.`
-    };
-
-  }
-
-
-  return {
-    valid: true,
-    message: ""
-  };
-
-}
-
-
-/* =========================================================
-   GET CURRENT AUTH USER
-========================================================= */
-
-export async function getCurrentUser() {
-
-  const {
-    data,
-    error
-  } =
-    await supabase.auth.getUser();
-
-
-  if (error) {
 
     if (
-      error.name
-      ===
-      "AuthSessionMissingError"
+        username.length
+        >
+        30
     ) {
-      return null;
+
+        throw new Error(
+            "Le pseudo ne peut pas dépasser 30 caractères."
+        );
+
     }
 
 
-    console.error(
-      "Erreur récupération utilisateur :",
-      error
-    );
+    if (
+        !/^[a-z0-9_-]+$/.test(
+            username
+        )
+    ) {
 
-    throw error;
-  }
+        throw new Error(
+            "Le pseudo peut uniquement contenir des lettres, chiffres, tirets et underscores."
+        );
+
+    }
 
 
-  return (
-    data.user
-    ??
-    null
-  );
+    return username;
 
 }
 
@@ -686,172 +259,64 @@ export async function getCurrentUser() {
 ========================================================= */
 
 export async function getCurrentProfile():
-  Promise<Profile | null> {
+    Promise<Profile | null> {
 
-  const user =
-    await getCurrentUser();
-
-
-  if (!user) {
-    return null;
-  }
+    const user =
+        await getCurrentUser();
 
 
-  const {
-    data,
-    error
-  } =
-    await supabase
-      .from(
-        "profiles"
-      )
-      .select(`
-        id,
-        username,
-        display_name,
-        avatar_url,
-        bio,
-        created_at,
-        updated_at
-      `)
-      .eq(
-        "id",
-        user.id
-      )
-      .maybeSingle();
+    if (
+        !user
+    ) {
+
+        return null;
+
+    }
 
 
-  if (error) {
-
-    console.error(
-      "Erreur récupération profil :",
-      error
-    );
-
-    throw error;
-  }
-
-
-  return (
-    data
-    ??
-    null
-  ) as Profile | null;
-
-}
+    const {
+        data,
+        error
+    } =
+        await supabase
+            .from(
+                "profiles"
+            )
+            .select(
+                PROFILE_SELECT
+            )
+            .eq(
+                "id",
+                user.id
+            )
+            .maybeSingle();
 
 
-/* =========================================================
-   GET PROFILE BY ID
-========================================================= */
+    if (
+        error
+    ) {
 
-export async function getProfileById(
-  profileId: string
-): Promise<Profile | null> {
-
-  const {
-    data,
-    error
-  } =
-    await supabase
-      .from(
-        "profiles"
-      )
-      .select(`
-        id,
-        username,
-        display_name,
-        avatar_url,
-        bio,
-        created_at,
-        updated_at
-      `)
-      .eq(
-        "id",
-        profileId
-      )
-      .maybeSingle();
+        console.error(
+            "Erreur récupération profil :",
+            error
+        );
 
 
-  if (error) {
+        throw error;
 
-    console.error(
-      "Erreur récupération profil par ID :",
-      error
-    );
-
-    throw error;
-  }
+    }
 
 
-  return (
-    data
-    ??
-    null
-  ) as Profile | null;
+    if (
+        !data
+    ) {
 
-}
+        return null;
 
-
-/* =========================================================
-   GET PROFILE BY USERNAME
-========================================================= */
-
-export async function getProfileByUsername(
-  username: string
-): Promise<Profile | null> {
-
-  const normalizedUsername =
-    normalizeUsername(
-      username
-    );
+    }
 
 
-  if (!normalizedUsername) {
-    return null;
-  }
-
-
-  const {
-    data,
-    error
-  } =
-    await supabase
-      .from(
-        "profiles"
-      )
-      .select(`
-        id,
-        username,
-        display_name,
-        avatar_url,
-        bio,
-        created_at,
-        updated_at
-      `)
-      .eq(
-        "username",
-        normalizedUsername
-      )
-      .maybeSingle();
-
-
-  if (error) {
-
-    console.error(
-      "Erreur récupération profil par pseudo :",
-      error
-    );
-
-    throw error;
-  }
-
-
-  return (
-    data
-    ??
-    null
-  ) as Profile | null;
+    return data as Profile;
 
 }
 
@@ -861,76 +326,83 @@ export async function getProfileByUsername(
 ========================================================= */
 
 export async function checkUsernameAvailable(
-  username: string,
-  ignoreUserId?: string
+    username:
+        string,
+
+    currentUserId?:
+        string
 ): Promise<boolean> {
 
-  const validation =
-    validateUsername(
-      username
-    );
+    const cleanUsername =
+        validateUsername(
+            username
+        );
 
 
-  if (!validation.valid) {
-    return false;
-  }
+    let query =
+        supabase
+            .from(
+                "profiles"
+            )
+            .select(
+                "id"
+            )
+            .ilike(
+                "username",
+                cleanUsername
+            )
+            .limit(
+                1
+            );
 
 
-  const normalizedUsername =
-    normalizeUsername(
-      username
-    );
+    /*
+     * Lorsque l'utilisateur modifie son propre pseudo,
+     * sa propre ligne ne doit pas compter comme doublon.
+     */
+
+    if (
+        currentUserId
+    ) {
+
+        query =
+            query.neq(
+                "id",
+                currentUserId
+            );
+
+    }
 
 
-  let query =
-    supabase
-      .from(
-        "profiles"
-      )
-      .select(
-        "id"
-      )
-      .eq(
-        "username",
-        normalizedUsername
-      );
+    const {
+        data,
+        error
+    } =
+        await query;
 
 
-  if (ignoreUserId) {
+    if (
+        error
+    ) {
 
-    query =
-      query.neq(
-        "id",
-        ignoreUserId
-      );
-
-  }
-
-
-  const {
-    data,
-    error
-  } =
-    await query
-      .limit(1);
+        console.error(
+            "Erreur vérification pseudo :",
+            error
+        );
 
 
-  if (error) {
+        throw error;
 
-    console.error(
-      "Erreur vérification pseudo :",
-      error
-    );
-
-    throw error;
-  }
+    }
 
 
-  return (
-    data.length
+    return (
+        data
+        ??
+        []
+    ).length
     ===
-    0
-  );
+    0;
 
 }
 
@@ -940,538 +412,1142 @@ export async function checkUsernameAvailable(
 ========================================================= */
 
 export async function updateMyProfile(
-  payload:
-    UpdateProfilePayload
+    payload:
+        UpdateProfilePayload
 ): Promise<Profile> {
 
-  const user =
-    await getCurrentUser();
+    const user =
+        await requireCurrentUser();
 
 
-  if (!user) {
+    /*
+     * IMPORTANT :
+     *
+     * On construit volontairement nous-mêmes
+     * les données autorisées.
+     *
+     * Il n'y a PAS de :
+     *
+     * role
+     * id
+     * created_at
+     *
+     * dans l'objet envoyé à Supabase.
+     */
 
-    throw new Error(
-      "Tu dois être connecté pour modifier ton profil."
+    const updateData: {
+
+        username?:
+            string;
+
+        display_name?:
+            string | null;
+
+        bio?:
+            string | null;
+
+        updated_at:
+            string;
+
+    } = {
+
+        updated_at:
+            new Date()
+                .toISOString()
+
+    };
+
+
+    /* =====================================================
+       USERNAME
+    ====================================================== */
+
+    if (
+        payload.username
+        !==
+        undefined
+    ) {
+
+        const username =
+            validateUsername(
+                payload.username
+            );
+
+
+        const available =
+            await checkUsernameAvailable(
+                username,
+                user.id
+            );
+
+
+        if (
+            !available
+        ) {
+
+            throw new Error(
+                "Ce pseudo est déjà utilisé."
+            );
+
+        }
+
+
+        updateData.username =
+            username;
+
+    }
+
+
+    /* =====================================================
+       DISPLAY NAME
+    ====================================================== */
+
+    if (
+        payload.display_name
+        !==
+        undefined
+    ) {
+
+        const displayName =
+            payload.display_name
+                ?.trim()
+            ??
+            null;
+
+
+        if (
+            displayName
+            &&
+            displayName.length
+            >
+            40
+        ) {
+
+            throw new Error(
+                "Le nom affiché ne peut pas dépasser 40 caractères."
+            );
+
+        }
+
+
+        updateData.display_name =
+            displayName
+            ||
+            null;
+
+    }
+
+
+    /* =====================================================
+       BIO
+    ====================================================== */
+
+    if (
+        payload.bio
+        !==
+        undefined
+    ) {
+
+        const bio =
+            payload.bio
+                ?.trim()
+            ??
+            null;
+
+
+        if (
+            bio
+            &&
+            bio.length
+            >
+            500
+        ) {
+
+            throw new Error(
+                "La bio ne peut pas dépasser 500 caractères."
+            );
+
+        }
+
+
+        updateData.bio =
+            bio
+            ||
+            null;
+
+    }
+
+
+    /* =====================================================
+       UPDATE
+    ====================================================== */
+
+    const {
+        data,
+        error
+    } =
+        await supabase
+            .from(
+                "profiles"
+            )
+            .update(
+                updateData
+            )
+            .eq(
+                "id",
+                user.id
+            )
+            .select(
+                PROFILE_SELECT
+            )
+            .single();
+
+
+    if (
+        error
+    ) {
+
+        console.error(
+            "Erreur modification profil :",
+            error
+        );
+
+
+        throw error;
+
+    }
+
+
+    return data as Profile;
+
+}
+
+
+/* =========================================================
+   GET OFFICIAL AVATARS
+========================================================= */
+
+export async function getOfficialAvatars():
+    Promise<OfficialAvatar[]> {
+
+    const {
+        data,
+        error
+    } =
+        await supabase
+            .storage
+            .from(
+                AVATAR_BUCKET
+            )
+            .list(
+                OFFICIAL_AVATAR_FOLDER,
+                {
+
+                    limit:
+                        100,
+
+                    sortBy: {
+
+                        column:
+                            "name",
+
+                        order:
+                            "asc"
+
+                    }
+
+                }
+            );
+
+
+    if (
+        error
+    ) {
+
+        console.error(
+            "Erreur récupération avatars officiels :",
+            error
+        );
+
+
+        throw error;
+
+    }
+
+
+    const allowedExtensions =
+        [
+            ".png",
+            ".jpg",
+            ".jpeg",
+            ".webp"
+        ];
+
+
+    return (
+        data
+        ??
+        []
+    )
+        .filter(
+            file => {
+
+                const fileName =
+                    file.name
+                        .toLowerCase();
+
+
+                return allowedExtensions
+                    .some(
+                        extension =>
+                            fileName.endsWith(
+                                extension
+                            )
+                    );
+
+            }
+        )
+        .map(
+            file => {
+
+                const path =
+                    `${OFFICIAL_AVATAR_FOLDER}/${file.name}`;
+
+
+                const {
+                    data:
+                        publicUrlData
+                } =
+                    supabase
+                        .storage
+                        .from(
+                            AVATAR_BUCKET
+                        )
+                        .getPublicUrl(
+                            path
+                        );
+
+
+                return {
+
+                    name:
+                        file.name
+                            .replace(
+                                /\.[^.]+$/,
+                                ""
+                            )
+                            .replace(
+                                /[-_]+/g,
+                                " "
+                            ),
+
+                    path,
+
+                    url:
+                        publicUrlData
+                            .publicUrl
+
+                };
+
+            }
+        );
+
+}
+
+
+/* =========================================================
+   CHECK OFFICIAL AVATAR
+========================================================= */
+
+async function isOfficialAvatar(
+    avatarUrl:
+        string
+): Promise<boolean> {
+
+    const officialAvatars =
+        await getOfficialAvatars();
+
+
+    return officialAvatars
+        .some(
+            avatar =>
+                avatar.url
+                ===
+                avatarUrl
+        );
+
+}
+
+
+/* =========================================================
+   SELECT OFFICIAL AVATAR
+========================================================= */
+
+export async function selectOfficialAvatar(
+    avatarUrl:
+        string
+): Promise<Profile> {
+
+    const user =
+        await requireCurrentUser();
+
+
+    const official =
+        await isOfficialAvatar(
+            avatarUrl
+        );
+
+
+    if (
+        !official
+    ) {
+
+        throw new Error(
+            "Cet avatar officiel n'est pas valide."
+        );
+
+    }
+
+
+    const {
+        data,
+        error
+    } =
+        await supabase
+            .from(
+                "profiles"
+            )
+            .update({
+
+                avatar_url:
+                    avatarUrl,
+
+                updated_at:
+                    new Date()
+                        .toISOString()
+
+            })
+            .eq(
+                "id",
+                user.id
+            )
+            .select(
+                PROFILE_SELECT
+            )
+            .single();
+
+
+    if (
+        error
+    ) {
+
+        console.error(
+            "Erreur sélection avatar officiel :",
+            error
+        );
+
+
+        throw error;
+
+    }
+
+
+    return data as Profile;
+
+}
+
+
+/* =========================================================
+   VALIDATE AVATAR FILE
+========================================================= */
+
+function validateAvatarFile(
+    file:
+        File
+) {
+
+    const allowedTypes =
+        [
+            "image/png",
+            "image/jpeg",
+            "image/webp"
+        ];
+
+
+    if (
+        !allowedTypes.includes(
+            file.type
+        )
+    ) {
+
+        throw new Error(
+            "Ton avatar doit être au format PNG, JPG ou WebP."
+        );
+
+    }
+
+
+    if (
+        file.size
+        >
+        MAX_AVATAR_SIZE
+    ) {
+
+        throw new Error(
+            "Ton avatar ne peut pas dépasser 2 Mo."
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   GET FILE EXTENSION
+========================================================= */
+
+function getFileExtension(
+    file:
+        File
+): string {
+
+    switch (
+        file.type
+    ) {
+
+        case "image/png":
+
+            return "png";
+
+
+        case "image/jpeg":
+
+            return "jpg";
+
+
+        case "image/webp":
+
+            return "webp";
+
+
+        default:
+
+            throw new Error(
+                "Format d'image non supporté."
+            );
+
+    }
+
+}
+
+
+/* =========================================================
+   GET STORAGE PATH FROM PUBLIC URL
+========================================================= */
+
+function getStoragePathFromPublicUrl(
+    url:
+        string
+): string | null {
+
+    try {
+
+        const marker =
+            `/storage/v1/object/public/${AVATAR_BUCKET}/`;
+
+
+        const markerIndex =
+            url.indexOf(
+                marker
+            );
+
+
+        if (
+            markerIndex
+            ===
+            -1
+        ) {
+
+            return null;
+
+        }
+
+
+        const path =
+            url.substring(
+                markerIndex
+                +
+                marker.length
+            );
+
+
+        return decodeURIComponent(
+            path
+        );
+
+    }
+    catch {
+
+        return null;
+
+    }
+
+}
+
+
+/* =========================================================
+   DELETE OLD CUSTOM AVATAR FILE
+========================================================= */
+
+async function deleteOldCustomAvatarFile(
+    userId:
+        string,
+    avatarUrl:
+        string | null
+) {
+
+    if (
+        !avatarUrl
+    ) {
+
+        return;
+
+    }
+
+
+    const path =
+        getStoragePathFromPublicUrl(
+            avatarUrl
+        );
+
+
+    if (
+        !path
+    ) {
+
+        return;
+
+    }
+
+
+    const userFolder =
+        `${USER_AVATAR_FOLDER}/${userId}/`;
+
+
+    /*
+     * Très important :
+     *
+     * On ne supprime jamais un avatar officiel.
+     * On supprime seulement un fichier appartenant
+     * au dossier personnel de l'utilisateur.
+     */
+
+    if (
+        !path.startsWith(
+            userFolder
+        )
+    ) {
+
+        return;
+
+    }
+
+
+    const {
+        error
+    } =
+        await supabase
+            .storage
+            .from(
+                AVATAR_BUCKET
+            )
+            .remove([
+                path
+            ]);
+
+
+    if (
+        error
+    ) {
+
+        console.warn(
+            "Impossible de supprimer l'ancien avatar :",
+            error
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   UPLOAD MY AVATAR
+========================================================= */
+
+export async function uploadMyAvatar(
+    file:
+        File
+): Promise<string> {
+
+    const user =
+        await requireCurrentUser();
+
+
+    validateAvatarFile(
+        file
     );
 
-  }
+
+    const currentProfile =
+        await getCurrentProfile();
 
 
-  const updates:
-    Record<string, unknown> =
-    {};
+    const extension =
+        getFileExtension(
+            file
+        );
 
 
-  /* =======================================================
-     USERNAME
-  ======================================================= */
-
-  if (
-    payload.username
-    !==
-    undefined
-  ) {
-
-    const validation =
-      validateUsername(
-        payload.username
-      );
+    const fileName =
+        `avatar-${Date.now()}.${extension}`;
 
 
-    if (!validation.valid) {
+    const storagePath =
+        `${USER_AVATAR_FOLDER}/${user.id}/${fileName}`;
 
-      throw new Error(
-        validation.message
-      );
+
+    /* =====================================================
+       UPLOAD
+    ====================================================== */
+
+    const {
+        error:
+            uploadError
+    } =
+        await supabase
+            .storage
+            .from(
+                AVATAR_BUCKET
+            )
+            .upload(
+                storagePath,
+                file,
+                {
+
+                    cacheControl:
+                        "3600",
+
+                    upsert:
+                        false,
+
+                    contentType:
+                        file.type
+
+                }
+            );
+
+
+    if (
+        uploadError
+    ) {
+
+        console.error(
+            "Erreur upload avatar :",
+            uploadError
+        );
+
+
+        throw uploadError;
+
+    }
+
+
+    /* =====================================================
+       PUBLIC URL
+    ====================================================== */
+
+    const {
+        data:
+            publicUrlData
+    } =
+        supabase
+            .storage
+            .from(
+                AVATAR_BUCKET
+            )
+            .getPublicUrl(
+                storagePath
+            );
+
+
+    const avatarUrl =
+        publicUrlData
+            .publicUrl;
+
+
+    /* =====================================================
+       UPDATE PROFILE
+    ====================================================== */
+
+    const {
+        error:
+            profileError
+    } =
+        await supabase
+            .from(
+                "profiles"
+            )
+            .update({
+
+                avatar_url:
+                    avatarUrl,
+
+                updated_at:
+                    new Date()
+                        .toISOString()
+
+            })
+            .eq(
+                "id",
+                user.id
+            );
+
+
+    if (
+        profileError
+    ) {
+
+        /*
+         * Si l'UPDATE du profil échoue,
+         * on retire le fichier fraîchement créé.
+         */
+
+        await supabase
+            .storage
+            .from(
+                AVATAR_BUCKET
+            )
+            .remove([
+                storagePath
+            ]);
+
+
+        console.error(
+            "Erreur mise à jour avatar profil :",
+            profileError
+        );
+
+
+        throw profileError;
+
+    }
+
+
+    /* =====================================================
+       DELETE PREVIOUS CUSTOM FILE
+    ====================================================== */
+
+    await deleteOldCustomAvatarFile(
+        user.id,
+        currentProfile?.avatar_url
+        ??
+        null
+    );
+
+
+    return avatarUrl;
+
+}
+
+
+/* =========================================================
+   DELETE MY AVATAR
+========================================================= */
+
+export async function deleteMyAvatar():
+    Promise<Profile> {
+
+    const user =
+        await requireCurrentUser();
+
+
+    const currentProfile =
+        await getCurrentProfile();
+
+
+    if (
+        !currentProfile
+    ) {
+
+        throw new Error(
+            "Profil introuvable."
+        );
+
+    }
+
+
+    /*
+     * Supprime le fichier seulement s'il s'agit
+     * d'un avatar personnalisé appartenant
+     * à l'utilisateur.
+     *
+     * Les avatars officiels restent évidemment
+     * dans le Storage.
+     */
+
+    await deleteOldCustomAvatarFile(
+        user.id,
+        currentProfile.avatar_url
+    );
+
+
+    const {
+        data,
+        error
+    } =
+        await supabase
+            .from(
+                "profiles"
+            )
+            .update({
+
+                avatar_url:
+                    null,
+
+                updated_at:
+                    new Date()
+                        .toISOString()
+
+            })
+            .eq(
+                "id",
+                user.id
+            )
+            .select(
+                PROFILE_SELECT
+            )
+            .single();
+
+
+    if (
+        error
+    ) {
+
+        console.error(
+            "Erreur suppression avatar profil :",
+            error
+        );
+
+
+        throw error;
+
+    }
+
+
+    return data as Profile;
+
+}
+
+
+/* =========================================================
+   PROFILE DISPLAY NAME
+========================================================= */
+
+export function getProfileDisplayName(
+    profile:
+        Profile | null | undefined
+): string {
+
+    if (
+        !profile
+    ) {
+
+        return "POUP";
+
+    }
+
+
+    const displayName =
+        profile.display_name
+            ?.trim();
+
+
+    if (
+        displayName
+    ) {
+
+        return displayName;
 
     }
 
 
     const username =
-      normalizeUsername(
-        payload.username
-      );
+        profile.username
+            ?.trim();
 
-
-    const available =
-      await checkUsernameAvailable(
-        username,
-        user.id
-      );
-
-
-    if (!available) {
-
-      throw new Error(
-        "Ce pseudo est déjà utilisé."
-      );
-
-    }
-
-
-    updates.username =
-      username;
-
-  }
-
-
-  /* =======================================================
-     DISPLAY NAME
-  ======================================================= */
-
-  if (
-    payload.display_name
-    !==
-    undefined
-  ) {
-
-    const validation =
-      validateDisplayName(
-        payload.display_name
-      );
-
-
-    if (!validation.valid) {
-
-      throw new Error(
-        validation.message
-      );
-
-    }
-
-
-    updates.display_name =
-
-      payload.display_name
-      ===
-      null
-
-        ? null
-
-        : payload.display_name.trim();
-
-  }
-
-
-  /* =======================================================
-     AVATAR
-  ======================================================= */
-
-  if (
-    payload.avatar_url
-    !==
-    undefined
-  ) {
-
-    updates.avatar_url =
-
-      payload.avatar_url
-      ===
-      null
-
-        ? null
-
-        : payload.avatar_url.trim();
-
-  }
-
-
-  /* =======================================================
-     BIO
-  ======================================================= */
-
-  if (
-    payload.bio
-    !==
-    undefined
-  ) {
-
-    const validation =
-      validateBio(
-        payload.bio
-      );
-
-
-    if (!validation.valid) {
-
-      throw new Error(
-        validation.message
-      );
-
-    }
-
-
-    updates.bio =
-
-      payload.bio
-      ===
-      null
-
-        ? null
-
-        : payload.bio.trim();
-
-  }
-
-
-  /* =======================================================
-     NOTHING TO UPDATE
-  ======================================================= */
-
-  if (
-    Object.keys(
-      updates
-    ).length
-    ===
-    0
-  ) {
-
-    const currentProfile =
-      await getCurrentProfile();
-
-
-    if (!currentProfile) {
-
-      throw new Error(
-        "Profil introuvable."
-      );
-
-    }
-
-
-    return currentProfile;
-
-  }
-
-
-  updates.updated_at =
-    new Date()
-      .toISOString();
-
-
-  /* =======================================================
-     UPDATE
-  ======================================================= */
-
-  const {
-    data,
-    error
-  } =
-    await supabase
-      .from(
-        "profiles"
-      )
-      .update(
-        updates
-      )
-      .eq(
-        "id",
-        user.id
-      )
-      .select(`
-        id,
-        username,
-        display_name,
-        avatar_url,
-        bio,
-        created_at,
-        updated_at
-      `)
-      .single();
-
-
-  if (error) {
-
-    console.error(
-      "Erreur modification profil :",
-      error
-    );
-
-
-    /*
-     * PostgreSQL :
-     * 23505 = violation UNIQUE
-     */
 
     if (
-      error.code
-      ===
-      "23505"
+        username
     ) {
 
-      throw new Error(
-        "Ce pseudo est déjà utilisé."
-      );
+        return username;
 
     }
 
 
-    /*
-     * PostgreSQL :
-     * 23514 = violation CHECK
-     */
-
-    if (
-      error.code
-      ===
-      "23514"
-    ) {
-
-      throw new Error(
-        "Une des informations du profil n'est pas valide."
-      );
-
-    }
-
-
-    throw error;
-  }
-
-
-  return data as Profile;
-
-}
-
-
-/* =========================================================
-   UPDATE USERNAME
-========================================================= */
-
-export async function updateUsername(
-  username: string
-): Promise<Profile> {
-
-  return updateMyProfile({
-    username
-  });
-
-}
-
-
-/* =========================================================
-   UPDATE DISPLAY NAME
-========================================================= */
-
-export async function updateDisplayName(
-  displayName:
-    string | null
-): Promise<Profile> {
-
-  return updateMyProfile({
-    display_name:
-      displayName
-  });
-
-}
-
-
-/* =========================================================
-   UPDATE BIO
-========================================================= */
-
-export async function updateBio(
-  bio:
-    string | null
-): Promise<Profile> {
-
-  return updateMyProfile({
-    bio
-  });
-
-}
-
-
-/* =========================================================
-   UPDATE AVATAR URL
-========================================================= */
-
-export async function updateAvatarUrl(
-  avatarUrl:
-    string | null
-): Promise<Profile> {
-
-  return updateMyProfile({
-    avatar_url:
-      avatarUrl
-  });
-
-}
-
-
-/* =========================================================
-   GET DISPLAY NAME
-========================================================= */
-
-export function getProfileDisplayName(
-  profile:
-    Profile | null
-): string {
-
-  if (!profile) {
     return "POUP";
-  }
-
-
-  if (
-    profile.display_name
-    &&
-    profile.display_name.trim()
-  ) {
-
-    return profile
-      .display_name
-      .trim();
-
-  }
-
-
-  return profile.username;
 
 }
 
 
 /* =========================================================
-   GET AVATAR
+   PROFILE AVATAR
 ========================================================= */
 
 export function getProfileAvatar(
-  profile:
-    Profile | null
+    profile:
+        Profile | null | undefined
 ): string | null {
 
-  if (
-    !profile?.avatar_url
-  ) {
-    return null;
-  }
+    const avatar =
+        profile?.avatar_url
+            ?.trim();
 
 
-  const avatarUrl =
-    profile.avatar_url.trim();
-
-
-  return (
-    avatarUrl
-    ||
-    null
-  );
+    return avatar
+        ||
+        null;
 
 }
 
 
 /* =========================================================
-   GET INITIAL
+   PROFILE INITIAL
 ========================================================= */
 
 export function getProfileInitial(
-  profile:
-    Profile | null
+    profile:
+        Profile | null | undefined
 ): string {
 
-  const displayName =
-    getProfileDisplayName(
-      profile
-    );
+    const displayName =
+        getProfileDisplayName(
+            profile
+        )
+            .trim();
 
 
-  return (
-    displayName
-      .charAt(0)
-      .toUpperCase()
-    ||
-    "P"
-  );
+    if (
+        !displayName
+    ) {
+
+        return "P";
+
+    }
+
+
+    return displayName
+        .charAt(0)
+        .toUpperCase();
 
 }
 
 
 /* =========================================================
-   REFRESH PROFILE
+   PROFILE ROLE LABEL
 ========================================================= */
 
-export async function refreshCurrentProfile():
-  Promise<Profile | null> {
+export function getProfileRoleLabel(
+    profile:
+        Profile | null | undefined
+): string {
 
-  /*
-   * Rafraîchit d'abord
-   * les informations Auth.
-   */
+    switch (
+        profile?.role
+    ) {
 
-  const {
-    error
-  } =
-    await supabase.auth.refreshSession();
+        case "admin":
 
-
-  if (
-    error
-    &&
-    error.name
-    !==
-    "AuthSessionMissingError"
-  ) {
-
-    console.error(
-      "Erreur rafraîchissement session :",
-      error
-    );
-
-    throw error;
-  }
+            return "ADMIN";
 
 
-  return getCurrentProfile();
+        case "moderator":
+
+            return "MODÉRATEUR";
+
+
+        default:
+
+            return "POUP";
+
+    }
 
 }
 
 
 /* =========================================================
-   IS CURRENT USER
+   IS ADMIN
 ========================================================= */
 
-export async function isCurrentUserProfile(
-  profileId: string
-): Promise<boolean> {
+export function isProfileAdmin(
+    profile:
+        Profile | null | undefined
+): boolean {
 
-  const user =
-    await getCurrentUser();
-
-
-  if (!user) {
-    return false;
-  }
-
-
-  return (
-    user.id
-    ===
-    profileId
-  );
+    return (
+        profile?.role
+        ===
+        "admin"
+    );
 
 }
 
 
 /* =========================================================
-   LOG OUT
+   IS MODERATOR
+========================================================= */
+
+export function isProfileModerator(
+    profile:
+        Profile | null | undefined
+): boolean {
+
+    return (
+        profile?.role
+        ===
+        "moderator"
+    );
+
+}
+
+
+/* =========================================================
+   LOGOUT
 ========================================================= */
 
 export async function logoutProfile():
-  Promise<void> {
+    Promise<void> {
 
-  const {
-    error
-  } =
-    await supabase.auth.signOut();
+    const {
+        error
+    } =
+        await supabase
+            .auth
+            .signOut();
 
 
-  if (error) {
+    if (
+        error
+    ) {
 
-    console.error(
-      "Erreur déconnexion :",
-      error
-    );
+        console.error(
+            "Erreur déconnexion :",
+            error
+        );
 
-    throw error;
-  }
+
+        throw error;
+
+    }
 
 }

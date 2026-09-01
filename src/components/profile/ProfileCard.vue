@@ -10,7 +10,8 @@ import type {
 
 import {
     getProfileAvatar,
-    getProfileDisplayName
+    getProfileDisplayName,
+    getProfileRoleLabel
 } from "../../services/profile.service";
 
 
@@ -41,12 +42,8 @@ const emit =
 
 
 /* =========================================================
-   COMPUTED
+   DISPLAY NAME
 ========================================================= */
-
-/*
- * Nom affiché du POUP.
- */
 
 const displayName =
     computed(
@@ -57,9 +54,9 @@ const displayName =
     );
 
 
-/*
- * Avatar du POUP.
- */
+/* =========================================================
+   AVATAR
+========================================================= */
 
 const avatarUrl =
     computed(
@@ -70,22 +67,27 @@ const avatarUrl =
     );
 
 
-/*
- * Username.
- */
+/* =========================================================
+   USERNAME
+========================================================= */
 
 const username =
     computed(
         () => {
 
-            if (
+            const value =
                 props.profile.username
+                    ?.trim();
+
+
+            if (
+                value
             ) {
 
                 return (
                     "@"
                     +
-                    props.profile.username
+                    value
                 );
 
             }
@@ -97,22 +99,47 @@ const username =
     );
 
 
-/*
- * Bio.
- */
+/* =========================================================
+   BIO
+========================================================= */
 
-const bio =
+const hasBio =
     computed(
         () =>
-            props.profile.bio
-            ||
-            "Ce POUP n'a pas encore écrit de bio."
+            Boolean(
+                props.profile.bio
+                    ?.trim()
+            )
     );
 
 
-/*
- * Date de création du compte.
- */
+const bio =
+    computed(
+        () => {
+
+            const value =
+                props.profile.bio
+                    ?.trim();
+
+
+            if (
+                value
+            ) {
+
+                return value;
+
+            }
+
+
+            return "Ce POUP n'a pas encore écrit de bio.";
+
+        }
+    );
+
+
+/* =========================================================
+   MEMBER SINCE
+========================================================= */
 
 const memberSince =
     computed(
@@ -147,11 +174,13 @@ const memberSince =
             return new Intl.DateTimeFormat(
                 "fr-FR",
                 {
+
                     month:
                         "long",
 
                     year:
                         "numeric"
+
                 }
             ).format(
                 date
@@ -161,10 +190,9 @@ const memberSince =
     );
 
 
-/*
- * Initiale utilisée lorsqu'il n'y a
- * pas encore d'avatar.
- */
+/* =========================================================
+   INITIAL
+========================================================= */
 
 const profileInitial =
     computed(
@@ -193,6 +221,96 @@ const profileInitial =
 
 
 /* =========================================================
+   ROLE
+========================================================= */
+
+const role =
+    computed(
+        () =>
+            props.profile.role
+            ||
+            "user"
+    );
+
+
+/* =========================================================
+   ROLE LABEL
+========================================================= */
+
+const roleLabel =
+    computed(
+        () =>
+            getProfileRoleLabel(
+                props.profile
+            )
+    );
+
+
+/* =========================================================
+   ROLE CLASS
+========================================================= */
+
+const roleClass =
+    computed(
+        () => {
+
+            switch (
+                role.value
+            ) {
+
+                case "admin":
+
+                    return "profile-role--admin";
+
+
+                case "moderator":
+
+                    return "profile-role--moderator";
+
+
+                default:
+
+                    return "profile-role--user";
+
+            }
+
+        }
+    );
+
+
+/* =========================================================
+   ROLE ICON
+========================================================= */
+
+const roleIcon =
+    computed(
+        () => {
+
+            switch (
+                role.value
+            ) {
+
+                case "admin":
+
+                    return "👑";
+
+
+                case "moderator":
+
+                    return "🛡️";
+
+
+                default:
+
+                    return "🐙";
+
+            }
+
+        }
+    );
+
+
+/* =========================================================
    EDIT
 ========================================================= */
 
@@ -214,72 +332,54 @@ function requestEdit() {
     >
 
         <!-- =================================================
-             BANNIÈRE
+             AVATAR COLUMN
         ================================================== -->
 
         <div
-            class="profile-card__banner"
-            aria-hidden="true"
+            class="profile-card__avatar-column"
         >
-
-            <span
-                class="profile-card__banner-orb profile-card__banner-orb--one"
-            ></span>
-
-            <span
-                class="profile-card__banner-orb profile-card__banner-orb--two"
-            ></span>
-
-            <span
-                class="profile-card__banner-orb profile-card__banner-orb--three"
-            ></span>
-
-        </div>
-
-
-        <!-- =================================================
-             CONTENU
-        ================================================== -->
-
-        <div
-            class="profile-card__content"
-        >
-
-            <!-- =============================================
-                 AVATAR
-            ============================================== -->
 
             <div
                 class="profile-card__avatar-wrapper"
             >
 
-                <div
+                <!-- =========================================
+                     AVATAR
+                ========================================== -->
+
+                <img
+                    v-if="avatarUrl"
+                    :src="avatarUrl"
+                    :alt="`Avatar de ${displayName}`"
                     class="profile-card__avatar"
                 >
 
-                    <img
-                        v-if="avatarUrl"
-                        :src="avatarUrl"
-                        :alt="`Avatar de ${displayName}`"
-                    >
 
+                <!-- =========================================
+                     FALLBACK
+                ========================================== -->
 
-                    <span
-                        v-else
-                        class="profile-card__avatar-fallback"
-                        aria-hidden="true"
-                    >
+                <div
+                    v-else
+                    class="
+                        profile-card__avatar
+                        profile-card__avatar--fallback
+                    "
+                    aria-hidden="true"
+                >
 
-                        {{ profileInitial }}
-
-                    </span>
+                    {{ profileInitial }}
 
                 </div>
 
 
+                <!-- =========================================
+                     POUP STATUS
+                ========================================== -->
+
                 <span
-                    class="profile-card__status"
-                    title="POUP"
+                    class="profile-card__avatar-status"
+                    title="Compte POUP"
                     aria-label="Compte POUP"
                 >
 
@@ -289,72 +389,111 @@ function requestEdit() {
 
             </div>
 
+        </div>
 
-            <!-- =============================================
-                 IDENTITÉ
-            ============================================== -->
 
-            <div
-                class="profile-card__identity"
+        <!-- =================================================
+             CONTENT
+        ================================================== -->
+
+        <div
+            class="profile-card__content"
+        >
+
+            <!-- =================================================
+                 HEADER
+            ================================================== -->
+
+            <header
+                class="profile-card__header"
             >
 
+                <!-- =============================================
+                     IDENTITY
+                ============================================== -->
+
                 <div
-                    class="profile-card__name-row"
+                    class="profile-card__identity"
                 >
 
-                    <div
-                        class="profile-card__names"
+                    <!-- POUP -->
+
+                    <span
+                        class="profile-card__eyebrow"
                     >
 
-                        <span
-                            class="profile-card__eyebrow"
-                        >
-                            POUP
-                        </span>
+                        🐙 POUP
+
+                    </span>
 
 
-                        <h2>
-                            {{ displayName }}
-                        </h2>
+                    <!-- DISPLAY NAME -->
 
-
-                        <span
-                            class="profile-card__username"
-                        >
-                            {{ username }}
-                        </span>
-
-                    </div>
-
-
-                    <button
-                        type="button"
-                        class="profile-card__edit"
-                        @click="requestEdit"
+                    <h2
+                        class="profile-card__display-name"
                     >
 
-                        <span
-                            aria-hidden="true"
-                        >
-                            ✎
-                        </span>
+                        {{ displayName }}
 
-                        Modifier mon profil
+                    </h2>
 
-                    </button>
+
+                    <!-- USERNAME -->
+
+                    <span
+                        class="profile-card__username"
+                    >
+
+                        {{ username }}
+
+                    </span>
 
                 </div>
 
 
-                <!-- =========================================
-                     BIO
-                ========================================== -->
+                <!-- =============================================
+                     ROLE
+                ============================================== -->
+
+                <span
+                    class="profile-role"
+                    :class="roleClass"
+                >
+
+                    <span
+                        class="profile-role__icon"
+                        aria-hidden="true"
+                    >
+
+                        {{ roleIcon }}
+
+                    </span>
+
+
+                    <span>
+
+                        {{ roleLabel }}
+
+                    </span>
+
+                </span>
+
+            </header>
+
+
+            <!-- =================================================
+                 BIO
+            ================================================== -->
+
+            <div
+                class="profile-card__bio-wrapper"
+            >
 
                 <p
                     class="profile-card__bio"
                     :class="{
                         'profile-card__bio--empty':
-                            !profile.bio
+                            !hasBio
                     }"
                 >
 
@@ -362,70 +501,96 @@ function requestEdit() {
 
                 </p>
 
+            </div>
 
-                <!-- =========================================
-                     INFORMATIONS
-                ========================================== -->
+
+            <!-- =================================================
+                 META INFORMATIONS
+            ================================================== -->
+
+            <div
+                class="profile-card__meta"
+            >
+
+                <!-- =============================================
+                     MEMBER SINCE
+                ============================================== -->
 
                 <div
-                    class="profile-card__meta"
+                    v-if="memberSince"
+                    class="profile-card__meta-item"
                 >
 
+                    <span
+                        class="profile-card__meta-icon"
+                        aria-hidden="true"
+                    >
+
+                        ✦
+
+                    </span>
+
+
                     <div
-                        v-if="memberSince"
-                        class="profile-card__meta-item"
+                        class="profile-card__meta-content"
                     >
 
                         <span
-                            class="profile-card__meta-icon"
-                            aria-hidden="true"
+                            class="profile-card__meta-label"
                         >
-                            ✦
+
+                            POUP depuis
+
                         </span>
 
 
-                        <div>
+                        <strong>
 
-                            <span
-                                class="profile-card__meta-label"
-                            >
-                                POUP depuis
-                            </span>
+                            {{ memberSince }}
 
-                            <strong>
-                                {{ memberSince }}
-                            </strong>
-
-                        </div>
+                        </strong>
 
                     </div>
 
+                </div>
+
+
+                <!-- =============================================
+                     COMMUNITY
+                ============================================== -->
+
+                <div
+                    class="profile-card__meta-item"
+                >
+
+                    <span
+                        class="profile-card__meta-icon"
+                        aria-hidden="true"
+                    >
+
+                        💜
+
+                    </span>
+
 
                     <div
-                        class="profile-card__meta-item"
+                        class="profile-card__meta-content"
                     >
 
                         <span
-                            class="profile-card__meta-icon"
-                            aria-hidden="true"
+                            class="profile-card__meta-label"
                         >
-                            💜
+
+                            Communauté
+
                         </span>
 
 
-                        <div>
+                        <strong>
 
-                            <span
-                                class="profile-card__meta-label"
-                            >
-                                Communauté
-                            </span>
+                            Les POUP
 
-                            <strong>
-                                Les POUP
-                            </strong>
-
-                        </div>
+                        </strong>
 
                     </div>
 
@@ -433,30 +598,47 @@ function requestEdit() {
 
             </div>
 
-        </div>
 
+            <!-- =================================================
+                 ACTIONS
+            ================================================== -->
 
-        <!-- =================================================
-             FOOTER
-        ================================================== -->
-
-        <footer
-            class="profile-card__footer"
-        >
-
-            <span
-                class="profile-card__footer-icon"
-                aria-hidden="true"
+            <div
+                class="profile-card__actions"
             >
-                🐙
-            </span>
+
+                <button
+                    type="button"
+                    class="
+                        profile-button
+                        profile-button--primary
+                    "
+                    @click="
+                        requestEdit
+                    "
+                >
+
+                    <span
+                        class="profile-button__icon"
+                        aria-hidden="true"
+                    >
+
+                        ✏️
+
+                    </span>
 
 
-            <span>
-                Membre de l'univers de Couaxia
-            </span>
+                    <span>
 
-        </footer>
+                        Modifier mon profil
+
+                    </span>
+
+                </button>
+
+            </div>
+
+        </div>
 
     </article>
 

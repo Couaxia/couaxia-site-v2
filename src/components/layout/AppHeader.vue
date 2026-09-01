@@ -1,16 +1,23 @@
 <script setup lang="ts">
 
 import {
+    computed,
+    onBeforeUnmount,
     onMounted,
     ref
 } from "vue";
 
 import {
-    RouterLink
+    RouterLink,
+    useRouter
 } from "vue-router";
 
 import AnnouncementBell
     from "../announcements/AnnouncementBell.vue";
+
+import {
+    supabase
+} from "../../lib/supabase";
 
 
 /* =========================================================
@@ -22,8 +29,36 @@ type Theme =
     | "dark";
 
 
+interface HeaderProfile {
+
+    id:
+        string;
+
+    username:
+        string | null;
+
+    display_name:
+        string | null;
+
+    avatar_url:
+        string | null;
+
+    role:
+        string | null;
+
+}
+
+
 /* =========================================================
-   ÉTAT DU THÈME
+   ROUTER
+========================================================= */
+
+const router =
+    useRouter();
+
+
+/* =========================================================
+   THEME
 ========================================================= */
 
 const theme =
@@ -33,7 +68,126 @@ const theme =
 
 
 /* =========================================================
-   APPLIQUER LE THÈME
+   AUTH
+========================================================= */
+
+const profile =
+    ref<HeaderProfile | null>(
+        null
+    );
+
+
+const authLoading =
+    ref(
+        true
+    );
+
+
+const accountMenuOpen =
+    ref(
+        false
+    );
+
+
+let authSubscription:
+    {
+        unsubscribe:
+            () => void;
+    }
+    |
+    null =
+        null;
+
+
+/* =========================================================
+   COMPUTED AUTH
+========================================================= */
+
+const isConnected =
+    computed(
+        () =>
+            profile.value
+            !==
+            null
+    );
+
+
+const displayName =
+    computed(
+        () => {
+
+            return (
+                profile.value?.display_name
+                ||
+                profile.value?.username
+                ||
+                "Mon profil"
+            );
+
+        }
+    );
+
+
+const username =
+    computed(
+        () => {
+
+            return (
+                profile.value?.username
+                ||
+                ""
+            );
+
+        }
+    );
+
+
+const avatarUrl =
+    computed(
+        () =>
+            profile.value?.avatar_url
+            ||
+            null
+    );
+
+
+const profileInitial =
+    computed(
+        () => {
+
+            const value =
+                displayName.value
+                    .trim();
+
+
+            if (
+                !value
+            ) {
+
+                return "P";
+
+            }
+
+
+            return value
+                .charAt(0)
+                .toUpperCase();
+
+        }
+    );
+
+
+const isAdmin =
+    computed(
+        () =>
+            profile.value?.role
+            ===
+            "admin"
+    );
+
+
+/* =========================================================
+   APPLY THEME
 ========================================================= */
 
 function applyTheme(
@@ -55,14 +209,14 @@ function applyTheme(
 
     try {
 
-        window.localStorage
+        window
+            .localStorage
             .setItem(
                 "couaxia-theme",
                 value
             );
 
     }
-
     catch (
         error
     ) {
@@ -78,74 +232,215 @@ function applyTheme(
 
 
 /* =========================================================
-   CHANGER LE THÈME
+   TOGGLE THEME
 ========================================================= */
 
 function toggleTheme() {
 
     applyTheme(
-        theme.value ===
-            "dark"
+
+        theme.value
+        ===
+        "dark"
 
             ? "light"
 
             : "dark"
+
     );
 
 }
 
 
 /* =========================================================
-   INITIALISATION
+   INITIALISE THEME
 ========================================================= */
 
-onMounted(
-    () => {
+function initialiseTheme() {
 
-        let savedTheme:
-            string | null =
-                null;
+    let savedTheme:
+        string | null =
+            null;
 
 
-        try {
+    try {
 
-            savedTheme =
-                window.localStorage
-                    .getItem(
-                        "couaxia-theme"
-                    );
+        savedTheme =
+            window
+                .localStorage
+                .getItem(
+                    "couaxia-theme"
+                );
 
-        }
+    }
+    catch (
+        error
+    ) {
 
-        catch (
+        console.debug(
+            "[Theme] Impossible de lire localStorage :",
+            error
+        );
+
+    }
+
+
+    /* =====================================================
+       SAVED THEME
+    ====================================================== */
+
+    if (
+        savedTheme
+        ===
+        "light"
+        ||
+        savedTheme
+        ===
+        "dark"
+    ) {
+
+        applyTheme(
+            savedTheme
+        );
+
+
+        return;
+
+    }
+
+
+    /* =====================================================
+       SYSTEM THEME
+    ====================================================== */
+
+    const prefersDark =
+        window.matchMedia(
+            "(prefers-color-scheme: dark)"
+        ).matches;
+
+
+    applyTheme(
+
+        prefersDark
+
+            ? "dark"
+
+            : "light"
+
+    );
+
+}
+
+
+/* =========================================================
+   LOAD PROFILE
+========================================================= */
+
+async function loadProfile(
+    userId:
+        string
+) {
+
+    const {
+        data,
+        error
+    } =
+        await supabase
+            .from(
+                "profiles"
+            )
+            .select(
+                `
+                    id,
+                    username,
+                    display_name,
+                    avatar_url,
+                    role
+                `
+            )
+            .eq(
+                "id",
+                userId
+            )
+            .maybeSingle();
+
+
+    if (
+        error
+    ) {
+
+        console.error(
+            "Erreur chargement profil header :",
+            error
+        );
+
+
+        profile.value =
+            null;
+
+
+        return;
+
+    }
+
+
+    if (
+        !data
+    ) {
+
+        profile.value =
+            null;
+
+
+        return;
+
+    }
+
+
+    profile.value =
+        data as HeaderProfile;
+
+}
+
+
+/* =========================================================
+   LOAD AUTH
+========================================================= */
+
+async function loadAuth() {
+
+    authLoading.value =
+        true;
+
+
+    try {
+
+        const {
+            data: {
+                session
+            },
+            error
+        } =
+            await supabase
+                .auth
+                .getSession();
+
+
+        if (
             error
         ) {
 
-            console.debug(
-                "[Theme] Impossible de lire localStorage :",
-                error
-            );
+            throw error;
 
         }
 
 
-        /* =================================================
-           THÈME ENREGISTRÉ
-        ================================================= */
-
         if (
-            savedTheme ===
-                "light"
-
-            ||
-
-            savedTheme ===
-                "dark"
+            !session?.user
         ) {
 
-            applyTheme(
-                savedTheme
-            );
+            profile.value =
+                null;
 
 
             return;
@@ -153,21 +448,231 @@ onMounted(
         }
 
 
-        /* =================================================
-           PRÉFÉRENCE SYSTÈME
-        ================================================= */
-
-        const prefersDark =
-            window.matchMedia(
-                "(prefers-color-scheme: dark)"
-            ).matches;
-
-
-        applyTheme(
-            prefersDark
-                ? "dark"
-                : "light"
+        await loadProfile(
+            session.user.id
         );
+
+    }
+    catch (
+        error
+    ) {
+
+        console.error(
+            "Erreur session header :",
+            error
+        );
+
+
+        profile.value =
+            null;
+
+    }
+    finally {
+
+        authLoading.value =
+            false;
+
+    }
+
+}
+
+
+/* =========================================================
+   ACCOUNT MENU
+========================================================= */
+
+function toggleAccountMenu() {
+
+    accountMenuOpen.value =
+        !accountMenuOpen.value;
+
+}
+
+
+function closeAccountMenu() {
+
+    accountMenuOpen.value =
+        false;
+
+}
+
+
+/* =========================================================
+   GO PROFILE
+========================================================= */
+
+async function goToProfile() {
+
+    closeAccountMenu();
+
+
+    await router.push({
+        name:
+            "profile"
+    });
+
+}
+
+
+/* =========================================================
+   GO ADMIN
+========================================================= */
+
+async function goToAdmin() {
+
+    closeAccountMenu();
+
+
+    await router.push({
+        name:
+            "admin"
+    });
+
+}
+
+
+/* =========================================================
+   LOGOUT
+========================================================= */
+
+async function logout() {
+
+    closeAccountMenu();
+
+
+    try {
+
+        const {
+            error
+        } =
+            await supabase
+                .auth
+                .signOut();
+
+
+        if (
+            error
+        ) {
+
+            throw error;
+
+        }
+
+
+        profile.value =
+            null;
+
+
+        await router.push({
+            name:
+                "home"
+        });
+
+    }
+    catch (
+        error
+    ) {
+
+        console.error(
+            "Erreur déconnexion :",
+            error
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   AUTH LISTENER
+========================================================= */
+
+function initialiseAuthListener() {
+
+    const {
+        data
+    } =
+        supabase
+            .auth
+            .onAuthStateChange(
+
+                async (
+                    event,
+                    session
+                ) => {
+
+                    /* =========================================
+                       LOGOUT
+                    ========================================== */
+
+                    if (
+                        event
+                        ===
+                        "SIGNED_OUT"
+                        ||
+                        !session?.user
+                    ) {
+
+                        profile.value =
+                            null;
+
+
+                        accountMenuOpen.value =
+                            false;
+
+
+                        return;
+
+                    }
+
+
+                    /* =========================================
+                       LOGIN / TOKEN REFRESH
+                    ========================================== */
+
+                    await loadProfile(
+                        session.user.id
+                    );
+
+                }
+
+            );
+
+
+    authSubscription =
+        data.subscription;
+
+}
+
+
+/* =========================================================
+   MOUNT
+========================================================= */
+
+onMounted(
+    async () => {
+
+        initialiseTheme();
+
+
+        await loadAuth();
+
+
+        initialiseAuthListener();
+
+    }
+);
+
+
+/* =========================================================
+   UNMOUNT
+========================================================= */
+
+onBeforeUnmount(
+    () => {
+
+        authSubscription
+            ?.unsubscribe();
 
     }
 );
@@ -177,10 +682,13 @@ onMounted(
 
 <template>
 
-    <header class="app-header">
+    <header
+        class="app-header"
+    >
 
-        <div class="app-header__inner">
-
+        <div
+            class="app-header__inner"
+        >
 
             <!-- =================================================
                  LOGO
@@ -192,7 +700,9 @@ onMounted(
                 aria-label="Retour à l'accueil"
             >
 
-                <span class="app-header__logo">
+                <span
+                    class="app-header__logo"
+                >
 
                     <video
                         class="app-header__logo-video"
@@ -224,6 +734,8 @@ onMounted(
                 aria-label="Navigation principale"
             >
 
+                <!-- INFORMATIONS -->
+
                 <RouterLink
                     to="/about"
                     class="app-header__link"
@@ -236,12 +748,17 @@ onMounted(
                         👤
                     </span>
 
-                    <span class="app-header__link-label">
+
+                    <span
+                        class="app-header__link-label"
+                    >
                         Mes informations
                     </span>
 
                 </RouterLink>
 
+
+                <!-- TWITCH -->
 
                 <RouterLink
                     to="/twitch"
@@ -255,12 +772,17 @@ onMounted(
                         📺
                     </span>
 
-                    <span class="app-header__link-label">
+
+                    <span
+                        class="app-header__link-label"
+                    >
                         Twitch
                     </span>
 
                 </RouterLink>
 
+
+                <!-- GAMES -->
 
                 <RouterLink
                     to="/games"
@@ -274,12 +796,17 @@ onMounted(
                         🕹️
                     </span>
 
-                    <span class="app-header__link-label">
+
+                    <span
+                        class="app-header__link-label"
+                    >
                         Jeux
                     </span>
 
                 </RouterLink>
 
+
+                <!-- POLLS -->
 
                 <RouterLink
                     to="/polls"
@@ -293,12 +820,17 @@ onMounted(
                         🗳️
                     </span>
 
-                    <span class="app-header__link-label">
+
+                    <span
+                        class="app-header__link-label"
+                    >
                         Sondages
                     </span>
 
                 </RouterLink>
 
+
+                <!-- HISTORY -->
 
                 <RouterLink
                     to="/history"
@@ -312,12 +844,17 @@ onMounted(
                         📖
                     </span>
 
-                    <span class="app-header__link-label">
+
+                    <span
+                        class="app-header__link-label"
+                    >
                         Mon histoire
                     </span>
 
                 </RouterLink>
 
+
+                <!-- CREDITS -->
 
                 <RouterLink
                     to="/credits"
@@ -331,7 +868,10 @@ onMounted(
                         🎨
                     </span>
 
-                    <span class="app-header__link-label">
+
+                    <span
+                        class="app-header__link-label"
+                    >
                         Crédits
                     </span>
 
@@ -344,8 +884,9 @@ onMounted(
                  ACTIONS
             ================================================== -->
 
-            <div class="app-header__actions">
-
+            <div
+                class="app-header__actions"
+            >
 
                 <!-- =============================================
                      NOTIFICATIONS
@@ -355,10 +896,30 @@ onMounted(
 
 
                 <!-- =============================================
-                     CONNEXION
+                     AUTH LOADING
+                ============================================== -->
+
+                <div
+                    v-if="authLoading"
+                    class="
+                        app-header__account
+                        app-header__account--loading
+                    "
+                >
+
+                    <span
+                        class="app-header__account-loader"
+                    ></span>
+
+                </div>
+
+
+                <!-- =============================================
+                     NOT CONNECTED
                 ============================================== -->
 
                 <RouterLink
+                    v-else-if="!isConnected"
                     to="/login"
                     class="app-header__account"
                 >
@@ -370,6 +931,7 @@ onMounted(
                         👤
                     </span>
 
+
                     <span>
                         Connexion
                     </span>
@@ -378,7 +940,268 @@ onMounted(
 
 
                 <!-- =============================================
-                     MODE JOUR / NUIT
+                     CONNECTED ACCOUNT
+                ============================================== -->
+
+                <div
+                    v-else
+                    class="app-header__account-wrapper"
+                >
+
+                    <button
+                        type="button"
+                        class="
+                            app-header__account
+                            app-header__account--connected
+                        "
+                        :aria-expanded="
+                            accountMenuOpen
+                        "
+                        aria-haspopup="menu"
+                        @click="
+                            toggleAccountMenu
+                        "
+                    >
+
+                        <!-- AVATAR -->
+
+                        <span
+                            class="app-header__account-avatar"
+                        >
+
+                            <img
+                                v-if="avatarUrl"
+                                :src="avatarUrl"
+                                :alt="
+                                    `Avatar de ${displayName}`
+                                "
+                            >
+
+
+                            <span
+                                v-else
+                            >
+                                {{ profileInitial }}
+                            </span>
+
+                        </span>
+
+
+                        <!-- NAME -->
+
+                        <span
+                            class="app-header__account-info"
+                        >
+
+                            <strong>
+                                {{ displayName }}
+                            </strong>
+
+
+                            <small
+                                v-if="username"
+                            >
+                                @{{ username }}
+                            </small>
+
+                        </span>
+
+
+                        <!-- ARROW -->
+
+                        <span
+                            class="app-header__account-arrow"
+                            :class="{
+                                'app-header__account-arrow--open':
+                                    accountMenuOpen
+                            }"
+                            aria-hidden="true"
+                        >
+                            ▾
+                        </span>
+
+                    </button>
+
+
+                    <!-- =========================================
+                         ACCOUNT MENU
+                    ========================================== -->
+
+                    <Transition
+                        name="account-menu"
+                    >
+
+                        <div
+                            v-if="
+                                accountMenuOpen
+                            "
+                            class="
+                                app-header__account-menu
+                            "
+                            role="menu"
+                        >
+
+                            <!-- HEADER -->
+
+                            <div
+                                class="
+                                    app-header__account-menu-profile
+                                "
+                            >
+
+                                <span
+                                    class="
+                                        app-header__account-menu-avatar
+                                    "
+                                >
+
+                                    <img
+                                        v-if="avatarUrl"
+                                        :src="avatarUrl"
+                                        :alt="
+                                            `Avatar de ${displayName}`
+                                        "
+                                    >
+
+
+                                    <span
+                                        v-else
+                                    >
+                                        {{ profileInitial }}
+                                    </span>
+
+                                </span>
+
+
+                                <div>
+
+                                    <strong>
+                                        {{ displayName }}
+                                    </strong>
+
+
+                                    <small
+                                        v-if="username"
+                                    >
+                                        @{{ username }}
+                                    </small>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- SEPARATOR -->
+
+                            <div
+                                class="
+                                    app-header__account-menu-separator
+                                "
+                            ></div>
+
+
+                            <!-- PROFILE -->
+
+                            <button
+                                type="button"
+                                class="
+                                    app-header__account-menu-item
+                                "
+                                role="menuitem"
+                                @click="
+                                    goToProfile
+                                "
+                            >
+
+                                <span>
+                                    👤
+                                </span>
+
+
+                                <span>
+                                    Mon profil
+                                </span>
+
+                            </button>
+
+
+                            <!-- ADMIN -->
+
+                            <button
+                                v-if="
+                                    isAdmin
+                                "
+                                type="button"
+                                class="
+                                    app-header__account-menu-item
+                                    app-header__account-menu-item--admin
+                                "
+                                role="menuitem"
+                                @click="
+                                    goToAdmin
+                                "
+                            >
+
+                                <span>
+                                    ⚙️
+                                </span>
+
+
+                                <span>
+                                    Administration
+                                </span>
+
+
+                                <small>
+                                    ADMIN
+                                </small>
+
+                            </button>
+
+
+                            <!-- SEPARATOR -->
+
+                            <div
+                                class="
+                                    app-header__account-menu-separator
+                                "
+                            ></div>
+
+
+                            <!-- LOGOUT -->
+
+                            <button
+                                type="button"
+                                class="
+                                    app-header__account-menu-item
+                                    app-header__account-menu-item--logout
+                                "
+                                role="menuitem"
+                                @click="
+                                    logout
+                                "
+                            >
+
+                                <span>
+                                    🚪
+                                </span>
+
+
+                                <span>
+                                    Déconnexion
+                                </span>
+
+                            </button>
+
+                        </div>
+
+                    </Transition>
+
+                </div>
+
+
+                <!-- =============================================
+                     THEME
                 ============================================== -->
 
                 <button
@@ -394,29 +1217,37 @@ onMounted(
                             ? 'Activer le mode jour'
                             : 'Activer le mode nuit'
                     "
-                    @click="toggleTheme"
+                    @click="
+                        toggleTheme
+                    "
                 >
 
                     <span
                         class="app-header__theme-icon"
                         aria-hidden="true"
                     >
+
                         {{
-                            theme ===
-                                "dark"
+                            theme
+                            ===
+                            "dark"
 
                                 ? "☀️"
 
                                 : "🌙"
                         }}
+
                     </span>
 
 
-                    <span class="app-header__theme-label">
+                    <span
+                        class="app-header__theme-label"
+                    >
 
                         {{
-                            theme ===
-                                "dark"
+                            theme
+                            ===
+                            "dark"
 
                                 ? "Mode jour"
 
@@ -439,7 +1270,7 @@ onMounted(
 <style scoped>
 
 /* =========================================================
-   VARIABLES — MODE NUIT
+   VARIABLES — DARK
 ========================================================= */
 
 :global(:root),
@@ -527,11 +1358,27 @@ onMounted(
             0.20
         );
 
+    --header-menu-background:
+        rgba(
+            19,
+            6,
+            31,
+            0.98
+        );
+
+    --header-menu-border:
+        rgba(
+            202,
+            81,
+            255,
+            0.25
+        );
+
 }
 
 
 /* =========================================================
-   VARIABLES — MODE JOUR
+   VARIABLES — LIGHT
 ========================================================= */
 
 :global(html[data-theme="light"]) {
@@ -608,6 +1455,22 @@ onMounted(
             0.13
         );
 
+    --header-menu-background:
+        rgba(
+            255,
+            248,
+            255,
+            0.99
+        );
+
+    --header-menu-border:
+        rgba(
+            109,
+            0,
+            163,
+            0.18
+        );
+
 }
 
 
@@ -630,13 +1493,14 @@ onMounted(
     box-sizing:
         border-box;
 
-    overflow: visible;
+    overflow:
+        visible;
 
 }
 
 
 /* =========================================================
-   BARRE PRINCIPALE
+   INNER
 ========================================================= */
 
 .app-header__inner {
@@ -650,7 +1514,8 @@ onMounted(
         minmax(0, 1fr)
         auto;
 
-    align-items: center;
+    align-items:
+        center;
 
     column-gap:
         clamp(
@@ -670,10 +1535,12 @@ onMounted(
     box-sizing:
         border-box;
 
-    overflow: visible;
+    overflow:
+        visible;
 
     border:
-        1px solid
+        1px
+        solid
         var(--header-border);
 
     border-radius:
@@ -705,36 +1572,52 @@ onMounted(
 
 .app-header__brand {
 
-    position: relative;
+    position:
+        relative;
 
-    z-index: 2;
+    z-index:
+        2;
 
-    display: flex;
+    display:
+        flex;
 
-    align-items: center;
-    justify-content: center;
+    align-items:
+        center;
 
-    width: 100px;
+    justify-content:
+        center;
 
-    min-width: 0;
+    width:
+        100px;
 
-    color: inherit;
+    min-width:
+        0;
 
-    text-decoration: none;
+    color:
+        inherit;
+
+    text-decoration:
+        none;
 
 }
 
 
 .app-header__logo {
 
-    display: flex;
+    display:
+        flex;
 
-    align-items: center;
-    justify-content: center;
+    align-items:
+        center;
 
-    width: 100%;
+    justify-content:
+        center;
 
-    overflow: visible;
+    width:
+        100%;
+
+    overflow:
+        visible;
 
     transition:
         transform 0.25s ease,
@@ -745,17 +1628,23 @@ onMounted(
 
 .app-header__logo-video {
 
-    display: block;
+    display:
+        block;
 
-    width: auto;
+    width:
+        auto;
 
-    height: 70px;
+    height:
+        70px;
 
-    max-width: 100px;
+    max-width:
+        100px;
 
-    object-fit: contain;
+    object-fit:
+        contain;
 
-    pointer-events: none;
+    pointer-events:
+        none;
 
 }
 
@@ -773,15 +1662,19 @@ onMounted(
 
 
 /* =========================================================
-   NAVIGATION
+   NAV
 ========================================================= */
 
 .app-header__nav {
 
-    display: flex;
+    display:
+        flex;
 
-    align-items: center;
-    justify-content: center;
+    align-items:
+        center;
+
+    justify-content:
+        center;
 
     gap:
         clamp(
@@ -790,34 +1683,43 @@ onMounted(
             34px
         );
 
-    min-width: 0;
+    min-width:
+        0;
 
 }
 
 
 /* =========================================================
-   LIENS
+   LINKS
 ========================================================= */
 
 .app-header__link {
 
-    position: relative;
+    position:
+        relative;
 
-    display: inline-flex;
+    display:
+        inline-flex;
 
-    align-items: center;
-    justify-content: center;
+    align-items:
+        center;
 
-    gap: 8px;
+    justify-content:
+        center;
+
+    gap:
+        8px;
 
     flex:
         0
         1
         auto;
 
-    min-width: 0;
+    min-width:
+        0;
 
-    min-height: 46px;
+    min-height:
+        46px;
 
     padding:
         8px
@@ -829,17 +1731,21 @@ onMounted(
     font-size:
         clamp(
             0.82rem,
-            0.90vw,
+            0.9vw,
             1rem
         );
 
-    font-weight: 800;
+    font-weight:
+        800;
 
-    line-height: 1.2;
+    line-height:
+        1.2;
 
-    text-decoration: none;
+    text-decoration:
+        none;
 
-    white-space: nowrap;
+    white-space:
+        nowrap;
 
     transition:
         color 0.25s ease,
@@ -848,26 +1754,22 @@ onMounted(
 }
 
 
-.app-header__link-label {
-
-    min-width: 0;
-
-}
-
-
 .app-header__link-icon {
 
-    display: inline-flex;
+    display:
+        inline-flex;
 
-    flex:
-        0
-        0
-        auto;
+    align-items:
+        center;
 
-    align-items: center;
-    justify-content: center;
+    justify-content:
+        center;
 
-    font-size: 1rem;
+    flex-shrink:
+        0;
+
+    font-size:
+        1rem;
 
 }
 
@@ -884,22 +1786,31 @@ onMounted(
 
 
 /* =========================================================
-   ACTIVE BAR
+   LINK UNDERLINE
 ========================================================= */
 
 .app-header__link::after {
 
-    content: "";
+    content:
+        "";
 
-    position: absolute;
+    position:
+        absolute;
 
-    left: 50%;
-    bottom: 0;
+    left:
+        50%;
 
-    width: 0;
-    height: 3px;
+    bottom:
+        0;
 
-    border-radius: 999px;
+    width:
+        0;
+
+    height:
+        3px;
+
+    border-radius:
+        999px;
 
     background:
         linear-gradient(
@@ -931,7 +1842,8 @@ onMounted(
 .app-header__link:hover::after,
 .app-header__link.router-link-active::after {
 
-    width: 90%;
+    width:
+        90%;
 
 }
 
@@ -950,14 +1862,20 @@ onMounted(
 
 .app-header__actions {
 
-    position: relative;
+    position:
+        relative;
 
-    z-index: 20;
+    z-index:
+        20;
 
-    display: flex;
+    display:
+        flex;
 
-    align-items: center;
-    justify-content: flex-end;
+    align-items:
+        center;
+
+    justify-content:
+        flex-end;
 
     gap:
         clamp(
@@ -971,50 +1889,79 @@ onMounted(
         0
         auto;
 
-    min-width: 0;
+    min-width:
+        0;
 
-    overflow: visible;
+    overflow:
+        visible;
 
 }
 
 
 /* =========================================================
-   CONNEXION
+   ACCOUNT WRAPPER
+========================================================= */
+
+.app-header__account-wrapper {
+
+    position:
+        relative;
+
+    z-index:
+        100;
+
+}
+
+
+/* =========================================================
+   ACCOUNT
 ========================================================= */
 
 .app-header__account {
 
-    display: inline-flex;
+    display:
+        inline-flex;
 
     flex:
         0
         0
         auto;
 
-    flex-direction: column;
+    flex-direction:
+        column;
 
-    align-items: center;
-    justify-content: center;
+    align-items:
+        center;
 
-    gap: 3px;
+    justify-content:
+        center;
 
-    min-width: 92px;
-    min-height: 70px;
+    gap:
+        3px;
+
+    min-width:
+        92px;
+
+    min-height:
+        70px;
 
     padding:
         8px
         15px;
 
-    box-sizing: border-box;
+    box-sizing:
+        border-box;
 
     color:
         var(--header-account-text);
 
     border:
-        1px solid
+        1px
+        solid
         var(--header-button-border);
 
-    border-radius: 44px;
+    border-radius:
+        44px;
 
     background:
         var(--header-account-background);
@@ -1022,25 +1969,31 @@ onMounted(
     box-shadow:
         var(--header-button-shadow);
 
-    font-size: 0.86rem;
-    font-weight: 900;
+    font:
+        inherit;
 
-    line-height: 1.1;
+    font-size:
+        0.86rem;
 
-    text-decoration: none;
+    font-weight:
+        900;
 
-    white-space: nowrap;
+    line-height:
+        1.1;
+
+    text-decoration:
+        none;
+
+    white-space:
+        nowrap;
+
+    cursor:
+        pointer;
 
     transition:
         transform 0.25s ease,
-        box-shadow 0.25s ease;
-
-}
-
-
-.app-header__account-icon {
-
-    font-size: 1.15rem;
+        box-shadow 0.25s ease,
+        border-color 0.25s ease;
 
 }
 
@@ -1066,40 +2019,728 @@ onMounted(
 
 
 /* =========================================================
-   THEME
+   CONNECTED ACCOUNT
+========================================================= */
+
+.app-header__account--connected {
+
+    min-width:
+        165px;
+
+    min-height:
+        64px;
+
+    flex-direction:
+        row;
+
+    justify-content:
+        flex-start;
+
+    gap:
+        9px;
+
+    padding:
+        7px
+        12px
+        7px
+        8px;
+
+}
+
+
+/* =========================================================
+   ACCOUNT AVATAR
+========================================================= */
+
+.app-header__account-avatar {
+
+    width:
+        44px;
+
+    height:
+        44px;
+
+    flex-shrink:
+        0;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    overflow:
+        hidden;
+
+    color:
+        #ffffff;
+
+    background:
+        linear-gradient(
+            135deg,
+            #6d00a3,
+            #ff00a6
+        );
+
+    border:
+        2px
+        solid
+        rgba(
+            255,
+            255,
+            255,
+            0.75
+        );
+
+    border-radius:
+        50%;
+
+    font-weight:
+        900;
+
+}
+
+
+.app-header__account-avatar img {
+
+    width:
+        100%;
+
+    height:
+        100%;
+
+    display:
+        block;
+
+    object-fit:
+        cover;
+
+}
+
+
+/* =========================================================
+   ACCOUNT INFO
+========================================================= */
+
+.app-header__account-info {
+
+    min-width:
+        0;
+
+    flex:
+        1;
+
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    align-items:
+        flex-start;
+
+    gap:
+        2px;
+
+}
+
+
+.app-header__account-info strong {
+
+    max-width:
+        120px;
+
+    overflow:
+        hidden;
+
+    color:
+        var(--header-account-text);
+
+    font-size:
+        0.82rem;
+
+    text-overflow:
+        ellipsis;
+
+    white-space:
+        nowrap;
+
+}
+
+
+.app-header__account-info small {
+
+    max-width:
+        120px;
+
+    overflow:
+        hidden;
+
+    color:
+        rgba(
+            109,
+            0,
+            163,
+            0.65
+        );
+
+    font-size:
+        0.62rem;
+
+    text-overflow:
+        ellipsis;
+
+}
+
+
+/* =========================================================
+   ACCOUNT ARROW
+========================================================= */
+
+.app-header__account-arrow {
+
+    flex-shrink:
+        0;
+
+    font-size:
+        0.72rem;
+
+    transition:
+        transform 0.2s ease;
+
+}
+
+
+.app-header__account-arrow--open {
+
+    transform:
+        rotate(180deg);
+
+}
+
+
+/* =========================================================
+   ACCOUNT MENU
+========================================================= */
+
+.app-header__account-menu {
+
+    position:
+        absolute;
+
+    top:
+        calc(
+            100%
+            +
+            10px
+        );
+
+    right:
+        0;
+
+    width:
+        245px;
+
+    padding:
+        10px;
+
+    overflow:
+        hidden;
+
+    color:
+        var(--header-text);
+
+    background:
+        var(--header-menu-background);
+
+    border:
+        1px
+        solid
+        var(--header-menu-border);
+
+    border-radius:
+        18px;
+
+    box-shadow:
+        0
+        22px
+        55px
+        rgba(
+            0,
+            0,
+            0,
+            0.35
+        );
+
+    backdrop-filter:
+        blur(18px);
+
+    z-index:
+        9999;
+
+}
+
+
+/* =========================================================
+   ACCOUNT MENU PROFILE
+========================================================= */
+
+.app-header__account-menu-profile {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        10px;
+
+    padding:
+        9px;
+
+}
+
+
+.app-header__account-menu-avatar {
+
+    width:
+        44px;
+
+    height:
+        44px;
+
+    flex-shrink:
+        0;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    overflow:
+        hidden;
+
+    color:
+        #ffffff;
+
+    background:
+        linear-gradient(
+            135deg,
+            #6d00a3,
+            #ff00a6
+        );
+
+    border-radius:
+        50%;
+
+    font-weight:
+        900;
+
+}
+
+
+.app-header__account-menu-avatar img {
+
+    width:
+        100%;
+
+    height:
+        100%;
+
+    display:
+        block;
+
+    object-fit:
+        cover;
+
+}
+
+
+.app-header__account-menu-profile > div {
+
+    min-width:
+        0;
+
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    gap:
+        2px;
+
+}
+
+
+.app-header__account-menu-profile strong {
+
+    overflow:
+        hidden;
+
+    color:
+        var(--header-text);
+
+    font-size:
+        0.82rem;
+
+    text-overflow:
+        ellipsis;
+
+    white-space:
+        nowrap;
+
+}
+
+
+.app-header__account-menu-profile small {
+
+    color:
+        var(--header-text-secondary);
+
+    font-size:
+        0.66rem;
+
+}
+
+
+/* =========================================================
+   ACCOUNT MENU SEPARATOR
+========================================================= */
+
+.app-header__account-menu-separator {
+
+    height:
+        1px;
+
+    margin:
+        7px
+        4px;
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            0.07
+        );
+
+}
+
+
+/* =========================================================
+   ACCOUNT MENU ITEM
+========================================================= */
+
+.app-header__account-menu-item {
+
+    width:
+        100%;
+
+    min-height:
+        42px;
+
+    display:
+        grid;
+
+    grid-template-columns:
+        25px
+        minmax(0, 1fr)
+        auto;
+
+    align-items:
+        center;
+
+    gap:
+        8px;
+
+    padding:
+        8px
+        10px;
+
+    color:
+        var(--header-text-secondary);
+
+    background:
+        transparent;
+
+    border:
+        1px
+        solid
+        transparent;
+
+    border-radius:
+        10px;
+
+    font:
+        inherit;
+
+    font-size:
+        0.74rem;
+
+    font-weight:
+        800;
+
+    text-align:
+        left;
+
+    cursor:
+        pointer;
+
+    transition:
+        color 0.2s ease,
+        background 0.2s ease,
+        border-color 0.2s ease;
+
+}
+
+
+.app-header__account-menu-item:hover {
+
+    color:
+        var(--header-text);
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            0.045
+        );
+
+    border-color:
+        rgba(
+            255,
+            255,
+            255,
+            0.06
+        );
+
+}
+
+
+.app-header__account-menu-item small {
+
+    padding:
+        3px
+        6px;
+
+    color:
+        #ff7bd0;
+
+    background:
+        rgba(
+            255,
+            0,
+            166,
+            0.08
+        );
+
+    border:
+        1px
+        solid
+        rgba(
+            255,
+            0,
+            166,
+            0.16
+        );
+
+    border-radius:
+        999px;
+
+    font-size:
+        0.52rem;
+
+}
+
+
+/* =========================================================
+   ADMIN ITEM
+========================================================= */
+
+.app-header__account-menu-item--admin {
+
+    color:
+        #ff7bd0;
+
+}
+
+
+/* =========================================================
+   LOGOUT ITEM
+========================================================= */
+
+.app-header__account-menu-item--logout {
+
+    color:
+        #ff8297;
+
+}
+
+
+.app-header__account-menu-item--logout:hover {
+
+    color:
+        #ffffff;
+
+    background:
+        rgba(
+            255,
+            65,
+            90,
+            0.1
+        );
+
+    border-color:
+        rgba(
+            255,
+            65,
+            90,
+            0.16
+        );
+
+}
+
+
+/* =========================================================
+   MENU TRANSITION
+========================================================= */
+
+.account-menu-enter-active,
+.account-menu-leave-active {
+
+    transition:
+        opacity 0.18s ease,
+        transform 0.18s ease;
+
+}
+
+
+.account-menu-enter-from,
+.account-menu-leave-to {
+
+    opacity:
+        0;
+
+    transform:
+        translateY(-7px)
+        scale(0.97);
+
+}
+
+
+/* =========================================================
+   AUTH LOADING
+========================================================= */
+
+.app-header__account--loading {
+
+    min-width:
+        92px;
+
+}
+
+
+.app-header__account-loader {
+
+    width:
+        20px;
+
+    height:
+        20px;
+
+    border:
+        2px
+        solid
+        rgba(
+            109,
+            0,
+            163,
+            0.18
+        );
+
+    border-top-color:
+        #6d00a3;
+
+    border-radius:
+        50%;
+
+    animation:
+        header-account-loading
+        0.75s
+        linear
+        infinite;
+
+}
+
+
+@keyframes header-account-loading {
+
+    to {
+
+        transform:
+            rotate(360deg);
+
+    }
+
+}
+
+
+/* =========================================================
+   THEME BUTTON
 ========================================================= */
 
 .app-header__theme {
 
-    display: inline-flex;
+    display:
+        inline-flex;
 
     flex:
         0
         0
         auto;
 
-    align-items: center;
-    justify-content: center;
+    align-items:
+        center;
 
-    gap: 8px;
+    justify-content:
+        center;
 
-    min-width: 142px;
-    min-height: 54px;
+    gap:
+        8px;
+
+    min-width:
+        142px;
+
+    min-height:
+        54px;
 
     padding:
         9px
         16px;
 
-    box-sizing: border-box;
+    box-sizing:
+        border-box;
 
     color:
         var(--header-text);
 
     border:
-        1px solid
+        1px
+        solid
         var(--header-button-border);
 
-    border-radius: 999px;
+    border-radius:
+        999px;
 
     background:
         var(--header-button-background);
@@ -1107,14 +2748,20 @@ onMounted(
     box-shadow:
         var(--header-button-shadow);
 
-    font: inherit;
+    font:
+        inherit;
 
-    font-size: 0.88rem;
-    font-weight: 900;
+    font-size:
+        0.88rem;
 
-    white-space: nowrap;
+    font-weight:
+        900;
 
-    cursor: pointer;
+    white-space:
+        nowrap;
+
+    cursor:
+        pointer;
 
     transition:
         color 0.25s ease,
@@ -1149,12 +2796,17 @@ onMounted(
 
 .app-header__theme-icon {
 
-    display: inline-flex;
+    display:
+        inline-flex;
 
-    align-items: center;
-    justify-content: center;
+    align-items:
+        center;
 
-    font-size: 1.25rem;
+    justify-content:
+        center;
+
+    font-size:
+        1.25rem;
 
 }
 
@@ -1165,10 +2817,12 @@ onMounted(
 
 .app-header__link:focus-visible,
 .app-header__account:focus-visible,
-.app-header__theme:focus-visible {
+.app-header__theme:focus-visible,
+.app-header__account-menu-item:focus-visible {
 
     outline:
-        3px solid
+        3px
+        solid
         #22f2ef;
 
     outline-offset:
@@ -1178,218 +2832,186 @@ onMounted(
 
 
 /* =========================================================
-   ÉCRANS INTERMÉDIAIRES
+   1600 PX
 ========================================================= */
 
-@media (max-width: 1600px) {
+@media (
+    max-width:
+    1600px
+) {
 
     .app-header__inner {
 
-        grid-template-columns:
-            88px
-            minmax(0, 1fr)
-            auto;
-
-        column-gap: 16px;
-
-        padding:
-            16px
-            20px;
-
-    }
-
-
-    .app-header__brand {
-
-        width: 88px;
-
-    }
-
-
-    .app-header__logo-video {
-
-        height: 62px;
-
-        max-width: 88px;
-
-    }
-
-
-    .app-header__nav {
-
-        gap:
-            clamp(
-                10px,
-                1.2vw,
-                22px
-            );
-
-    }
-
-
-    .app-header__link {
-
-        gap: 6px;
-
-        font-size: 0.84rem;
-
-    }
-
-
-    .app-header__account {
-
-        min-width: 84px;
-
-        padding:
-            8px
-            12px;
-
-    }
-
-
-    .app-header__theme {
-
-        min-width: 126px;
-
-        padding:
-            9px
-            13px;
-
-    }
-
-}
-
-
-/* =========================================================
-   PASSAGE SUR 2 LIGNES
-========================================================= */
-
-/* =========================================================
-   ÉCRANS INTERMÉDIAIRES
-========================================================= */
-
-@media (max-width: 1600px) {
-
-    .app-header__inner {
         grid-template-columns:
             90px
             minmax(0, 1fr)
             auto;
 
-        column-gap: 12px;
+        column-gap:
+            12px;
 
         padding:
             16px
             18px;
+
     }
 
 
     .app-header__brand {
-        width: 90px;
+
+        width:
+            90px;
+
     }
 
 
     .app-header__logo-video {
-        height: 68px;
-        max-width: 90px;
+
+        height:
+            68px;
+
+        max-width:
+            90px;
+
     }
 
 
     .app-header__nav {
+
         gap:
             clamp(
                 8px,
                 1vw,
                 18px
             );
+
     }
 
 
     .app-header__link {
-        gap: 6px;
-        font-size: 0.82rem;
+
+        gap:
+            6px;
+
+        font-size:
+            0.82rem;
+
     }
 
 
     .app-header__account {
-        min-width: 82px;
 
-        padding:
-            8px
-            11px;
+        min-width:
+            82px;
+
+    }
+
+
+    .app-header__account--connected {
+
+        min-width:
+            150px;
+
     }
 
 
     .app-header__theme {
-        min-width: 120px;
+
+        min-width:
+            120px;
 
         padding:
             9px
             12px;
+
     }
+
 }
 
 
 /* =========================================================
-   PASSAGE SUR DEUX LIGNES
-   seulement lorsque nécessaire
+   1100 PX
 ========================================================= */
 
-@media (max-width: 1100px) {
+@media (
+    max-width:
+    1100px
+) {
 
     .app-header__inner {
-        display: flex;
 
-        flex-wrap: wrap;
+        display:
+            flex;
+
+        flex-wrap:
+            wrap;
 
         justify-content:
             space-between;
 
-        row-gap: 14px;
+        row-gap:
+            14px;
+
     }
 
 
     .app-header__brand {
+
         flex:
             0
             0
             90px;
+
     }
 
 
     .app-header__actions {
-        margin-left: auto;
+
+        margin-left:
+            auto;
+
     }
 
 
     .app-header__nav {
-        order: 3;
+
+        order:
+            3;
 
         flex:
             1
             0
             100%;
 
-        width: 100%;
+        width:
+            100%;
 
         justify-content:
             center;
 
-        flex-wrap: wrap;
+        flex-wrap:
+            wrap;
 
         gap:
             6px
             24px;
 
-        padding-top: 4px;
+        padding-top:
+            4px;
+
     }
+
 }
 
+
 /* =========================================================
-   TABLETTE
+   TABLET
 ========================================================= */
 
-@media (max-width: 900px) {
+@media (
+    max-width:
+    900px
+) {
 
     .app-header {
 
@@ -1401,44 +3023,60 @@ onMounted(
 
     .app-header__inner {
 
-        min-height: auto;
+        min-height:
+            auto;
 
         padding:
             15px;
 
-        border-radius: 28px;
+        border-radius:
+            28px;
 
     }
 
 
     .app-header__brand {
 
-        flex-basis: 80px;
+        flex-basis:
+            80px;
 
     }
 
 
     .app-header__logo-video {
 
-        height: 58px;
+        height:
+            58px;
 
     }
 
 
     .app-header__theme {
 
-        min-width: 54px;
+        min-width:
+            54px;
 
-        width: 54px;
+        width:
+            54px;
 
-        padding: 0;
+        padding:
+            0;
 
     }
 
 
     .app-header__theme-label {
 
-        display: none;
+        display:
+            none;
+
+    }
+
+
+    .app-header__account-info small {
+
+        display:
+            none;
 
     }
 
@@ -1449,51 +3087,65 @@ onMounted(
    MOBILE
 ========================================================= */
 
-@media (max-width: 700px) {
+@media (
+    max-width:
+    700px
+) {
 
     .app-header {
 
-        padding: 10px;
+        padding:
+            10px;
 
     }
 
 
     .app-header__inner {
 
-        flex-direction: column;
+        flex-direction:
+            column;
 
-        align-items: stretch;
+        align-items:
+            stretch;
 
-        gap: 13px;
+        gap:
+            13px;
 
-        padding: 14px;
+        padding:
+            14px;
 
-        border-radius: 22px;
+        border-radius:
+            22px;
 
     }
 
 
     .app-header__brand {
 
-        width: 100%;
+        width:
+            100%;
 
-        flex-basis: auto;
+        flex-basis:
+            auto;
 
     }
 
 
     .app-header__logo-video {
 
-        height: 62px;
+        height:
+            62px;
 
     }
 
 
     .app-header__nav {
 
-        order: initial;
+        order:
+            initial;
 
-        display: grid;
+        display:
+            grid;
 
         grid-template-columns:
             repeat(
@@ -1504,26 +3156,32 @@ onMounted(
                 )
             );
 
-        gap: 6px;
+        gap:
+            6px;
 
-        padding: 0;
+        padding:
+            0;
 
     }
 
 
     .app-header__link {
 
-        width: 100%;
+        width:
+            100%;
 
-        justify-content: flex-start;
+        justify-content:
+            flex-start;
 
-        box-sizing: border-box;
+        box-sizing:
+            border-box;
 
         padding:
             10px
             12px;
 
-        border-radius: 10px;
+        border-radius:
+            10px;
 
     }
 
@@ -1543,35 +3201,86 @@ onMounted(
 
     .app-header__actions {
 
-        width: 100%;
+        width:
+            100%;
 
-        margin: 0;
+        margin:
+            0;
 
-        justify-content: center;
+        justify-content:
+            center;
 
-        flex-wrap: wrap;
+        flex-wrap:
+            wrap;
+
+    }
+
+
+    .app-header__account-wrapper {
+
+        width:
+            auto;
 
     }
 
 
     .app-header__account {
 
-        min-height: 50px;
+        min-height:
+            50px;
 
-        flex-direction: row;
+        flex-direction:
+            row;
 
-        border-radius: 999px;
+        border-radius:
+            999px;
+
+    }
+
+
+    .app-header__account--connected {
+
+        min-width:
+            170px;
+
+    }
+
+
+    .app-header__account-menu {
+
+        right:
+            50%;
+
+        transform:
+            translateX(50%);
+
+    }
+
+
+    .account-menu-enter-from,
+    .account-menu-leave-to {
+
+        opacity:
+            0;
+
+        transform:
+            translateX(50%)
+            translateY(-7px)
+            scale(0.97);
 
     }
 
 
     .app-header__theme {
 
-        width: auto;
+        width:
+            auto;
 
-        min-width: 130px;
+        min-width:
+            130px;
 
-        min-height: 50px;
+        min-height:
+            50px;
 
         padding:
             8px
@@ -1582,7 +3291,8 @@ onMounted(
 
     .app-header__theme-label {
 
-        display: inline;
+        display:
+            inline;
 
     }
 
@@ -1590,10 +3300,13 @@ onMounted(
 
 
 /* =========================================================
-   PETITS MOBILES
+   SMALL MOBILE
 ========================================================= */
 
-@media (max-width: 430px) {
+@media (
+    max-width:
+    430px
+) {
 
     .app-header__nav {
 
@@ -1605,15 +3318,41 @@ onMounted(
 
     .app-header__actions {
 
-        flex-direction: column;
+        flex-direction:
+            column;
 
     }
 
 
+    .app-header__account-wrapper,
     .app-header__account,
     .app-header__theme {
 
-        width: 100%;
+        width:
+            100%;
+
+    }
+
+
+    .app-header__account--connected {
+
+        justify-content:
+            center;
+
+    }
+
+
+    .app-header__account-menu {
+
+        width:
+            calc(
+                100vw
+                -
+                50px
+            );
+
+        max-width:
+            300px;
 
     }
 
@@ -1621,17 +3360,30 @@ onMounted(
 
 
 /* =========================================================
-   ANIMATIONS RÉDUITES
+   REDUCED MOTION
 ========================================================= */
 
-@media (prefers-reduced-motion: reduce) {
+@media (
+    prefers-reduced-motion:
+    reduce
+) {
 
     .app-header__link,
     .app-header__account,
     .app-header__theme,
-    .app-header__logo {
+    .app-header__logo,
+    .app-header__account-arrow {
 
-        transition: none;
+        transition:
+            none;
+
+    }
+
+
+    .app-header__account-loader {
+
+        animation:
+            none;
 
     }
 
