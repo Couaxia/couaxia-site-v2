@@ -1,5 +1,8 @@
+/* =========================================================
+   TWITCH ROUTES
+========================================================= */
 import { Router } from "express";
-import { getTwitchClips, getTwitchFollowers, getTwitchLive, getTwitchRecommendations, getTwitchVideos, getTwitchGames } from "../services/twitch.service.js";
+import { getTwitchClips, getTwitchFollowers, getTwitchGames, getTwitchLive, getTwitchRecommendations, getTwitchVideos, searchTwitchGames } from "../services/twitch.service.js";
 /* =========================================================
    ROUTER
 ========================================================= */
@@ -9,23 +12,22 @@ const router = Router();
 ========================================================= */
 router.get("/live", async (_req, res) => {
     try {
-        const live = await getTwitchLive();
+        const data = await getTwitchLive();
         res.json({
             success: true,
-            data: live
+            data
         });
     }
     catch (error) {
         console.error("Twitch live route error:", error);
-        const message = error instanceof Error
-            ? error.message
-            : "Unknown Twitch error";
         res
             .status(500)
             .json({
             success: false,
-            message: "Unable to retrieve Twitch live data",
-            error: message
+            message: "Impossible de récupérer le live Twitch.",
+            error: error instanceof Error
+                ? error.message
+                : "Erreur Twitch inconnue"
         });
     }
 });
@@ -34,23 +36,22 @@ router.get("/live", async (_req, res) => {
 ========================================================= */
 router.get("/followers", async (_req, res) => {
     try {
-        const followers = await getTwitchFollowers();
+        const data = await getTwitchFollowers();
         res.json({
             success: true,
-            data: followers
+            data
         });
     }
     catch (error) {
         console.error("Twitch followers route error:", error);
-        const message = error instanceof Error
-            ? error.message
-            : "Unknown Twitch error";
         res
             .status(500)
             .json({
             success: false,
-            message: "Unable to retrieve Twitch followers",
-            error: message
+            message: "Impossible de récupérer les followers Twitch.",
+            error: error instanceof Error
+                ? error.message
+                : "Erreur Twitch inconnue"
         });
     }
 });
@@ -59,59 +60,35 @@ router.get("/followers", async (_req, res) => {
 ========================================================= */
 router.get("/recommendations", async (req, res) => {
     try {
-        const loginQuery = req.query.login;
-        let logins = [];
-        /* -------------------------------------------------
-           SINGLE LOGIN
-        ------------------------------------------------- */
-        if (typeof loginQuery ===
+        const rawLogins = req.query.logins;
+        if (typeof rawLogins !==
             "string") {
-            logins =
-                [
-                    loginQuery
-                ];
-        }
-        /* -------------------------------------------------
-           MULTIPLE LOGINS
-        ------------------------------------------------- */
-        else if (Array.isArray(loginQuery)) {
-            logins =
-                loginQuery.filter((value) => typeof value ===
-                    "string");
-        }
-        /* -------------------------------------------------
-           VALIDATION
-        ------------------------------------------------- */
-        if (logins.length ===
-            0) {
-            res
-                .status(400)
-                .json({
-                success: false,
-                message: "At least one Twitch login is required."
+            res.json({
+                success: true,
+                data: []
             });
             return;
         }
-        /* -------------------------------------------------
-           GET RECOMMENDATIONS
-        ------------------------------------------------- */
-        const recommendations = await getTwitchRecommendations(logins);
+        const logins = rawLogins
+            .split(",")
+            .map(login => login.trim())
+            .filter(Boolean);
+        const data = await getTwitchRecommendations(logins);
         res.json({
             success: true,
-            data: recommendations
+            data
         });
     }
     catch (error) {
         console.error("Twitch recommendations route error:", error);
-        const message = error instanceof Error
-            ? error.message
-            : "Unknown Twitch error";
         res
             .status(500)
             .json({
             success: false,
-            message: "Unable to retrieve Twitch recommendations",
-            error: message
+            message: "Impossible de récupérer les recommandations Twitch.",
+            error: error instanceof Error
+                ? error.message
+                : "Erreur Twitch inconnue"
         });
     }
 });
@@ -120,26 +97,17 @@ router.get("/recommendations", async (req, res) => {
 ========================================================= */
 router.get("/clips", async (req, res) => {
     try {
-        /* -------------------------------------------------
-           FIRST
-        ------------------------------------------------- */
-        const firstQuery = req.query.first;
+        const rawFirst = req.query.first;
         let first = 100;
-        if (typeof firstQuery ===
+        if (typeof rawFirst ===
             "string") {
-            const parsed = Number(firstQuery);
+            const parsed = Number(rawFirst);
             if (Number.isFinite(parsed)) {
                 first =
                     parsed;
             }
         }
-        /* -------------------------------------------------
-           GET CLIPS
-        ------------------------------------------------- */
         const clips = await getTwitchClips(first);
-        /* -------------------------------------------------
-           RESPONSE
-        ------------------------------------------------- */
         res.json({
             success: true,
             data: clips,
@@ -148,15 +116,14 @@ router.get("/clips", async (req, res) => {
     }
     catch (error) {
         console.error("Twitch clips route error:", error);
-        const message = error instanceof Error
-            ? error.message
-            : "Unknown Twitch error";
         res
             .status(500)
             .json({
             success: false,
-            message: "Unable to retrieve Twitch clips",
-            error: message
+            message: "Impossible de récupérer les clips Twitch.",
+            error: error instanceof Error
+                ? error.message
+                : "Erreur Twitch inconnue"
         });
     }
 });
@@ -165,26 +132,17 @@ router.get("/clips", async (req, res) => {
 ========================================================= */
 router.get("/videos", async (req, res) => {
     try {
-        /* -------------------------------------------------
-           FIRST
-        ------------------------------------------------- */
-        const firstQuery = req.query.first;
+        const rawFirst = req.query.first;
         let first = 100;
-        if (typeof firstQuery ===
+        if (typeof rawFirst ===
             "string") {
-            const parsed = Number(firstQuery);
+            const parsed = Number(rawFirst);
             if (Number.isFinite(parsed)) {
                 first =
                     parsed;
             }
         }
-        /* -------------------------------------------------
-           GET VIDEOS
-        ------------------------------------------------- */
         const videos = await getTwitchVideos(first);
-        /* -------------------------------------------------
-           RESPONSE
-        ------------------------------------------------- */
         res.json({
             success: true,
             data: videos,
@@ -193,78 +151,139 @@ router.get("/videos", async (req, res) => {
     }
     catch (error) {
         console.error("Twitch videos route error:", error);
-        const message = error instanceof Error
-            ? error.message
-            : "Unknown Twitch error";
         res
             .status(500)
             .json({
             success: false,
-            message: "Unable to retrieve Twitch videos",
-            error: message
+            message: "Impossible de récupérer les vidéos Twitch.",
+            error: error instanceof Error
+                ? error.message
+                : "Erreur Twitch inconnue"
         });
     }
 });
 /* =========================================================
    GET /api/twitch/games
 ========================================================= */
+/*
+ * DEUX MODES :
+ *
+ * ---------------------------------------------------------
+ *
+ * RECHERCHE PAR NOM
+ *
+ * /api/twitch/games?search=Dead%20By%20Daylight
+ *
+ * ---------------------------------------------------------
+ *
+ * RECHERCHE PAR IDS
+ *
+ * /api/twitch/games?ids=509658,123456
+ *
+ * ---------------------------------------------------------
+ */
 router.get("/games", async (req, res) => {
     try {
-        /* =============================================
-           IDS
-        ============================================== */
+        const rawSearch = req.query.search;
         const rawIds = req.query.ids;
-        if (typeof rawIds !==
+        const rawFirst = req.query.first;
+        /* =================================================
+           SEARCH BY NAME
+        ================================================== */
+        if (typeof rawSearch ===
             "string") {
-            res
-                .status(400)
-                .json({
-                success: false,
-                message: "Le paramètre ids est obligatoire."
+            const search = rawSearch.trim();
+            if (search.length <
+                2) {
+                res.json({
+                    success: true,
+                    data: []
+                });
+                return;
+            }
+            /* =============================================
+               FIRST
+            ============================================== */
+            let first = 20;
+            if (typeof rawFirst ===
+                "string") {
+                const parsed = Number(rawFirst);
+                if (Number.isFinite(parsed)) {
+                    first =
+                        Math.min(Math.max(Math.floor(parsed), 1), 100);
+                }
+            }
+            /* =============================================
+               TWITCH SEARCH
+            ============================================== */
+            const games = await searchTwitchGames(search, first);
+            res.json({
+                success: true,
+                data: games
             });
             return;
         }
-        /* =============================================
-           SPLIT
-        ============================================== */
-        const gameIds = rawIds
-            .split(",")
-            .map(id => id.trim())
-            .filter(Boolean);
-        if (gameIds.length === 0) {
-            res
-                .status(400)
-                .json({
-                success: false,
-                message: "Aucun identifiant Twitch fourni."
+        /* =================================================
+           SEARCH BY IDS
+        ================================================== */
+        if (typeof rawIds ===
+            "string") {
+            const gameIds = [
+                ...new Set(rawIds
+                    .split(",")
+                    .map(id => id.trim())
+                    .filter(Boolean))
+            ]
+                .slice(0, 100);
+            if (gameIds.length ===
+                0) {
+                res.json({
+                    success: true,
+                    data: []
+                });
+                return;
+            }
+            const games = await getTwitchGames(gameIds);
+            res.json({
+                success: true,
+                data: games
             });
             return;
         }
-        /* =============================================
-           TWITCH
-        ============================================== */
-        const games = await getTwitchGames(gameIds);
-        /* =============================================
-           RESPONSE
-        ============================================== */
-        res.json({
-            success: true,
-            data: games
+        /* =================================================
+           INVALID REQUEST
+        ================================================== */
+        res
+            .status(400)
+            .json({
+            success: false,
+            message: "Utilise le paramètre search ou ids."
         });
     }
     catch (error) {
-        console.error("Twitch games error:", error);
-        const message = error instanceof Error
-            ? error.message
-            : "Erreur Twitch inconnue";
+        console.error("Twitch games route error:", error);
         res
             .status(500)
             .json({
             success: false,
             message: "Impossible de récupérer les jeux Twitch.",
-            error: message
+            error: error instanceof Error
+                ? error.message
+                : "Erreur Twitch inconnue"
         });
     }
+});
+/* =========================================================
+   ROUTER FALLBACK
+========================================================= */
+router.use((req, res) => {
+    res
+        .status(404)
+        .json({
+        success: false,
+        message: "Route Twitch introuvable.",
+        path: req.originalUrl
+    });
 });
 /* =========================================================
    EXPORT
