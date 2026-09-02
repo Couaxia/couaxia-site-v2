@@ -526,6 +526,128 @@ export type UpdateArtworkPayload =
 
 
 /* =========================================================
+   ANNOUNCEMENTS
+========================================================= */
+
+export type AnnouncementType =
+    | "announcement"
+    | "poll"
+    | "game"
+    | "artwork"
+    | "lore"
+    | "event"
+    | "stream"
+    | "other";
+
+
+export interface AdminAnnouncement {
+
+    id:
+        string;
+
+    type:
+        AnnouncementType;
+
+    title:
+        string;
+
+    message:
+        string;
+
+    icon:
+        string | null;
+
+    image_url:
+        string | null;
+
+    link_url:
+        string | null;
+
+    link_label:
+        string | null;
+
+    is_published:
+        boolean;
+
+    is_pinned:
+        boolean;
+
+    is_important:
+        boolean;
+
+    published_at:
+        string | null;
+
+    expires_at:
+        string | null;
+
+    source_type:
+        string | null;
+
+    source_id:
+        string | null;
+
+    created_at:
+        string;
+
+    updated_at:
+        string;
+
+}
+
+
+export interface AnnouncementPayload {
+
+    type?:
+        AnnouncementType;
+
+    title:
+        string;
+
+    message?:
+        string | null;
+
+    icon?:
+        string | null;
+
+    image_url?:
+        string | null;
+
+    link_url?:
+        string | null;
+
+    link_label?:
+        string | null;
+
+    is_published?:
+        boolean;
+
+    is_pinned?:
+        boolean;
+
+    is_important?:
+        boolean;
+
+    published_at?:
+        string | null;
+
+    expires_at?:
+        string | null;
+
+    source_type?:
+        string | null;
+
+    source_id?:
+        string | null;
+
+}
+
+
+export type UpdateAnnouncementPayload =
+    Partial<AnnouncementPayload>;
+
+
+/* =========================================================
    HELPERS — STRINGS
 ========================================================= */
 
@@ -3854,3 +3976,741 @@ export async function deleteAdminArtworkFile(
     }
 
 }
+
+/* =========================================================
+   ANNOUNCEMENTS — NORMALIZE
+========================================================= */
+
+function normalizeAdminAnnouncement(
+    announcement:
+        any
+): AdminAnnouncement {
+
+    return {
+
+        id:
+            String(
+                announcement?.id
+                ??
+                ""
+            ),
+
+        type:
+            (
+                announcement?.type
+                ??
+                "announcement"
+            ) as AnnouncementType,
+
+        title:
+            String(
+                announcement?.title
+                ??
+                ""
+            ),
+
+        message:
+            String(
+                announcement?.message
+                ??
+                ""
+            ),
+
+        icon:
+            announcement?.icon
+            ??
+            null,
+
+        image_url:
+            announcement?.image_url
+            ??
+            null,
+
+        link_url:
+            announcement?.link_url
+            ??
+            null,
+
+        link_label:
+            announcement?.link_label
+            ??
+            null,
+
+        is_published:
+            announcement?.is_published
+            ===
+            true,
+
+        is_pinned:
+            announcement?.is_pinned
+            ===
+            true,
+
+        is_important:
+            announcement?.is_important
+            ===
+            true,
+
+        published_at:
+            announcement?.published_at
+            ??
+            null,
+
+        expires_at:
+            announcement?.expires_at
+            ??
+            null,
+
+        source_type:
+            announcement?.source_type
+            ??
+            null,
+
+        source_id:
+            announcement?.source_id
+            ??
+            null,
+
+        created_at:
+            String(
+                announcement?.created_at
+                ??
+                ""
+            ),
+
+        updated_at:
+            String(
+                announcement?.updated_at
+                ??
+                ""
+            )
+
+    };
+
+}
+
+
+/* =========================================================
+   ANNOUNCEMENTS — PAYLOAD
+========================================================= */
+
+function normalizeAnnouncementPayload(
+    payload:
+        AnnouncementPayload | UpdateAnnouncementPayload,
+
+    includeTitle:
+        boolean
+): Record<string, unknown> {
+
+    const data:
+        Record<string, unknown> = {};
+
+
+    const setNullableText =
+        (
+            key:
+                string,
+
+            value:
+                string | null | undefined
+        ) => {
+
+            if (
+                value ===
+                undefined
+            ) {
+
+                return;
+
+            }
+
+
+            const clean =
+                cleanString(
+                    value
+                );
+
+
+            data[key] =
+                clean
+                    ? clean
+                    : null;
+
+        };
+
+
+    if (
+        payload.type
+        !==
+        undefined
+    ) {
+
+        data.type =
+            payload.type;
+
+    }
+
+
+    if (
+        includeTitle
+        ||
+        payload.title
+        !==
+        undefined
+    ) {
+
+        const title =
+            cleanString(
+                payload.title
+            );
+
+
+        if (
+            !title
+        ) {
+
+            throw new Error(
+                "Le titre de l'annonce est obligatoire."
+            );
+
+        }
+
+
+        data.title =
+            title;
+
+    }
+
+
+    if (
+        payload.message
+        !==
+        undefined
+    ) {
+
+        data.message =
+            cleanString(
+                payload.message
+            );
+
+    }
+
+
+    setNullableText(
+        "icon",
+        payload.icon
+    );
+
+
+    setNullableText(
+        "image_url",
+        payload.image_url
+    );
+
+
+    setNullableText(
+        "link_url",
+        payload.link_url
+    );
+
+
+    setNullableText(
+        "link_label",
+        payload.link_label
+    );
+
+
+    setNullableText(
+        "source_type",
+        payload.source_type
+    );
+
+
+    setNullableText(
+        "source_id",
+        payload.source_id
+    );
+
+
+    if (
+        payload.is_published
+        !==
+        undefined
+    ) {
+
+        data.is_published =
+            payload.is_published;
+
+    }
+
+
+    if (
+        payload.is_pinned
+        !==
+        undefined
+    ) {
+
+        data.is_pinned =
+            payload.is_pinned;
+
+    }
+
+
+    if (
+        payload.is_important
+        !==
+        undefined
+    ) {
+
+        data.is_important =
+            payload.is_important;
+
+    }
+
+
+    if (
+        payload.published_at
+        !==
+        undefined
+    ) {
+
+        data.published_at =
+            payload.published_at
+                ? new Date(
+                    payload.published_at
+                ).toISOString()
+                : null;
+
+    }
+
+
+    if (
+        payload.expires_at
+        !==
+        undefined
+    ) {
+
+        data.expires_at =
+            payload.expires_at
+                ? new Date(
+                    payload.expires_at
+                ).toISOString()
+                : null;
+
+    }
+
+
+    return data;
+
+}
+
+
+/* =========================================================
+   ANNOUNCEMENTS — GET
+========================================================= */
+
+export async function getAdminAnnouncements():
+    Promise<AdminAnnouncement[]> {
+
+    await requireAdmin();
+
+
+    const {
+        data,
+        error
+    } =
+        await supabase
+            .from(
+                "announcements"
+            )
+            .select(`
+                id,
+                type,
+                title,
+                message,
+                icon,
+                image_url,
+                link_url,
+                link_label,
+                is_published,
+                is_pinned,
+                is_important,
+                published_at,
+                expires_at,
+                source_type,
+                source_id,
+                created_at,
+                updated_at
+            `)
+            .order(
+                "is_pinned",
+                {
+                    ascending:
+                        false
+                }
+            )
+            .order(
+                "created_at",
+                {
+                    ascending:
+                        false
+                }
+            );
+
+
+    if (
+        error
+    ) {
+
+        console.error(
+            "Erreur récupération annonces admin :",
+            error
+        );
+
+
+        throw error;
+
+    }
+
+
+    return (
+        data
+        ??
+        []
+    ).map(
+        announcement =>
+            normalizeAdminAnnouncement(
+                announcement
+            )
+    );
+
+}
+
+
+/* =========================================================
+   ANNOUNCEMENTS — CREATE
+========================================================= */
+
+export async function createAdminAnnouncement(
+    payload:
+        AnnouncementPayload
+): Promise<AdminAnnouncement> {
+
+    await requireAdmin();
+
+
+    const insertData =
+        normalizeAnnouncementPayload(
+            payload,
+            true
+        );
+
+
+    if (
+        insertData.is_published ===
+        true
+        &&
+        !insertData.published_at
+    ) {
+
+        insertData.published_at =
+            new Date()
+                .toISOString();
+
+    }
+
+
+    if (
+        insertData.published_at
+        &&
+        insertData.expires_at
+        &&
+        new Date(
+            String(
+                insertData.expires_at
+            )
+        ).getTime()
+        <=
+        new Date(
+            String(
+                insertData.published_at
+            )
+        ).getTime()
+    ) {
+
+        throw new Error(
+            "La date d'expiration doit être postérieure à la date de publication."
+        );
+
+    }
+
+
+    const {
+        data,
+        error
+    } =
+        await supabase
+            .from(
+                "announcements"
+            )
+            .insert(
+                insertData
+            )
+            .select()
+            .single();
+
+
+    if (
+        error
+    ) {
+
+        console.error(
+            "Erreur création annonce admin :",
+            error
+        );
+
+
+        throw error;
+
+    }
+
+
+    return normalizeAdminAnnouncement(
+        data
+    );
+
+}
+
+
+/* =========================================================
+   ANNOUNCEMENTS — UPDATE
+========================================================= */
+
+export async function updateAdminAnnouncement(
+    announcementId:
+        string,
+
+    payload:
+        UpdateAnnouncementPayload
+): Promise<AdminAnnouncement> {
+
+    await requireAdmin();
+
+
+    const updateData =
+        normalizeAnnouncementPayload(
+            payload,
+            false
+        );
+
+
+    updateData.updated_at =
+        new Date()
+            .toISOString();
+
+
+    /*
+     * Lorsqu'une annonce devient publiée pour la première fois,
+     * on lui attribue automatiquement la date actuelle.
+     */
+
+    if (
+        updateData.is_published ===
+        true
+        &&
+        updateData.published_at ===
+        undefined
+    ) {
+
+        const {
+            data:
+                current,
+            error:
+                currentError
+        } =
+            await supabase
+                .from(
+                    "announcements"
+                )
+                .select(
+                    "published_at"
+                )
+                .eq(
+                    "id",
+                    announcementId
+                )
+                .maybeSingle();
+
+
+        if (
+            currentError
+        ) {
+
+            console.error(
+                "Erreur récupération annonce actuelle :",
+                currentError
+            );
+
+
+            throw currentError;
+
+        }
+
+
+        if (
+            !current?.published_at
+        ) {
+
+            updateData.published_at =
+                new Date()
+                    .toISOString();
+
+        }
+
+    }
+
+
+    const {
+        data,
+        error
+    } =
+        await supabase
+            .from(
+                "announcements"
+            )
+            .update(
+                updateData
+            )
+            .eq(
+                "id",
+                announcementId
+            )
+            .select()
+            .single();
+
+
+    if (
+        error
+    ) {
+
+        console.error(
+            "Erreur modification annonce admin :",
+            error
+        );
+
+
+        throw error;
+
+    }
+
+
+    return normalizeAdminAnnouncement(
+        data
+    );
+
+}
+
+
+/* =========================================================
+   ANNOUNCEMENTS — DELETE
+========================================================= */
+
+export async function deleteAdminAnnouncement(
+    announcementId:
+        string
+): Promise<void> {
+
+    await requireAdmin();
+
+
+    const {
+        error
+    } =
+        await supabase
+            .from(
+                "announcements"
+            )
+            .delete()
+            .eq(
+                "id",
+                announcementId
+            );
+
+
+    if (
+        error
+    ) {
+
+        console.error(
+            "Erreur suppression annonce admin :",
+            error
+        );
+
+
+        throw error;
+
+    }
+
+}
+
+
+/* =========================================================
+   ANNOUNCEMENTS — QUICK TOGGLES
+========================================================= */
+
+export async function toggleAnnouncementPublished(
+    announcementId:
+        string,
+
+    published:
+        boolean
+): Promise<AdminAnnouncement> {
+
+    return updateAdminAnnouncement(
+        announcementId,
+        {
+            is_published:
+                published
+        }
+    );
+
+}
+
+
+export async function toggleAnnouncementPinned(
+    announcementId:
+        string,
+
+    pinned:
+        boolean
+): Promise<AdminAnnouncement> {
+
+    return updateAdminAnnouncement(
+        announcementId,
+        {
+            is_pinned:
+                pinned
+        }
+    );
+
+}
+
+
+export async function toggleAnnouncementImportant(
+    announcementId:
+        string,
+
+    important:
+        boolean
+): Promise<AdminAnnouncement> {
+
+    return updateAdminAnnouncement(
+        announcementId,
+        {
+            is_important:
+                important
+        }
+    );
+
+}
+

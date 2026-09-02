@@ -50,7 +50,8 @@ import AdminUsers from
 
 import AdminArtworks from
     "../components/admin/AdminArtworks.vue";
-
+import AdminAnnouncements from
+    "../components/admin/AdminAnnouncements.vue";
 
 /* =========================================================
    TYPES
@@ -62,7 +63,8 @@ type AdminTab =
     | "games"
     | "suggestions"
     | "users"
-    | "artworks";
+    | "artworks"
+    | "announcements";
 
 
 interface AdminTabInfo {
@@ -207,6 +209,20 @@ const tabs:
 
             description:
                 "Ajoute et organise les créations affichées dans les crédits."
+        },
+
+        {
+            id:
+                "announcements",
+
+            label:
+                "Annonces",
+
+            icon:
+                "🔔",
+
+            description:
+                "Crée et gère les annonces et notifications affichées sur le site."
         }
 
     ];
@@ -843,6 +859,19 @@ onMounted(
                             activeTab
                             ===
                             'artworks'
+                        "
+                    />
+
+
+                    <!-- =====================================
+                         ANNOUNCEMENTS
+                    ====================================== -->
+
+                    <AdminAnnouncements
+                        v-else-if="
+                            activeTab
+                            ===
+                            'announcements'
                         "
                     />
 

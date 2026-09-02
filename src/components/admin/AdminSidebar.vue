@@ -10,7 +10,8 @@ export type AdminTab =
     | "games"
     | "suggestions"
     | "users"
-    | "artworks";
+    | "artworks"
+    | "announcements";
 
 
 interface AdminSidebarItem {
@@ -133,6 +134,17 @@ const items:
 
             icon:
                 "🎨"
+        },
+
+        {
+            id:
+                "announcements",
+
+            label:
+                "Annonces",
+
+            icon:
+                "🔔"
         }
 
     ];
