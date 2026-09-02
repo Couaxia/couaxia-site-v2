@@ -1,14 +1,19 @@
+/* =========================================================
+   TWITCH ROUTES
+========================================================= */
+
 import {
     Router
 } from "express";
 
+
 import {
     getTwitchClips,
     getTwitchFollowers,
+    getTwitchGames,
     getTwitchLive,
     getTwitchRecommendations,
     getTwitchVideos,
-    getTwitchGames,
     searchTwitchGames
 } from "../services/twitch.service.js";
 
@@ -35,21 +40,23 @@ router.get(
 
         try {
 
-            const live =
+            const data =
                 await getTwitchLive();
 
 
             res.json({
+
                 success:
                     true,
 
-                data:
-                    live
+                data
+
             });
 
         }
-
-        catch (error) {
+        catch (
+            error
+        ) {
 
             console.error(
                 "Twitch live route error:",
@@ -57,23 +64,23 @@ router.get(
             );
 
 
-            const message =
-                error instanceof Error
-                    ? error.message
-                    : "Unknown Twitch error";
-
-
             res
-                .status(500)
+                .status(
+                    500
+                )
                 .json({
+
                     success:
                         false,
 
                     message:
-                        "Unable to retrieve Twitch live data",
+                        "Impossible de récupérer le live Twitch.",
 
                     error:
-                        message
+                        error instanceof Error
+                            ? error.message
+                            : "Erreur Twitch inconnue"
+
                 });
 
         }
@@ -96,21 +103,23 @@ router.get(
 
         try {
 
-            const followers =
+            const data =
                 await getTwitchFollowers();
 
 
             res.json({
+
                 success:
                     true,
 
-                data:
-                    followers
+                data
+
             });
 
         }
-
-        catch (error) {
+        catch (
+            error
+        ) {
 
             console.error(
                 "Twitch followers route error:",
@@ -118,23 +127,23 @@ router.get(
             );
 
 
-            const message =
-                error instanceof Error
-                    ? error.message
-                    : "Unknown Twitch error";
-
-
             res
-                .status(500)
+                .status(
+                    500
+                )
                 .json({
+
                     success:
                         false,
 
                     message:
-                        "Unable to retrieve Twitch followers",
+                        "Impossible de récupérer les followers Twitch.",
 
                     error:
-                        message
+                        error instanceof Error
+                            ? error.message
+                            : "Erreur Twitch inconnue"
+
                 });
 
         }
@@ -157,73 +166,24 @@ router.get(
 
         try {
 
-            const loginQuery =
-                req.query.login;
+            const rawLogins =
+                req.query.logins;
 
-
-            let logins:
-                string[] =
-                [];
-
-
-            /* -------------------------------------------------
-               SINGLE LOGIN
-            ------------------------------------------------- */
 
             if (
-                typeof loginQuery ===
+                typeof rawLogins !==
                 "string"
             ) {
 
-                logins =
-                    [
-                        loginQuery
-                    ];
+                res.json({
 
-            }
+                    success:
+                        true,
 
+                    data:
+                        []
 
-            /* -------------------------------------------------
-               MULTIPLE LOGINS
-            ------------------------------------------------- */
-
-            else if (
-                Array.isArray(
-                    loginQuery
-                )
-            ) {
-
-                logins =
-                    loginQuery.filter(
-                        (
-                            value
-                        ):
-                            value is string =>
-                            typeof value ===
-                            "string"
-                    );
-
-            }
-
-
-            /* -------------------------------------------------
-               VALIDATION
-            ------------------------------------------------- */
-
-            if (
-                logins.length ===
-                0
-            ) {
-
-                res
-                    .status(400)
-                    .json({
-                        success:
-                            false,
-
-                        message:
-                            "At least one Twitch login is required."
-                    });
+                });
 
 
                 return;
@@ -231,27 +191,39 @@ router.get(
             }
 
 
-            /* -------------------------------------------------
-               GET RECOMMENDATIONS
-            ------------------------------------------------- */
+            const logins =
+                rawLogins
+                    .split(
+                        ","
+                    )
+                    .map(
+                        login =>
+                            login.trim()
+                    )
+                    .filter(
+                        Boolean
+                    );
 
-            const recommendations =
+
+            const data =
                 await getTwitchRecommendations(
                     logins
                 );
 
 
             res.json({
+
                 success:
                     true,
 
-                data:
-                    recommendations
+                data
+
             });
 
         }
-
-        catch (error) {
+        catch (
+            error
+        ) {
 
             console.error(
                 "Twitch recommendations route error:",
@@ -259,23 +231,23 @@ router.get(
             );
 
 
-            const message =
-                error instanceof Error
-                    ? error.message
-                    : "Unknown Twitch error";
-
-
             res
-                .status(500)
+                .status(
+                    500
+                )
                 .json({
+
                     success:
                         false,
 
                     message:
-                        "Unable to retrieve Twitch recommendations",
+                        "Impossible de récupérer les recommandations Twitch.",
 
                     error:
-                        message
+                        error instanceof Error
+                            ? error.message
+                            : "Erreur Twitch inconnue"
+
                 });
 
         }
@@ -298,11 +270,7 @@ router.get(
 
         try {
 
-            /* -------------------------------------------------
-               FIRST
-            ------------------------------------------------- */
-
-            const firstQuery =
+            const rawFirst =
                 req.query.first;
 
 
@@ -311,13 +279,13 @@ router.get(
 
 
             if (
-                typeof firstQuery ===
+                typeof rawFirst ===
                 "string"
             ) {
 
                 const parsed =
                     Number(
-                        firstQuery
+                        rawFirst
                     );
 
 
@@ -335,21 +303,14 @@ router.get(
             }
 
 
-            /* -------------------------------------------------
-               GET CLIPS
-            ------------------------------------------------- */
-
             const clips =
                 await getTwitchClips(
                     first
                 );
 
 
-            /* -------------------------------------------------
-               RESPONSE
-            ------------------------------------------------- */
-
             res.json({
+
                 success:
                     true,
 
@@ -358,11 +319,13 @@ router.get(
 
                 total:
                     clips.length
+
             });
 
         }
-
-        catch (error) {
+        catch (
+            error
+        ) {
 
             console.error(
                 "Twitch clips route error:",
@@ -370,23 +333,23 @@ router.get(
             );
 
 
-            const message =
-                error instanceof Error
-                    ? error.message
-                    : "Unknown Twitch error";
-
-
             res
-                .status(500)
+                .status(
+                    500
+                )
                 .json({
+
                     success:
                         false,
 
                     message:
-                        "Unable to retrieve Twitch clips",
+                        "Impossible de récupérer les clips Twitch.",
 
                     error:
-                        message
+                        error instanceof Error
+                            ? error.message
+                            : "Erreur Twitch inconnue"
+
                 });
 
         }
@@ -409,11 +372,7 @@ router.get(
 
         try {
 
-            /* -------------------------------------------------
-               FIRST
-            ------------------------------------------------- */
-
-            const firstQuery =
+            const rawFirst =
                 req.query.first;
 
 
@@ -422,13 +381,13 @@ router.get(
 
 
             if (
-                typeof firstQuery ===
+                typeof rawFirst ===
                 "string"
             ) {
 
                 const parsed =
                     Number(
-                        firstQuery
+                        rawFirst
                     );
 
 
@@ -446,21 +405,14 @@ router.get(
             }
 
 
-            /* -------------------------------------------------
-               GET VIDEOS
-            ------------------------------------------------- */
-
             const videos =
                 await getTwitchVideos(
                     first
                 );
 
 
-            /* -------------------------------------------------
-               RESPONSE
-            ------------------------------------------------- */
-
             res.json({
+
                 success:
                     true,
 
@@ -469,11 +421,13 @@ router.get(
 
                 total:
                     videos.length
+
             });
 
         }
-
-        catch (error) {
+        catch (
+            error
+        ) {
 
             console.error(
                 "Twitch videos route error:",
@@ -481,26 +435,26 @@ router.get(
             );
 
 
-            const message =
-                error instanceof Error
-                    ? error.message
-                    : "Unknown Twitch error";
-
-
             res
-                .status(500)
+                .status(
+                    500
+                )
                 .json({
+
                     success:
                         false,
 
                     message:
-                        "Unable to retrieve Twitch videos",
+                        "Impossible de récupérer les vidéos Twitch.",
 
                     error:
-                        message
+                        error instanceof Error
+                            ? error.message
+                            : "Erreur Twitch inconnue"
+
                 });
 
-               }
+        }
 
     }
 );
@@ -511,23 +465,21 @@ router.get(
 ========================================================= */
 
 /*
- * Cette route possède maintenant DEUX modes :
+ * DEUX MODES :
  *
- * 1.
- * Recherche par nom :
+ * ---------------------------------------------------------
  *
- * /api/twitch/games?search=Party%20Animals
+ * RECHERCHE PAR NOM
  *
+ * /api/twitch/games?search=Dead%20By%20Daylight
  *
- * 2.
- * Recherche par IDs :
+ * ---------------------------------------------------------
  *
- * /api/twitch/games?ids=123,456
+ * RECHERCHE PAR IDS
  *
+ * /api/twitch/games?ids=509658,123456
  *
- * Le mode IDs reste utilisé par les pages publiques
- * pour récupérer les informations Twitch des jeux
- * déjà présents dans Supabase.
+ * ---------------------------------------------------------
  */
 
 router.get(
@@ -539,10 +491,6 @@ router.get(
     ) => {
 
         try {
-
-            /* =================================================
-               PARAMÈTRES
-            ================================================== */
 
             const rawSearch =
                 req.query.search;
@@ -557,27 +505,20 @@ router.get(
 
 
             /* =================================================
-               MODE 1 — SEARCH
+               SEARCH BY NAME
             ================================================== */
 
             if (
-                typeof rawSearch
-                ===
+                typeof rawSearch ===
                 "string"
             ) {
 
                 const search =
-                    rawSearch
-                        .trim();
+                    rawSearch.trim();
 
-
-                /*
-                 * Pas de recherche Twitch pour une seule lettre.
-                 */
 
                 if (
-                    search.length
-                    <
+                    search.length <
                     2
                 ) {
 
@@ -598,7 +539,7 @@ router.get(
 
 
                 /* =============================================
-                   LIMIT
+                   FIRST
                 ============================================== */
 
                 let first =
@@ -606,8 +547,7 @@ router.get(
 
 
                 if (
-                    typeof rawFirst
-                    ===
+                    typeof rawFirst ===
                     "string"
                 ) {
 
@@ -667,12 +607,11 @@ router.get(
 
 
             /* =================================================
-               MODE 2 — IDS
+               SEARCH BY IDS
             ================================================== */
 
             if (
-                typeof rawIds
-                ===
+                typeof rawIds ===
                 "string"
             ) {
 
@@ -698,13 +637,8 @@ router.get(
                         );
 
 
-                /* =============================================
-                   EMPTY IDS
-                ============================================== */
-
                 if (
-                    gameIds.length
-                    ===
+                    gameIds.length ===
                     0
                 ) {
 
@@ -723,10 +657,6 @@ router.get(
 
                 }
 
-
-                /* =============================================
-                   GET GAMES
-                ============================================== */
 
                 const games =
                     await getTwitchGames(
@@ -751,7 +681,7 @@ router.get(
 
 
             /* =================================================
-               AUCUN PARAMÈTRE
+               INVALID REQUEST
             ================================================== */
 
             res
@@ -769,28 +699,14 @@ router.get(
                 });
 
         }
-
-
-        /* =====================================================
-           ERROR
-        ====================================================== */
-
         catch (
             error
         ) {
 
             console.error(
-                "Twitch games error:",
+                "Twitch games route error:",
                 error
             );
-
-
-            const message =
-                error instanceof Error
-
-                    ? error.message
-
-                    : "Erreur Twitch inconnue";
 
 
             res
@@ -806,11 +722,44 @@ router.get(
                         "Impossible de récupérer les jeux Twitch.",
 
                     error:
-                        message
+                        error instanceof Error
+                            ? error.message
+                            : "Erreur Twitch inconnue"
 
                 });
 
         }
+
+    }
+);
+
+
+/* =========================================================
+   ROUTER FALLBACK
+========================================================= */
+
+router.use(
+    (
+        req,
+        res
+    ) => {
+
+        res
+            .status(
+                404
+            )
+            .json({
+
+                success:
+                    false,
+
+                message:
+                    "Route Twitch introuvable.",
+
+                path:
+                    req.originalUrl
+
+            });
 
     }
 );

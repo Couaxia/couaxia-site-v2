@@ -24,6 +24,14 @@ export interface TwitchGame {
 }
 
 
+/*
+ * Compatibilité avec les anciens composants
+ * Favorites.vue / Currently.vue / etc.
+ */
+export type TwitchGameData =
+    TwitchGame;
+
+
 /* =========================================================
    API RESPONSE
 ========================================================= */
@@ -46,7 +54,7 @@ interface TwitchGamesApiResponse {
 
 
 /* =========================================================
-   RAW GAME
+   RAW TWITCH GAME
 ========================================================= */
 
 interface RawTwitchGame {
@@ -70,7 +78,7 @@ interface RawTwitchGame {
 
 
 /* =========================================================
-   API BASE
+   API
 ========================================================= */
 
 const TWITCH_GAMES_API =
@@ -105,7 +113,7 @@ function normalizeString(
 
 
 /* =========================================================
-   FORMAT BOX ART
+   FORMAT TWITCH BOX ART
 ========================================================= */
 
 export function formatTwitchGameBoxArt(
@@ -184,9 +192,8 @@ function normalizeTwitchGame(
     if (
         !value
         ||
-        typeof value
-        !==
-        "object"
+        typeof value !==
+            "object"
     ) {
 
         return null;
@@ -194,19 +201,19 @@ function normalizeTwitchGame(
     }
 
 
-    const game =
+    const raw =
         value as RawTwitchGame;
 
 
     const id =
         normalizeString(
-            game.id
+            raw.id
         );
 
 
     const name =
         normalizeString(
-            game.name
+            raw.name
         );
 
 
@@ -221,28 +228,39 @@ function normalizeTwitchGame(
     }
 
 
+    /*
+     * URL Twitch originale avec :
+     *
+     * {width}
+     * {height}
+     */
+
     const rawBoxArtUrl =
         normalizeString(
-            game.rawBoxArtUrl
+            raw.rawBoxArtUrl
             ??
-            game.box_art_url
+            raw.box_art_url
             ??
-            game.boxArtUrl
+            raw.boxArtUrl
         )
         ||
         null;
 
 
-    const directBoxArtUrl =
+    /*
+     * URL déjà formatée par notre serveur.
+     */
+
+    const suppliedBoxArt =
         normalizeString(
-            game.boxArtUrl
+            raw.boxArtUrl
         )
         ||
         null;
 
 
     const boxArtUrl =
-        directBoxArtUrl
+        suppliedBoxArt
         ??
         formatTwitchGameBoxArt(
             rawBoxArtUrl
@@ -299,10 +317,10 @@ function normalizeTwitchGames(
 
 
 /* =========================================================
-   READ API RESPONSE
+   READ RESPONSE
 ========================================================= */
 
-async function readApiResponse(
+async function readResponse(
     response:
         Response
 ): Promise<TwitchGamesApiResponse> {
@@ -334,12 +352,18 @@ async function readApiResponse(
 
 
     /* =====================================================
-       TEXT / HTML
+       NON JSON
     ====================================================== */
 
     const text =
         await response.text();
 
+
+    /*
+     * Si on arrive ici avec du HTML,
+     * la requête est probablement tombée
+     * sur index.html au lieu de l'API.
+     */
 
     if (
         text
@@ -390,10 +414,10 @@ async function readApiResponse(
 
 
 /* =========================================================
-   FETCH API
+   FETCH TWITCH API
 ========================================================= */
 
-async function fetchTwitchApi(
+async function fetchTwitchGames(
     url:
         string
 ): Promise<TwitchGame[]> {
@@ -417,8 +441,8 @@ async function fetchTwitchApi(
         );
 
 
-    const body =
-        await readApiResponse(
+    const result =
+        await readResponse(
             response
         );
 
@@ -428,9 +452,9 @@ async function fetchTwitchApi(
     ) {
 
         throw new Error(
-            body.message
+            result.error
             ??
-            body.error
+            result.message
             ??
             `Erreur Twitch (${response.status}).`
         );
@@ -439,15 +463,14 @@ async function fetchTwitchApi(
 
 
     if (
-        body.success
-        ===
+        result.success ===
         false
     ) {
 
         throw new Error(
-            body.message
+            result.error
             ??
-            body.error
+            result.message
             ??
             "Impossible de récupérer les jeux Twitch."
         );
@@ -456,7 +479,7 @@ async function fetchTwitchApi(
 
 
     return normalizeTwitchGames(
-        body.data
+        result.data
     );
 
 }
@@ -466,13 +489,13 @@ async function fetchTwitchApi(
    SEARCH TWITCH GAMES
 ========================================================= */
 
-/**
- * Recherche les jeux Twitch par NOM.
+/*
+ * Recherche Twitch PAR NOM.
  *
  * Exemple :
  *
  * searchTwitchGames(
- *     "Party Animals"
+ *     "Dead By Daylight"
  * );
  */
 export async function searchTwitchGames(
@@ -484,14 +507,13 @@ export async function searchTwitchGames(
             20
 ): Promise<TwitchGame[]> {
 
-    const search =
+    const cleanQuery =
         query
             .trim();
 
 
     if (
-        search.length
-        <
+        cleanQuery.length <
         2
     ) {
 
@@ -500,7 +522,7 @@ export async function searchTwitchGames(
     }
 
 
-    const limit =
+    const cleanFirst =
         Number.isFinite(
             first
         )
@@ -522,27 +544,21 @@ export async function searchTwitchGames(
         new URLSearchParams();
 
 
-    /*
-     * Notre route backend utilise :
-     *
-     * /api/twitch/games?search=Party Animals
-     */
-
     params.set(
         "search",
-        search
+        cleanQuery
     );
 
 
     params.set(
         "first",
         String(
-            limit
+            cleanFirst
         )
     );
 
 
-    return fetchTwitchApi(
+    return fetchTwitchGames(
         `${TWITCH_GAMES_API}?${params.toString()}`
     );
 
@@ -550,22 +566,22 @@ export async function searchTwitchGames(
 
 
 /* =========================================================
-   GET TWITCH GAMES BY IDS
+   GET GAMES BY IDS
 ========================================================= */
 
-/**
+/*
  * Utilisé pour les jeux déjà enregistrés
  * dans Supabase.
  */
 export async function getTwitchGamesByIds(
-    gameIds:
+    ids:
         string[]
 ): Promise<TwitchGame[]> {
 
-    const ids =
+    const cleanIds =
         [
             ...new Set(
-                gameIds
+                ids
                     .map(
                         id =>
                             String(
@@ -581,8 +597,7 @@ export async function getTwitchGamesByIds(
 
 
     if (
-        ids.length
-        ===
+        cleanIds.length ===
         0
     ) {
 
@@ -591,10 +606,15 @@ export async function getTwitchGamesByIds(
     }
 
 
-    const allGames:
+    const result:
         TwitchGame[] =
             [];
 
+
+    /*
+     * Twitch accepte maximum 100 IDs
+     * dans GET /helix/games.
+     */
 
     const chunkSize =
         100;
@@ -602,12 +622,12 @@ export async function getTwitchGamesByIds(
 
     for (
         let index = 0;
-        index < ids.length;
+        index < cleanIds.length;
         index += chunkSize
     ) {
 
         const chunk =
-            ids.slice(
+            cleanIds.slice(
                 index,
                 index
                 +
@@ -628,39 +648,38 @@ export async function getTwitchGamesByIds(
 
 
         const games =
-            await fetchTwitchApi(
+            await fetchTwitchGames(
                 `${TWITCH_GAMES_API}?${params.toString()}`
             );
 
 
-        allGames.push(
+        result.push(
             ...games
         );
 
     }
 
 
-    return allGames;
+    return result;
 
 }
 
 
 /* =========================================================
-   GET ONE GAME
+   GET ONE GAME BY ID
 ========================================================= */
 
 export async function getTwitchGameById(
-    gameId:
+    id:
         string
 ): Promise<TwitchGame | null> {
 
-    const id =
-        gameId
-            .trim();
+    const cleanId =
+        id.trim();
 
 
     if (
-        !id
+        !cleanId
     ) {
 
         return null;
@@ -670,7 +689,7 @@ export async function getTwitchGameById(
 
     const games =
         await getTwitchGamesByIds([
-            id
+            cleanId
         ]);
 
 
