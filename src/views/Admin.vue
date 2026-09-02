@@ -50,8 +50,13 @@ import AdminUsers from
 
 import AdminArtworks from
     "../components/admin/AdminArtworks.vue";
+
 import AdminAnnouncements from
     "../components/admin/AdminAnnouncements.vue";
+
+import AdminMessages from
+    "../components/admin/AdminMessages.vue";
+
 
 /* =========================================================
    TYPES
@@ -64,7 +69,8 @@ type AdminTab =
     | "suggestions"
     | "users"
     | "artworks"
-    | "announcements";
+    | "announcements"
+    | "messages";
 
 
 interface AdminTabInfo {
@@ -223,6 +229,20 @@ const tabs:
 
             description:
                 "Crée et gère les annonces et notifications affichées sur le site."
+        },
+
+        {
+            id:
+                "messages",
+
+            label:
+                "Messages",
+
+            icon:
+                "📬",
+
+            description:
+                "Consulte et gère les demandes reçues depuis la page de contact."
         }
 
     ];
@@ -872,6 +892,19 @@ onMounted(
                             activeTab
                             ===
                             'announcements'
+                        "
+                    />
+
+
+                    <!-- =====================================
+                         MESSAGES
+                    ====================================== -->
+
+                    <AdminMessages
+                        v-else-if="
+                            activeTab
+                            ===
+                            'messages'
                         "
                     />
 

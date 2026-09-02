@@ -2,6 +2,11 @@ import {
     supabase
 } from "../lib/supabase";
 
+import type {
+    ContactRequest,
+    ContactStatus
+} from "./contact.service";
+
 
 /* =========================================================
    TYPES GÉNÉRAUX
@@ -4714,3 +4719,446 @@ export async function toggleAnnouncementImportant(
 
 }
 
+/* =========================================================
+   CONTACT REQUESTS — TYPES
+========================================================= */
+
+export interface UpdateAdminContactRequestPayload {
+
+    status?:
+        ContactStatus;
+
+    is_read?:
+        boolean;
+
+    admin_note?:
+        string | null;
+
+}
+
+
+/* =========================================================
+   CONTACT REQUESTS — SELECT FIELDS
+========================================================= */
+
+const ADMIN_CONTACT_REQUEST_SELECT = `
+    id,
+    user_id,
+    name,
+    email,
+    identity,
+    reason,
+    subject,
+    message,
+    links,
+    contact_preference,
+    discord_username,
+    locale,
+    status,
+    is_read,
+    admin_note,
+    created_at,
+    updated_at
+`;
+
+
+/* =========================================================
+   GET ADMIN CONTACT REQUESTS
+========================================================= */
+
+export async function getAdminContactRequests():
+    Promise<ContactRequest[]> {
+
+    await requireAdmin();
+
+    const {
+        data,
+        error
+    } =
+        await supabase
+            .from(
+                "contact_requests"
+            )
+            .select(
+                ADMIN_CONTACT_REQUEST_SELECT
+            )
+            .order(
+                "created_at",
+                {
+                    ascending:
+                        false
+                }
+            );
+
+    if (
+        error
+    ) {
+
+        console.error(
+            "Erreur récupération messages contact admin :",
+            error
+        );
+
+        throw new Error(
+            error.message
+            ||
+            "Impossible de récupérer les messages."
+        );
+
+    }
+
+    return (
+        data
+        ??
+        []
+    ) as ContactRequest[];
+
+}
+
+
+/* =========================================================
+   GET ONE ADMIN CONTACT REQUEST
+========================================================= */
+
+export async function getAdminContactRequest(
+    requestId:
+        string
+):
+    Promise<ContactRequest | null> {
+
+    await requireAdmin();
+
+    const cleanId =
+        requestId.trim();
+
+    if (
+        !cleanId
+    ) {
+
+        return null;
+
+    }
+
+    const {
+        data,
+        error
+    } =
+        await supabase
+            .from(
+                "contact_requests"
+            )
+            .select(
+                ADMIN_CONTACT_REQUEST_SELECT
+            )
+            .eq(
+                "id",
+                cleanId
+            )
+            .maybeSingle();
+
+    if (
+        error
+    ) {
+
+        console.error(
+            "Erreur récupération message contact admin :",
+            error
+        );
+
+        throw new Error(
+            error.message
+            ||
+            "Impossible de récupérer ce message."
+        );
+
+    }
+
+    return data
+        ? data as ContactRequest
+        : null;
+
+}
+
+
+/* =========================================================
+   UPDATE ADMIN CONTACT REQUEST
+========================================================= */
+
+export async function updateAdminContactRequest(
+    requestId:
+        string,
+    payload:
+        UpdateAdminContactRequestPayload
+):
+    Promise<ContactRequest> {
+
+    await requireAdmin();
+
+    const cleanId =
+        requestId.trim();
+
+    if (
+        !cleanId
+    ) {
+
+        throw new Error(
+            "Identifiant du message manquant."
+        );
+
+    }
+
+    const updatePayload:
+        Record<
+            string,
+            unknown
+        > = {};
+
+    if (
+        payload.status
+        !==
+        undefined
+    ) {
+
+        const validStatuses:
+            ContactStatus[] = [
+                "new",
+                "read",
+                "to_reply",
+                "replied",
+                "archived"
+            ];
+
+        if (
+            !validStatuses.includes(
+                payload.status
+            )
+        ) {
+
+            throw new Error(
+                "Statut de message invalide."
+            );
+
+        }
+
+        updatePayload.status =
+            payload.status;
+
+    }
+
+    if (
+        payload.is_read
+        !==
+        undefined
+    ) {
+
+        updatePayload.is_read =
+            payload.is_read;
+
+    }
+
+    if (
+        payload.admin_note
+        !==
+        undefined
+    ) {
+
+        const note =
+            payload.admin_note
+                ?.trim()
+            ??
+            "";
+
+        if (
+            note.length >
+            2000
+        ) {
+
+            throw new Error(
+                "La note administrateur est trop longue."
+            );
+
+        }
+
+        updatePayload.admin_note =
+            note
+                ||
+                null;
+
+    }
+
+    if (
+        Object.keys(
+            updatePayload
+        ).length
+        ===
+        0
+    ) {
+
+        const current =
+            await getAdminContactRequest(
+                cleanId
+            );
+
+        if (
+            !current
+        ) {
+
+            throw new Error(
+                "Message introuvable."
+            );
+
+        }
+
+        return current;
+
+    }
+
+    if (
+        payload.status
+        !==
+        undefined
+        &&
+        payload.is_read
+        ===
+        undefined
+    ) {
+
+        updatePayload.is_read =
+            payload.status
+            !==
+            "new";
+
+    }
+
+    const {
+        data,
+        error
+    } =
+        await supabase
+            .from(
+                "contact_requests"
+            )
+            .update(
+                updatePayload
+            )
+            .eq(
+                "id",
+                cleanId
+            )
+            .select(
+                ADMIN_CONTACT_REQUEST_SELECT
+            )
+            .single();
+
+    if (
+        error
+    ) {
+
+        console.error(
+            "Erreur modification message contact admin :",
+            error
+        );
+
+        throw new Error(
+            error.message
+            ||
+            "Impossible de modifier ce message."
+        );
+
+    }
+
+    if (
+        !data
+    ) {
+
+        throw new Error(
+            "Message introuvable après modification."
+        );
+
+    }
+
+    return data as ContactRequest;
+
+}
+
+
+/* =========================================================
+   MARK ADMIN CONTACT REQUEST AS READ
+========================================================= */
+
+export async function markAdminContactRequestAsRead(
+    requestId:
+        string
+):
+    Promise<ContactRequest> {
+
+    return updateAdminContactRequest(
+        requestId,
+        {
+            status:
+                "read",
+
+            is_read:
+                true
+        }
+    );
+
+}
+
+
+/* =========================================================
+   DELETE ADMIN CONTACT REQUEST
+========================================================= */
+
+export async function deleteAdminContactRequest(
+    requestId:
+        string
+):
+    Promise<void> {
+
+    await requireAdmin();
+
+    const cleanId =
+        requestId.trim();
+
+    if (
+        !cleanId
+    ) {
+
+        throw new Error(
+            "Identifiant du message manquant."
+        );
+
+    }
+
+    const {
+        error
+    } =
+        await supabase
+            .from(
+                "contact_requests"
+            )
+            .delete()
+            .eq(
+                "id",
+                cleanId
+            );
+
+    if (
+        error
+    ) {
+
+        console.error(
+            "Erreur suppression message contact admin :",
+            error
+        );
+
+        throw new Error(
+            error.message
+            ||
+            "Impossible de supprimer ce message."
+        );
+
+    }
+
+}

@@ -217,6 +217,7 @@ function applyTheme(
             );
 
     }
+
     catch (
         error
     ) {
@@ -238,15 +239,11 @@ function applyTheme(
 function toggleTheme() {
 
     applyTheme(
-
         theme.value
         ===
         "dark"
-
             ? "light"
-
             : "dark"
-
     );
 
 }
@@ -273,6 +270,7 @@ function initialiseTheme() {
                 );
 
     }
+
     catch (
         error
     ) {
@@ -284,10 +282,6 @@ function initialiseTheme() {
 
     }
 
-
-    /* =====================================================
-       SAVED THEME
-    ====================================================== */
 
     if (
         savedTheme
@@ -309,10 +303,6 @@ function initialiseTheme() {
     }
 
 
-    /* =====================================================
-       SYSTEM THEME
-    ====================================================== */
-
     const prefersDark =
         window.matchMedia(
             "(prefers-color-scheme: dark)"
@@ -320,13 +310,9 @@ function initialiseTheme() {
 
 
     applyTheme(
-
         prefersDark
-
             ? "dark"
-
             : "light"
-
     );
 
 }
@@ -349,15 +335,13 @@ async function loadProfile(
             .from(
                 "profiles"
             )
-            .select(
-                `
-                    id,
-                    username,
-                    display_name,
-                    avatar_url,
-                    role
-                `
-            )
+            .select(`
+                id,
+                username,
+                display_name,
+                avatar_url,
+                role
+            `)
             .eq(
                 "id",
                 userId
@@ -453,6 +437,7 @@ async function loadAuth() {
         );
 
     }
+
     catch (
         error
     ) {
@@ -467,6 +452,7 @@ async function loadAuth() {
             null;
 
     }
+
     finally {
 
         authLoading.value =
@@ -569,6 +555,7 @@ async function logout() {
         });
 
     }
+
     catch (
         error
     ) {
@@ -595,15 +582,10 @@ function initialiseAuthListener() {
         supabase
             .auth
             .onAuthStateChange(
-
                 async (
                     event,
                     session
                 ) => {
-
-                    /* =========================================
-                       LOGOUT
-                    ========================================== */
 
                     if (
                         event
@@ -626,16 +608,11 @@ function initialiseAuthListener() {
                     }
 
 
-                    /* =========================================
-                       LOGIN / TOKEN REFRESH
-                    ========================================== */
-
                     await loadProfile(
                         session.user.id
                     );
 
                 }
-
             );
 
 
@@ -877,6 +854,30 @@ onBeforeUnmount(
 
                 </RouterLink>
 
+
+                <!-- CONTACT -->
+
+                <RouterLink
+                    to="/contact"
+                    class="app-header__link"
+                >
+
+                    <span
+                        class="app-header__link-icon"
+                        aria-hidden="true"
+                    >
+                        💌
+                    </span>
+
+
+                    <span
+                        class="app-header__link-label"
+                    >
+                        Me contacter
+                    </span>
+
+                </RouterLink>
+
             </nav>
 
 
@@ -1091,8 +1092,6 @@ onBeforeUnmount(
                             </div>
 
 
-                            <!-- SEPARATOR -->
-
                             <div
                                 class="
                                     app-header__account-menu-separator
@@ -1159,8 +1158,6 @@ onBeforeUnmount(
                             </button>
 
 
-                            <!-- SEPARATOR -->
-
                             <div
                                 class="
                                     app-header__account-menu-separator
@@ -1214,8 +1211,8 @@ onBeforeUnmount(
                     "
                     :title="
                         theme === 'dark'
-                            ? 'Activer le mode jour'
-                            : 'Activer le mode nuit'
+                            ? 'Mode jour'
+                            : 'Mode nuit'
                     "
                     @click="
                         toggleTheme
@@ -1226,34 +1223,13 @@ onBeforeUnmount(
                         class="app-header__theme-icon"
                         aria-hidden="true"
                     >
-
                         {{
                             theme
                             ===
                             "dark"
-
                                 ? "☀️"
-
                                 : "🌙"
                         }}
-
-                    </span>
-
-
-                    <span
-                        class="app-header__theme-label"
-                    >
-
-                        {{
-                            theme
-                            ===
-                            "dark"
-
-                                ? "Mode jour"
-
-                                : "Mode nuit"
-                        }}
-
                     </span>
 
                 </button>
@@ -1480,11 +1456,14 @@ onBeforeUnmount(
 
 .app-header {
 
-    position: relative;
+    position:
+        relative;
 
-    z-index: 10000;
+    z-index:
+        10000;
 
-    width: 100%;
+    width:
+        100%;
 
     padding:
         20px
@@ -1505,9 +1484,11 @@ onBeforeUnmount(
 
 .app-header__inner {
 
-    position: relative;
+    position:
+        relative;
 
-    display: grid;
+    display:
+        grid;
 
     grid-template-columns:
         100px
@@ -1519,14 +1500,16 @@ onBeforeUnmount(
 
     column-gap:
         clamp(
-            18px,
-            2vw,
-            34px
+            14px,
+            1.5vw,
+            28px
         );
 
-    width: 100%;
+    width:
+        100%;
 
-    min-height: 106px;
+    min-height:
+        106px;
 
     padding:
         18px
@@ -1678,9 +1661,9 @@ onBeforeUnmount(
 
     gap:
         clamp(
-            14px,
-            1.8vw,
-            34px
+            8px,
+            1.15vw,
+            22px
         );
 
     min-width:
@@ -1708,7 +1691,7 @@ onBeforeUnmount(
         center;
 
     gap:
-        8px;
+        7px;
 
     flex:
         0
@@ -1723,16 +1706,16 @@ onBeforeUnmount(
 
     padding:
         8px
-        3px;
+        2px;
 
     color:
         var(--header-text);
 
     font-size:
         clamp(
-            0.82rem,
-            0.9vw,
-            1rem
+            0.78rem,
+            0.82vw,
+            0.96rem
         );
 
     font-weight:
@@ -1784,10 +1767,6 @@ onBeforeUnmount(
 
 }
 
-
-/* =========================================================
-   LINK UNDERLINE
-========================================================= */
 
 .app-header__link::after {
 
@@ -1878,11 +1857,7 @@ onBeforeUnmount(
         flex-end;
 
     gap:
-        clamp(
-            8px,
-            0.8vw,
-            14px
-        );
+        10px;
 
     flex:
         0
@@ -2284,10 +2259,6 @@ onBeforeUnmount(
 }
 
 
-/* =========================================================
-   ACCOUNT MENU PROFILE
-========================================================= */
-
 .app-header__account-menu-profile {
 
     display:
@@ -2411,10 +2382,6 @@ onBeforeUnmount(
 
 }
 
-
-/* =========================================================
-   ACCOUNT MENU SEPARATOR
-========================================================= */
 
 .app-header__account-menu-separator {
 
@@ -2563,10 +2530,6 @@ onBeforeUnmount(
 }
 
 
-/* =========================================================
-   ADMIN ITEM
-========================================================= */
-
 .app-header__account-menu-item--admin {
 
     color:
@@ -2574,10 +2537,6 @@ onBeforeUnmount(
 
 }
 
-
-/* =========================================================
-   LOGOUT ITEM
-========================================================= */
 
 .app-header__account-menu-item--logout {
 
@@ -2696,7 +2655,7 @@ onBeforeUnmount(
 
 
 /* =========================================================
-   THEME BUTTON
+   THEME BUTTON — COMPACT
 ========================================================= */
 
 .app-header__theme {
@@ -2715,18 +2674,20 @@ onBeforeUnmount(
     justify-content:
         center;
 
-    gap:
-        8px;
+    width:
+        54px;
+
+    height:
+        54px;
 
     min-width:
-        142px;
+        54px;
 
     min-height:
         54px;
 
     padding:
-        9px
-        16px;
+        0;
 
     box-sizing:
         border-box;
@@ -2740,7 +2701,7 @@ onBeforeUnmount(
         var(--header-button-border);
 
     border-radius:
-        999px;
+        50%;
 
     background:
         var(--header-button-background);
@@ -2750,15 +2711,6 @@ onBeforeUnmount(
 
     font:
         inherit;
-
-    font-size:
-        0.88rem;
-
-    font-weight:
-        900;
-
-    white-space:
-        nowrap;
 
     cursor:
         pointer;
@@ -2778,7 +2730,8 @@ onBeforeUnmount(
         var(--header-hover);
 
     transform:
-        translateY(-3px);
+        translateY(-3px)
+        scale(1.05);
 
     box-shadow:
         0
@@ -2806,7 +2759,10 @@ onBeforeUnmount(
         center;
 
     font-size:
-        1.25rem;
+        1.35rem;
+
+    line-height:
+        1;
 
 }
 
@@ -2848,7 +2804,7 @@ onBeforeUnmount(
             auto;
 
         column-gap:
-            12px;
+            10px;
 
         padding:
             16px
@@ -2880,9 +2836,9 @@ onBeforeUnmount(
 
         gap:
             clamp(
-                8px,
-                1vw,
-                18px
+                6px,
+                0.7vw,
+                14px
             );
 
     }
@@ -2891,10 +2847,10 @@ onBeforeUnmount(
     .app-header__link {
 
         gap:
-            6px;
+            5px;
 
         font-size:
-            0.82rem;
+            0.78rem;
 
     }
 
@@ -2917,12 +2873,17 @@ onBeforeUnmount(
 
     .app-header__theme {
 
-        min-width:
-            120px;
+        width:
+            52px;
 
-        padding:
-            9px
-            12px;
+        height:
+            52px;
+
+        min-width:
+            52px;
+
+        min-height:
+            52px;
 
     }
 
@@ -3047,28 +3008,6 @@ onBeforeUnmount(
 
         height:
             58px;
-
-    }
-
-
-    .app-header__theme {
-
-        min-width:
-            54px;
-
-        width:
-            54px;
-
-        padding:
-            0;
-
-    }
-
-
-    .app-header__theme-label {
-
-        display:
-            none;
 
     }
 
@@ -3274,25 +3213,16 @@ onBeforeUnmount(
     .app-header__theme {
 
         width:
-            auto;
+            50px;
+
+        height:
+            50px;
 
         min-width:
-            130px;
+            50px;
 
         min-height:
             50px;
-
-        padding:
-            8px
-            15px;
-
-    }
-
-
-    .app-header__theme-label {
-
-        display:
-            inline;
 
     }
 
@@ -3319,17 +3249,23 @@ onBeforeUnmount(
     .app-header__actions {
 
         flex-direction:
-            column;
+            row;
 
     }
 
 
-    .app-header__account-wrapper,
-    .app-header__account,
-    .app-header__theme {
+    .app-header__account-wrapper {
 
         width:
-            100%;
+            auto;
+
+    }
+
+
+    .app-header__account {
+
+        width:
+            auto;
 
     }
 

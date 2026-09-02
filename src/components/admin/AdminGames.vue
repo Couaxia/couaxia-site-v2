@@ -2235,7 +2235,7 @@ onMounted(
 </template>
 
 
-<style scoped>
+<style>
 
 /* =========================================================
    ROOT
@@ -3872,5 +3872,465 @@ onMounted(
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
+
+
+/* =========================================================
+   LIGHT MODE
+========================================================= */
+
+html[data-theme="light"] .admin-games {
+
+    --pink:
+        #c21878;
+
+    --purple:
+        #6d00a3;
+
+    --cyan:
+        #008f91;
+
+    --panel:
+        #ffffff;
+
+    --panel-dark:
+        #f7eefb;
+
+    --border:
+        rgba(
+            109,
+            0,
+            163,
+            0.18
+        );
+
+    --muted:
+        #74527f;
+
+    color:
+        #48135d;
+
+}
+
+
+/* =========================================================
+   LIGHT MODE — HEADER
+========================================================= */
+
+html[data-theme="light"] .admin-section-header {
+    border-bottom-color:
+        rgba(109, 0, 163, 0.16);
+}
+
+html[data-theme="light"] .admin-section-header h2 {
+    color: #48135d;
+}
+
+html[data-theme="light"] .admin-section-header p {
+    color: #74527f;
+}
+
+html[data-theme="light"] .admin-section-header__eyebrow {
+    color: #008f91;
+}
+
+
+/* =========================================================
+   LIGHT MODE — MESSAGES
+========================================================= */
+
+html[data-theme="light"] .admin-message--success {
+    color: #087c68;
+    background: rgba(8, 124, 104, 0.07);
+    border-color: rgba(8, 124, 104, 0.24);
+}
+
+html[data-theme="light"] .admin-message--error {
+    color: #c62563;
+    background: rgba(198, 37, 99, 0.07);
+    border-color: rgba(198, 37, 99, 0.25);
+}
+
+
+/* =========================================================
+   LIGHT MODE — LOADING / EMPTY
+========================================================= */
+
+html[data-theme="light"] .admin-loading,
+html[data-theme="light"] .admin-games-empty {
+    color: #74527f;
+    background: #ffffff;
+    border-color: rgba(109, 0, 163, 0.16);
+    box-shadow: 0 14px 32px rgba(72, 19, 93, 0.08);
+}
+
+html[data-theme="light"] .admin-games-empty strong {
+    color: #48135d;
+}
+
+html[data-theme="light"] .admin-games-empty p {
+    color: #74527f;
+}
+
+
+/* =========================================================
+   LIGHT MODE — STATS
+========================================================= */
+
+html[data-theme="light"] .admin-games-stat {
+    background:
+        linear-gradient(
+            145deg,
+            #ffffff,
+            #f8effd
+        );
+    border-color: rgba(109, 0, 163, 0.18);
+    box-shadow: 0 14px 34px rgba(72, 19, 93, 0.10);
+}
+
+html[data-theme="light"] .admin-games-stat span {
+    color: #74527f;
+}
+
+html[data-theme="light"] .admin-games-stat strong {
+    color: #48135d;
+}
+
+
+/* =========================================================
+   LIGHT MODE — SEARCH
+========================================================= */
+
+html[data-theme="light"] .admin-games-search {
+    background: #ffffff;
+    border-color: rgba(109, 0, 163, 0.18);
+    box-shadow: 0 10px 26px rgba(72, 19, 93, 0.07);
+}
+
+html[data-theme="light"] .admin-games-search input {
+    color: #48135d;
+}
+
+html[data-theme="light"] .admin-games-search input::placeholder {
+    color: #9b82a3;
+}
+
+
+/* =========================================================
+   LIGHT MODE — FILTERS
+========================================================= */
+
+html[data-theme="light"] .admin-games-filters button {
+    color: #74527f;
+    background: rgba(255, 255, 255, 0.88);
+    border-color: rgba(109, 0, 163, 0.16);
+}
+
+html[data-theme="light"] .admin-games-filters button:hover {
+    color: #48135d;
+    background: #f6eefe;
+    border-color: rgba(194, 24, 120, 0.28);
+}
+
+html[data-theme="light"] .admin-games-filter--active {
+    color: #ffffff !important;
+    background:
+        linear-gradient(
+            135deg,
+            #8d2cff,
+            #ff2ca8
+        ) !important;
+    border-color: rgba(194, 24, 120, 0.34) !important;
+}
+
+html[data-theme="light"] .admin-games-count {
+    color: #74527f;
+}
+
+
+/* =========================================================
+   LIGHT MODE — GAME CARDS
+========================================================= */
+
+html[data-theme="light"] .admin-game-card {
+    color: #48135d;
+    background:
+        linear-gradient(
+            145deg,
+            #ffffff,
+            #f8effd
+        );
+    border-color: rgba(109, 0, 163, 0.18);
+    box-shadow: 0 16px 38px rgba(72, 19, 93, 0.10);
+}
+
+html[data-theme="light"] .admin-game-card:hover {
+    border-color: rgba(194, 24, 120, 0.30);
+}
+
+html[data-theme="light"] .admin-game-card__image {
+    background: #efe4f4;
+}
+
+html[data-theme="light"] .admin-game-card__placeholder {
+    color: #6d00a3;
+    background:
+        linear-gradient(
+            145deg,
+            #f3e6f8,
+            #ead8f2
+        );
+}
+
+html[data-theme="light"] .admin-game-card__content {
+    background: transparent;
+}
+
+html[data-theme="light"] .admin-game-card__title-row h3 {
+    color: #48135d;
+}
+
+html[data-theme="light"] .admin-game-card__rating {
+    color: #805700;
+    background: rgba(255, 187, 0, 0.09);
+    border-color: rgba(150, 100, 0, 0.20);
+}
+
+html[data-theme="light"] .admin-game-card__description {
+    color: #74527f;
+}
+
+html[data-theme="light"] .admin-game-card__description--empty {
+    color: #9b82a3;
+}
+
+html[data-theme="light"] .admin-game-card__tags span {
+    color: #6d00a3;
+    background: rgba(109, 0, 163, 0.06);
+    border-color: rgba(109, 0, 163, 0.16);
+}
+
+html[data-theme="light"] .admin-game-card__poll-toggle {
+    color: #74527f;
+    background: #f7eefb;
+    border-color: rgba(109, 0, 163, 0.16);
+}
+
+html[data-theme="light"] .admin-game-card__poll-toggle:hover {
+    color: #48135d;
+    border-color: rgba(194, 24, 120, 0.25);
+}
+
+html[data-theme="light"] .admin-game-card__actions {
+    border-top-color: rgba(109, 0, 163, 0.12);
+}
+
+
+/* =========================================================
+   LIGHT MODE — GAME BUTTONS
+========================================================= */
+
+html[data-theme="light"] .admin-game-button {
+    color: #48135d;
+    background: #ffffff;
+    border-color: rgba(109, 0, 163, 0.16);
+}
+
+html[data-theme="light"] .admin-game-button:hover {
+    background: #f6eefe;
+}
+
+html[data-theme="light"] .admin-game-button--edit {
+    color: #6d00a3;
+}
+
+html[data-theme="light"] .admin-game-button--delete {
+    color: #c62563;
+    background: rgba(198, 37, 99, 0.055);
+    border-color: rgba(198, 37, 99, 0.24);
+}
+
+
+/* =========================================================
+   LIGHT MODE — MODAL
+========================================================= */
+
+html[data-theme="light"] .admin-game-modal {
+    background: rgba(72, 19, 93, 0.28);
+}
+
+html[data-theme="light"] .admin-game-modal__dialog {
+    color: #48135d;
+    background:
+        linear-gradient(
+            145deg,
+            #ffffff,
+            #f8effd
+        );
+    border-color: rgba(109, 0, 163, 0.20);
+    box-shadow: 0 28px 80px rgba(72, 19, 93, 0.22);
+}
+
+html[data-theme="light"] .admin-game-modal__header {
+    background: rgba(255, 251, 255, 0.97);
+    border-bottom-color: rgba(109, 0, 163, 0.15);
+}
+
+html[data-theme="light"] .admin-game-modal__header h2 {
+    color: #48135d;
+}
+
+html[data-theme="light"] .admin-game-modal__header p {
+    color: #74527f;
+}
+
+html[data-theme="light"] .admin-game-modal__close {
+    color: #48135d;
+    background: #f7eefb;
+    border-color: rgba(109, 0, 163, 0.16);
+}
+
+
+/* =========================================================
+   LIGHT MODE — FORM
+========================================================= */
+
+html[data-theme="light"] .admin-game-form {
+    color: #48135d;
+}
+
+html[data-theme="light"] .admin-game-field > span,
+html[data-theme="light"] .admin-game-field label,
+html[data-theme="light"] .admin-game-form__poll strong {
+    color: #48135d;
+}
+
+html[data-theme="light"] .admin-game-field small,
+html[data-theme="light"] .admin-game-form__poll small {
+    color: #74527f;
+}
+
+html[data-theme="light"] .admin-game-field input,
+html[data-theme="light"] .admin-game-field textarea,
+html[data-theme="light"] .admin-game-field select {
+    color: #48135d;
+    background: #ffffff;
+    border-color: rgba(109, 0, 163, 0.18);
+}
+
+html[data-theme="light"] .admin-game-field input::placeholder,
+html[data-theme="light"] .admin-game-field textarea::placeholder {
+    color: #9b82a3;
+}
+
+html[data-theme="light"] .admin-game-field select option {
+    color: #48135d;
+    background: #ffffff;
+}
+
+html[data-theme="light"] .admin-game-form__preview,
+html[data-theme="light"] .admin-game-form__cover {
+    background: #efe4f4;
+    border-color: rgba(109, 0, 163, 0.16);
+}
+
+html[data-theme="light"] .admin-game-form__poll {
+    color: #48135d;
+    background: #f7eefb;
+    border-color: rgba(109, 0, 163, 0.16);
+}
+
+html[data-theme="light"] .admin-game-form__actions {
+    border-top-color: rgba(109, 0, 163, 0.13);
+}
+
+html[data-theme="light"] .admin-game-form__cancel {
+    color: #48135d;
+    background: #ffffff;
+    border-color: rgba(109, 0, 163, 0.18);
+}
+
+
+/* =========================================================
+   LIGHT MODE — TWITCH SEARCH
+========================================================= */
+
+html[data-theme="light"] .admin-twitch-search {
+    color: #48135d;
+    background: #f8effd;
+    border-color: rgba(109, 0, 163, 0.16);
+}
+
+html[data-theme="light"] .admin-twitch-search__heading strong {
+    color: #48135d;
+}
+
+html[data-theme="light"] .admin-twitch-search__heading p {
+    color: #74527f;
+}
+
+html[data-theme="light"] .admin-twitch-search__bar input {
+    color: #48135d;
+    background: #ffffff;
+    border-color: rgba(109, 0, 163, 0.18);
+}
+
+html[data-theme="light"] .admin-twitch-search__bar input::placeholder {
+    color: #9b82a3;
+}
+
+html[data-theme="light"] .admin-twitch-selected {
+    background:
+        linear-gradient(
+            135deg,
+            rgba(0, 143, 145, 0.07),
+            rgba(109, 0, 163, 0.06)
+        );
+    border-color: rgba(0, 143, 145, 0.22);
+}
+
+html[data-theme="light"] .admin-twitch-selected__info strong {
+    color: #48135d;
+}
+
+html[data-theme="light"] .admin-twitch-selected__info small {
+    color: #74527f;
+}
+
+html[data-theme="light"] .admin-twitch-selected__change {
+    color: #48135d;
+    background: #ffffff;
+    border-color: rgba(109, 0, 163, 0.16);
+}
+
+html[data-theme="light"] .admin-twitch-search__loading,
+html[data-theme="light"] .admin-twitch-search__empty {
+    color: #74527f;
+    background: rgba(255, 255, 255, 0.75);
+    border-color: rgba(109, 0, 163, 0.16);
+}
+
+html[data-theme="light"] .admin-twitch-result {
+    color: #48135d;
+    background: #ffffff;
+    border-color: rgba(109, 0, 163, 0.16);
+}
+
+html[data-theme="light"] .admin-twitch-result:hover {
+    background: #f6eefe;
+    border-color: rgba(194, 24, 120, 0.28);
+}
+
+html[data-theme="light"] .admin-twitch-result__cover {
+    background: #efe4f4;
+}
+
+html[data-theme="light"] .admin-twitch-result > strong {
+    color: #48135d;
+}
+
+html[data-theme="light"] .admin-twitch-result__select {
+    color: #008f91;
+}
+
 
 </style>

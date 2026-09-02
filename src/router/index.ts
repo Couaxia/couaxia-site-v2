@@ -195,6 +195,20 @@ const routes = [
 
         component:
             TwitchView
+    },
+
+    {
+        path:
+            "/contact",
+
+        name:
+            "contact",
+
+        component:
+            () =>
+                import(
+                    "../views/Contact.vue"
+                )
     }
 
 ];

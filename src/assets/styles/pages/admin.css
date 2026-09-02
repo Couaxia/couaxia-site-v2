@@ -2,7 +2,137 @@
    ADMIN.CSS
    Administration Couaxia
 ========================================================= */
+/* =========================================================
+   ADMIN THEME — DARK
+========================================================= */
 
+:root,
+html[data-theme="dark"] {
+
+    --admin-bg:
+        #0d0712;
+
+    --admin-panel:
+        #15091d;
+
+    --admin-panel-soft:
+        #210c2d;
+
+    --admin-card:
+        #260d31;
+
+    --admin-card-soft:
+        #32113e;
+
+    --admin-sidebar:
+        #14091b;
+
+    --admin-border:
+        rgba(
+            180,
+            70,
+            255,
+            0.22
+        );
+
+    --admin-text:
+        #ffffff;
+
+    --admin-text-secondary:
+        #a58ba9;
+
+    --admin-text-muted:
+        #806d84;
+
+    --admin-accent:
+        #f22292;
+
+    --admin-cyan:
+        #22f2ef;
+
+    --admin-button:
+        #1b101f;
+
+    --admin-button-hover:
+        #2a1432;
+
+    --admin-shadow:
+        0
+        14px
+        35px
+        rgba(
+            0,
+            0,
+            0,
+            0.30
+        );
+}
+
+
+/* =========================================================
+   ADMIN THEME — LIGHT
+========================================================= */
+
+html[data-theme="light"] {
+
+    --admin-bg:
+        #fbf5ff;
+
+    --admin-panel:
+        #ffffff;
+
+    --admin-panel-soft:
+        #f6eefe;
+
+    --admin-card:
+        #ffffff;
+
+    --admin-card-soft:
+        #f8efff;
+
+    --admin-sidebar:
+        #fff8ff;
+
+    --admin-border:
+        rgba(
+            109,
+            0,
+            163,
+            0.18
+        );
+
+    --admin-text:
+        #48135d;
+
+    --admin-text-secondary:
+        #74527f;
+
+    --admin-text-muted:
+        #9b82a3;
+
+    --admin-accent:
+        #c21878;
+
+    --admin-cyan:
+        #008f91;
+
+    --admin-button:
+        #ffffff;
+
+    --admin-button-hover:
+        #f5e8fb;
+
+    --admin-shadow:
+        0
+        14px
+        35px
+        rgba(
+            72,
+            19,
+            93,
+            0.12
+        );
+}
 
 /* =========================================================
    PAGE
@@ -7219,4 +7349,1430 @@ button:disabled {
     gap: 10px;
 
     margin-top: 10px;
+}
+
+
+/* =========================================================
+   LIGHT MODE — COMPLETE ADMIN OVERRIDES
+   Added for the Couaxia admin interface
+========================================================= */
+
+/*
+ * These aliases let scoped admin components (Messages,
+ * Announcements, etc.) reuse the same light/dark palette.
+ */
+.admin-page {
+    --surface-background:
+        var(--admin-panel);
+
+    --surface-background-secondary:
+        var(--admin-panel-soft);
+
+    --text-primary:
+        var(--admin-text);
+
+    --text-secondary:
+        var(--admin-text-secondary);
+
+    --text-muted:
+        var(--admin-text-muted);
+
+    --border-primary:
+        var(--admin-border);
+
+    --color-pink:
+        var(--admin-accent);
+
+    --color-cyan:
+        var(--admin-cyan);
+
+    --color-purple:
+        #6d00a3;
+}
+
+
+/* =========================================================
+   PAGE / MAIN
+========================================================= */
+
+html[data-theme="light"] .admin-page {
+    color:
+        var(--admin-text);
+
+    background:
+        radial-gradient(
+            circle at top left,
+            rgba(
+                109,
+                0,
+                163,
+                0.08
+            ),
+            transparent 34%
+        ),
+        radial-gradient(
+            circle at bottom right,
+            rgba(
+                255,
+                0,
+                166,
+                0.055
+            ),
+            transparent 30%
+        ),
+        var(--admin-bg);
+}
+
+
+html[data-theme="light"] .admin-main {
+    color:
+        var(--admin-text);
+
+    background:
+        transparent;
+}
+
+
+/* =========================================================
+   GLOBAL TEXT
+========================================================= */
+
+html[data-theme="light"] .admin-state strong,
+html[data-theme="light"] .admin-topbar__title h1,
+html[data-theme="light"] .admin-dashboard__header h2,
+html[data-theme="light"] .admin-dashboard-card__value,
+html[data-theme="light"] .admin-dashboard-panel h3,
+html[data-theme="light"] .admin-dashboard__summary h3,
+html[data-theme="light"] .admin-section-header h2,
+html[data-theme="light"] .admin-empty strong,
+html[data-theme="light"] .admin-poll-card h3,
+html[data-theme="light"] .admin-field label,
+html[data-theme="light"] .admin-switch-row strong,
+html[data-theme="light"] .admin-poll-games__header h3,
+html[data-theme="light"] .admin-poll-game strong,
+html[data-theme="light"] .admin-artwork-card h3,
+html[data-theme="light"] .admin-artwork-card__title,
+html[data-theme="light"] .admin-suggestion-card h3,
+html[data-theme="light"] .admin-user-card h3,
+html[data-theme="light"] .admin-user-card__name,
+html[data-theme="light"] .admin-users .admin-empty strong {
+    color:
+        var(--admin-text);
+}
+
+
+html[data-theme="light"] .admin-state p,
+html[data-theme="light"] .admin-topbar__description,
+html[data-theme="light"] .admin-dashboard__header p,
+html[data-theme="light"] .admin-dashboard__loading,
+html[data-theme="light"] .admin-dashboard-card__label,
+html[data-theme="light"] .admin-dashboard-card__detail,
+html[data-theme="light"] .admin-dashboard-panel p,
+html[data-theme="light"] .admin-dashboard__summary p,
+html[data-theme="light"] .admin-section-header p,
+html[data-theme="light"] .admin-loading,
+html[data-theme="light"] .admin-toolbar__count,
+html[data-theme="light"] .admin-empty p,
+html[data-theme="light"] .admin-poll-card__question,
+html[data-theme="light"] .admin-poll-card__description,
+html[data-theme="light"] .admin-poll-card__meta,
+html[data-theme="light"] .admin-switch-row span,
+html[data-theme="light"] .admin-poll-games__header p,
+html[data-theme="light"] .admin-users .admin-empty p {
+    color:
+        var(--admin-text-secondary);
+}
+
+
+/* =========================================================
+   SIDEBAR
+========================================================= */
+
+html[data-theme="light"] .admin-sidebar {
+    color:
+        var(--admin-text);
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(
+                255,
+                250,
+                255,
+                0.99
+            ),
+            rgba(
+                247,
+                237,
+                252,
+                0.99
+            )
+        );
+
+    border-right-color:
+        var(--admin-border);
+
+    box-shadow:
+        18px
+        0
+        45px
+        rgba(
+            72,
+            19,
+            93,
+            0.08
+        );
+}
+
+
+html[data-theme="light"] .admin-sidebar__brand {
+    border-bottom-color:
+        var(--admin-border);
+}
+
+
+html[data-theme="light"] .admin-sidebar__brand div span {
+    color:
+        var(--admin-cyan);
+}
+
+
+html[data-theme="light"] .admin-sidebar__brand div strong {
+    color:
+        var(--admin-text);
+}
+
+
+html[data-theme="light"] .admin-sidebar__nav-item {
+    color:
+        var(--admin-text-secondary);
+
+    background:
+        transparent;
+}
+
+
+html[data-theme="light"] .admin-sidebar__nav-item:hover {
+    color:
+        var(--admin-text);
+
+    background:
+        rgba(
+            109,
+            0,
+            163,
+            0.055
+        );
+}
+
+
+html[data-theme="light"] .admin-sidebar__nav-item--active,
+html[data-theme="light"] .admin-sidebar__nav-item--active:hover {
+    color:
+        var(--admin-text);
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(
+                109,
+                0,
+                163,
+                0.10
+            ),
+            rgba(
+                242,
+                34,
+                146,
+                0.07
+            )
+        );
+
+    border-color:
+        rgba(
+            194,
+            24,
+            120,
+            0.24
+        );
+}
+
+
+html[data-theme="light"] .admin-sidebar__footer {
+    border-top-color:
+        var(--admin-border);
+}
+
+
+html[data-theme="light"] .admin-sidebar__secondary-action {
+    color:
+        var(--admin-text-secondary);
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            0.58
+        );
+
+    border-color:
+        var(--admin-border);
+}
+
+
+html[data-theme="light"] .admin-sidebar__secondary-action:hover {
+    color:
+        var(--admin-text);
+
+    background:
+        rgba(
+            242,
+            34,
+            146,
+            0.065
+        );
+
+    border-color:
+        rgba(
+            194,
+            24,
+            120,
+            0.24
+        );
+}
+
+
+html[data-theme="light"] .admin-sidebar__nav::-webkit-scrollbar-track {
+    background:
+        rgba(
+            109,
+            0,
+            163,
+            0.04
+        );
+}
+
+
+html[data-theme="light"] .admin-sidebar__nav::-webkit-scrollbar-thumb {
+    background:
+        rgba(
+            109,
+            0,
+            163,
+            0.28
+        );
+}
+
+
+/* =========================================================
+   TOPBAR
+========================================================= */
+
+html[data-theme="light"] .admin-topbar {
+    background:
+        rgba(
+            251,
+            245,
+            255,
+            0.90
+        );
+
+    border-bottom-color:
+        var(--admin-border);
+
+    box-shadow:
+        0
+        10px
+        26px
+        rgba(
+            72,
+            19,
+            93,
+            0.035
+        );
+}
+
+
+html[data-theme="light"] .admin-topbar__eyebrow,
+html[data-theme="light"] .admin-dashboard__eyebrow,
+html[data-theme="light"] .admin-section-header__eyebrow,
+html[data-theme="light"] .admin-dashboard-panel__eyebrow,
+html[data-theme="light"] .admin-poll-card__category,
+html[data-theme="light"] .admin-poll-games__eyebrow,
+html[data-theme="light"] .admin-modal__eyebrow {
+    color:
+        var(--admin-cyan);
+}
+
+
+html[data-theme="light"] .admin-topbar__profile {
+    color:
+        var(--admin-text);
+
+    background:
+        var(--admin-panel);
+
+    border-color:
+        var(--admin-border);
+
+    box-shadow:
+        var(--admin-shadow);
+}
+
+
+html[data-theme="light"] .admin-topbar__profile:hover {
+    background:
+        var(--admin-panel-soft);
+
+    border-color:
+        rgba(
+            194,
+            24,
+            120,
+            0.24
+        );
+}
+
+
+html[data-theme="light"] .admin-topbar__profile-text strong {
+    color:
+        var(--admin-text);
+}
+
+
+html[data-theme="light"] .admin-topbar__profile-text span {
+    color:
+        var(--admin-text-secondary);
+}
+
+
+/* =========================================================
+   BUTTONS
+========================================================= */
+
+html[data-theme="light"] .admin-button--secondary {
+    color:
+        var(--admin-text);
+
+    background:
+        var(--admin-button);
+
+    border-color:
+        var(--admin-border);
+}
+
+
+html[data-theme="light"] .admin-button--secondary:hover:not(:disabled) {
+    color:
+        var(--admin-text);
+
+    background:
+        var(--admin-button-hover);
+
+    border-color:
+        rgba(
+            194,
+            24,
+            120,
+            0.24
+        );
+}
+
+
+/*
+ * Primary buttons stay white on the purple/pink gradient.
+ */
+html[data-theme="light"] .admin-button--primary {
+    color:
+        #ffffff;
+}
+
+
+/* =========================================================
+   DASHBOARD
+========================================================= */
+
+html[data-theme="light"] .admin-dashboard__loading {
+    background:
+        var(--admin-panel);
+
+    border-color:
+        var(--admin-border);
+
+    box-shadow:
+        var(--admin-shadow);
+}
+
+
+html[data-theme="light"] .admin-dashboard-card {
+    background:
+        linear-gradient(
+            145deg,
+            rgba(
+                255,
+                255,
+                255,
+                0.99
+            ),
+            rgba(
+                249,
+                240,
+                255,
+                0.98
+            )
+        );
+
+    border-color:
+        var(--admin-border);
+
+    box-shadow:
+        var(--admin-shadow);
+}
+
+
+html[data-theme="light"] .admin-dashboard-card:hover {
+    border-color:
+        rgba(
+            194,
+            24,
+            120,
+            0.26
+        );
+
+    box-shadow:
+        0
+        18px
+        42px
+        rgba(
+            72,
+            19,
+            93,
+            0.14
+        );
+}
+
+
+html[data-theme="light"] .admin-dashboard-card::before {
+    background:
+        rgba(
+            242,
+            34,
+            146,
+            0.07
+        );
+}
+
+
+html[data-theme="light"] .admin-dashboard-card__icon {
+    background:
+        linear-gradient(
+            135deg,
+            rgba(
+                109,
+                0,
+                163,
+                0.10
+            ),
+            rgba(
+                242,
+                34,
+                146,
+                0.07
+            )
+        );
+
+    border-color:
+        rgba(
+            194,
+            24,
+            120,
+            0.18
+        );
+}
+
+
+html[data-theme="light"] .admin-dashboard-panel {
+    background:
+        var(--admin-panel);
+
+    border-color:
+        var(--admin-border);
+
+    box-shadow:
+        var(--admin-shadow);
+}
+
+
+html[data-theme="light"] .admin-dashboard__summary {
+    background:
+        linear-gradient(
+            135deg,
+            rgba(
+                109,
+                0,
+                163,
+                0.07
+            ),
+            rgba(
+                242,
+                34,
+                146,
+                0.045
+            )
+        );
+
+    border-color:
+        rgba(
+            194,
+            24,
+            120,
+            0.18
+        );
+}
+
+
+/* =========================================================
+   COMMON ADMIN PANELS
+========================================================= */
+
+html[data-theme="light"] .admin-loading,
+html[data-theme="light"] .admin-empty,
+html[data-theme="light"] .admin-mini-stat,
+html[data-theme="light"] .admin-switch-row,
+html[data-theme="light"] .admin-poll-games {
+    background:
+        var(--admin-panel);
+
+    border-color:
+        var(--admin-border);
+
+    box-shadow:
+        var(--admin-shadow);
+}
+
+
+html[data-theme="light"] .admin-mini-stat span {
+    color:
+        var(--admin-text-secondary);
+}
+
+
+html[data-theme="light"] .admin-mini-stat strong {
+    color:
+        var(--admin-text);
+}
+
+
+/* =========================================================
+   SEARCH / SELECT / INPUTS
+========================================================= */
+
+html[data-theme="light"] .admin-search,
+html[data-theme="light"] .admin-suggestions .admin-search,
+html[data-theme="light"] .admin-users .admin-search {
+    background:
+        var(--admin-panel);
+
+    border-color:
+        var(--admin-border);
+}
+
+
+html[data-theme="light"] .admin-search input,
+html[data-theme="light"] .admin-suggestions .admin-search input,
+html[data-theme="light"] .admin-users .admin-search input {
+    color:
+        var(--admin-text);
+
+    background:
+        transparent;
+}
+
+
+html[data-theme="light"] .admin-search input::placeholder,
+html[data-theme="light"] .admin-suggestions .admin-search input::placeholder,
+html[data-theme="light"] .admin-users .admin-search input::placeholder {
+    color:
+        var(--admin-text-muted);
+}
+
+
+html[data-theme="light"] .admin-select,
+html[data-theme="light"] .admin-field select,
+html[data-theme="light"] .admin-suggestions-filter,
+html[data-theme="light"] .admin-users-filter,
+html[data-theme="light"] .admin-user-role-select {
+    color:
+        var(--admin-text);
+
+    background:
+        var(--admin-panel);
+
+    border-color:
+        var(--admin-border);
+}
+
+
+html[data-theme="light"] .admin-select option,
+html[data-theme="light"] .admin-field select option,
+html[data-theme="light"] .admin-suggestions-filter option,
+html[data-theme="light"] .admin-users-filter option,
+html[data-theme="light"] .admin-user-role-select option {
+    color:
+        var(--admin-text);
+
+    background:
+        #ffffff;
+}
+
+
+html[data-theme="light"] .admin-field input,
+html[data-theme="light"] .admin-field textarea {
+    color:
+        var(--admin-text);
+
+    background:
+        var(--admin-panel);
+
+    border-color:
+        var(--admin-border);
+}
+
+
+html[data-theme="light"] .admin-field input::placeholder,
+html[data-theme="light"] .admin-field textarea::placeholder {
+    color:
+        var(--admin-text-muted);
+}
+
+
+/* =========================================================
+   POLLS
+========================================================= */
+
+html[data-theme="light"] .admin-poll-card {
+    background:
+        linear-gradient(
+            145deg,
+            #ffffff,
+            #f9f1fd
+        );
+
+    border-color:
+        var(--admin-border);
+
+    box-shadow:
+        var(--admin-shadow);
+}
+
+
+html[data-theme="light"] .admin-poll-card__question {
+    color:
+        var(--admin-text);
+}
+
+
+html[data-theme="light"] .admin-poll-card__description,
+html[data-theme="light"] .admin-poll-card__meta {
+    color:
+        var(--admin-text-secondary);
+}
+
+
+html[data-theme="light"] .admin-poll-game {
+    color:
+        var(--admin-text);
+
+    background:
+        var(--admin-panel);
+
+    border-color:
+        transparent;
+}
+
+
+html[data-theme="light"] .admin-poll-game:hover {
+    background:
+        var(--admin-panel-soft);
+}
+
+
+html[data-theme="light"] .admin-poll-game--selected {
+    background:
+        rgba(
+            0,
+            143,
+            145,
+            0.055
+        );
+
+    border-color:
+        var(--admin-cyan);
+}
+
+
+html[data-theme="light"] .admin-poll-game__image {
+    background:
+        #f3e8f8;
+}
+
+
+/* =========================================================
+   MODALS
+========================================================= */
+
+html[data-theme="light"] .admin-modal {
+    background:
+        rgba(
+            70,
+            45,
+            78,
+            0.32
+        );
+}
+
+
+html[data-theme="light"] .admin-modal__dialog {
+    color:
+        var(--admin-text);
+
+    background:
+        linear-gradient(
+            145deg,
+            #ffffff,
+            #f8effd
+        );
+
+    border-color:
+        rgba(
+            194,
+            24,
+            120,
+            0.20
+        );
+
+    box-shadow:
+        0
+        30px
+        90px
+        rgba(
+            72,
+            19,
+            93,
+            0.22
+        );
+}
+
+
+html[data-theme="light"] .admin-modal__header {
+    background:
+        rgba(
+            255,
+            251,
+            255,
+            0.96
+        );
+
+    border-bottom-color:
+        var(--admin-border);
+}
+
+
+html[data-theme="light"] .admin-modal__header h2 {
+    color:
+        var(--admin-text);
+}
+
+
+html[data-theme="light"] .admin-modal__close {
+    color:
+        var(--admin-text);
+
+    background:
+        var(--admin-panel-soft);
+
+    border-color:
+        var(--admin-border);
+}
+
+
+/* =========================================================
+   ARTWORKS
+========================================================= */
+
+html[data-theme="light"] .admin-artworks-filters button {
+    color:
+        var(--admin-text-secondary);
+
+    background:
+        var(--admin-panel);
+
+    border-color:
+        var(--admin-border);
+}
+
+
+html[data-theme="light"] .admin-artworks-filters button:hover,
+html[data-theme="light"] .admin-artworks-filter--active {
+    color:
+        var(--admin-text);
+
+    background:
+        var(--admin-panel-soft);
+
+    border-color:
+        rgba(
+            194,
+            24,
+            120,
+            0.24
+        );
+}
+
+
+html[data-theme="light"] .admin-artwork-card {
+    color:
+        var(--admin-text);
+
+    background:
+        linear-gradient(
+            145deg,
+            #ffffff,
+            #f9f0fd
+        );
+
+    border-color:
+        var(--admin-border);
+
+    box-shadow:
+        var(--admin-shadow);
+}
+
+
+html[data-theme="light"] .admin-artwork-card__media,
+html[data-theme="light"] .admin-artwork-form__media {
+    background:
+        #f2e6f7;
+
+    border-color:
+        var(--admin-border);
+}
+
+
+html[data-theme="light"] .admin-artwork-card__order,
+html[data-theme="light"] .admin-artwork-card__tags,
+html[data-theme="light"] .admin-artwork-card__switches label {
+    color:
+        var(--admin-text-secondary);
+
+    background:
+        var(--admin-panel-soft);
+
+    border-color:
+        var(--admin-border);
+}
+
+
+/* =========================================================
+   SUGGESTIONS
+========================================================= */
+
+html[data-theme="light"] .admin-suggestion-stat,
+html[data-theme="light"] .admin-suggestion-card,
+html[data-theme="light"] .admin-suggestion-card__user {
+    color:
+        var(--admin-text);
+
+    background:
+        var(--admin-panel);
+
+    border-color:
+        var(--admin-border);
+
+    box-shadow:
+        var(--admin-shadow);
+}
+
+
+html[data-theme="light"] .admin-suggestion-stat:hover,
+html[data-theme="light"] .admin-suggestion-stat--active {
+    background:
+        var(--admin-panel-soft);
+
+    border-color:
+        rgba(
+            194,
+            24,
+            120,
+            0.24
+        );
+}
+
+
+html[data-theme="light"] .admin-suggestion-category {
+    color:
+        #6d00a3;
+
+    background:
+        rgba(
+            109,
+            0,
+            163,
+            0.065
+        );
+
+    border-color:
+        rgba(
+            109,
+            0,
+            163,
+            0.20
+        );
+}
+
+
+html[data-theme="light"] .admin-suggestion-card__loading {
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            0.76
+        );
+
+    color:
+        var(--admin-text);
+}
+
+
+/* =========================================================
+   USERS
+========================================================= */
+
+html[data-theme="light"] .admin-user-stat,
+html[data-theme="light"] .admin-user-card {
+    color:
+        var(--admin-text);
+
+    background:
+        var(--admin-panel);
+
+    border-color:
+        var(--admin-border);
+
+    box-shadow:
+        var(--admin-shadow);
+}
+
+
+html[data-theme="light"] .admin-user-stat:hover,
+html[data-theme="light"] .admin-user-stat--active {
+    background:
+        var(--admin-panel-soft);
+
+    border-color:
+        rgba(
+            194,
+            24,
+            120,
+            0.24
+        );
+}
+
+
+html[data-theme="light"] .admin-user-card__meta > div {
+    color:
+        var(--admin-text-secondary);
+
+    background:
+        var(--admin-panel-soft);
+
+    border-color:
+        var(--admin-border);
+}
+
+
+html[data-theme="light"] .admin-user-card__loading {
+    color:
+        var(--admin-text);
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            0.78
+        );
+}
+
+
+/* =========================================================
+   ADMIN MESSAGES
+   Works with AdminMessages.vue scoped classes.
+========================================================= */
+
+html[data-theme="light"] .admin-messages__stats article,
+html[data-theme="light"] .admin-message-card,
+html[data-theme="light"] .admin-message-detail {
+    color:
+        var(--admin-text);
+
+    background:
+        var(--admin-panel);
+
+    border-color:
+        var(--admin-border);
+
+    box-shadow:
+        var(--admin-shadow);
+}
+
+
+html[data-theme="light"] .admin-message-card--selected,
+html[data-theme="light"] .admin-message-card:hover {
+    border-color:
+        var(--admin-accent);
+}
+
+
+html[data-theme="light"] .admin-message-detail__info,
+html[data-theme="light"] .admin-message-detail__message,
+html[data-theme="light"] .admin-message-action,
+html[data-theme="light"] .admin-message-detail textarea,
+html[data-theme="light"] .admin-messages__filters input,
+html[data-theme="light"] .admin-messages__filters select {
+    color:
+        var(--admin-text);
+
+    background:
+        var(--admin-panel-soft);
+
+    border-color:
+        var(--admin-border);
+}
+
+
+html[data-theme="light"] .admin-message-card__author,
+html[data-theme="light"] .admin-message-card__preview,
+html[data-theme="light"] .admin-message-card time,
+html[data-theme="light"] .admin-message-detail__info p,
+html[data-theme="light"] .admin-message-detail__message,
+html[data-theme="light"] .admin-messages__header p {
+    color:
+        var(--admin-text-secondary);
+}
+
+
+/* =========================================================
+   RESPONSIVE LIGHT SIDEBAR BORDER
+========================================================= */
+
+@media screen and (max-width: 780px) {
+
+    html[data-theme="light"] .admin-sidebar {
+        border-bottom-color:
+            var(--admin-border);
+    }
+
+}
+/* =========================================================
+   LIGHT MODE — USERS
+========================================================= */
+
+html[data-theme="light"] .admin-users {
+    color: #48135d;
+}
+
+
+/* =========================================================
+   USER CARD
+========================================================= */
+
+html[data-theme="light"] .admin-user-card {
+    color: #48135d;
+
+    background:
+        linear-gradient(
+            145deg,
+            #ffffff,
+            #fbf5ff
+        );
+
+    border-color:
+        rgba(
+            109,
+            0,
+            163,
+            0.18
+        );
+
+    box-shadow:
+        0
+        14px
+        34px
+        rgba(
+            72,
+            19,
+            93,
+            0.10
+        );
+}
+
+
+/* =========================================================
+   NAME
+========================================================= */
+
+html[data-theme="light"] .admin-user-card h3,
+html[data-theme="light"] .admin-user-card__name {
+    color: #48135d;
+}
+
+
+/* =========================================================
+   USERNAME
+========================================================= */
+
+html[data-theme="light"] .admin-user-card__username {
+    color: #008f91;
+}
+
+
+/* =========================================================
+   DESCRIPTION
+========================================================= */
+
+html[data-theme="light"] .admin-user-card__description,
+html[data-theme="light"] .admin-user-card p {
+    color: #74527f;
+}
+
+
+/* =========================================================
+   META BLOCKS
+========================================================= */
+
+html[data-theme="light"] .admin-user-card__meta > div {
+    color: #48135d;
+
+    background:
+        #f7eefb;
+
+    border-color:
+        rgba(
+            109,
+            0,
+            163,
+            0.16
+        );
+}
+
+
+html[data-theme="light"] .admin-user-card__meta span,
+html[data-theme="light"] .admin-user-card__meta small {
+    color: #8b6b95;
+}
+
+
+html[data-theme="light"] .admin-user-card__meta strong {
+    color: #48135d;
+}
+
+
+/* =========================================================
+   ROLE SECTION
+========================================================= */
+
+html[data-theme="light"] .admin-user-card__role {
+    color: #48135d;
+}
+
+
+html[data-theme="light"] .admin-user-card__role strong {
+    color: #48135d;
+}
+
+
+html[data-theme="light"] .admin-user-card__role p,
+html[data-theme="light"] .admin-user-card__role span {
+    color: #74527f;
+}
+
+
+/* =========================================================
+   SELECT
+========================================================= */
+
+html[data-theme="light"] .admin-user-role-select {
+    color: #48135d;
+
+    background:
+        #ffffff;
+
+    border-color:
+        rgba(
+            109,
+            0,
+            163,
+            0.18
+        );
+}
+
+
+html[data-theme="light"] .admin-user-role-select option {
+    color: #48135d;
+
+    background:
+        #ffffff;
+}
+
+
+/* =========================================================
+   BADGES
+========================================================= */
+
+html[data-theme="light"] .admin-user-card__badge {
+    color: #6d00a3;
+
+    background:
+        rgba(
+            109,
+            0,
+            163,
+            0.06
+        );
+
+    border-color:
+        rgba(
+            109,
+            0,
+            163,
+            0.18
+        );
+}
+
+
+/* =========================================================
+   ADMIN BADGE
+========================================================= */
+
+html[data-theme="light"] .admin-user-card__badge--admin {
+    color: #c21878;
+
+    background:
+        rgba(
+            242,
+            34,
+            146,
+            0.07
+        );
+
+    border-color:
+        rgba(
+            242,
+            34,
+            146,
+            0.25
+        );
+}
+/* =========================================================
+   LIGHT MODE — FORCE TEXT USER CARD
+========================================================= */
+
+html[data-theme="light"] .admin-user-card {
+    color:
+        #48135d !important;
+}
+
+
+/*
+ * On retire les couleurs blanches forcées
+ * dans tous les éléments de la carte.
+ */
+html[data-theme="light"] .admin-user-card * {
+    color:
+        inherit;
+}
+
+
+/* =========================================================
+   TEXTES SECONDAIRES
+========================================================= */
+
+html[data-theme="light"] .admin-user-card p,
+html[data-theme="light"] .admin-user-card small,
+html[data-theme="light"] .admin-user-card__description,
+html[data-theme="light"] .admin-user-card__bio,
+html[data-theme="light"] .admin-user-card__role-description,
+html[data-theme="light"] .admin-user-card__role-help,
+html[data-theme="light"] .admin-user-card__role-info,
+html[data-theme="light"] .admin-user-card__role-warning {
+    color:
+        #74527f !important;
+}
+
+
+/* =========================================================
+   USERNAME
+========================================================= */
+
+html[data-theme="light"] .admin-user-card__username {
+    color:
+        #008f91 !important;
+}
+
+
+/* =========================================================
+   TITRES
+========================================================= */
+
+html[data-theme="light"] .admin-user-card h2,
+html[data-theme="light"] .admin-user-card h3,
+html[data-theme="light"] .admin-user-card h4,
+html[data-theme="light"] .admin-user-card strong {
+    color:
+        #48135d !important;
+}
+
+
+/* =========================================================
+   ADMIN BADGE
+========================================================= */
+
+html[data-theme="light"] .admin-user-card__badge,
+html[data-theme="light"] .admin-user-role-badge {
+    color:
+        #c21878 !important;
+}
+
+
+/* =========================================================
+   SELECT ROLE
+========================================================= */
+
+html[data-theme="light"] .admin-user-card select,
+html[data-theme="light"] .admin-user-role-select {
+    color:
+        #48135d !important;
+
+    background:
+        #ffffff !important;
+
+    border-color:
+        rgba(
+            109,
+            0,
+            163,
+            0.18
+        ) !important;
+}
+
+
+html[data-theme="light"] .admin-user-card select option {
+    color:
+        #48135d !important;
+
+    background:
+        #ffffff !important;
 }

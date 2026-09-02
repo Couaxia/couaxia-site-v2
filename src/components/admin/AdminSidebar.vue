@@ -11,6 +11,7 @@ export type AdminTab =
     | "suggestions"
     | "users"
     | "artworks"
+    | "messages"
     | "announcements";
 
 
@@ -134,6 +135,17 @@ const items:
 
             icon:
                 "🎨"
+        },
+
+        {
+            id:
+                "messages",
+
+            label:
+                "Messages",
+
+            icon:
+                "📬"
         },
 
         {

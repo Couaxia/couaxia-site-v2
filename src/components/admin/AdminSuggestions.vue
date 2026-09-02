@@ -1460,7 +1460,7 @@ onMounted(
 
 </template>
 
-<style scoped>
+<style>
 
 /* =========================================================
    SUGGESTION USER
@@ -1770,5 +1770,229 @@ onMounted(
     }
 
 }
+
+
+/* =========================================================
+   LIGHT MODE — ADMIN SUGGESTIONS
+========================================================= */
+
+html[data-theme="light"] .admin-suggestions {
+    color: #48135d;
+}
+
+html[data-theme="light"] .admin-suggestions .admin-section-header {
+    border-bottom-color: rgba(109, 0, 163, 0.16);
+}
+
+html[data-theme="light"] .admin-suggestions .admin-section-eyebrow {
+    color: #008f91;
+}
+
+html[data-theme="light"] .admin-suggestions .admin-section-header h2 {
+    color: #48135d;
+}
+
+html[data-theme="light"] .admin-suggestions .admin-section-header p {
+    color: #74527f;
+}
+
+html[data-theme="light"] .admin-suggestion-stat {
+    color: #48135d;
+    background: linear-gradient(145deg, #ffffff, #f8effd);
+    border-color: rgba(109, 0, 163, 0.18);
+    box-shadow: 0 14px 34px rgba(72, 19, 93, 0.10);
+}
+
+html[data-theme="light"] .admin-suggestion-stat span {
+    color: #74527f;
+}
+
+html[data-theme="light"] .admin-suggestion-stat strong {
+    color: #48135d;
+}
+
+html[data-theme="light"] .admin-suggestion-stat:hover,
+html[data-theme="light"] .admin-suggestion-stat--active {
+    color: #48135d;
+    background: linear-gradient(145deg, #f8effd, #f3e5fa);
+    border-color: rgba(194, 24, 120, 0.28);
+}
+
+html[data-theme="light"] .admin-suggestions .admin-search {
+    background: #ffffff;
+    border-color: rgba(109, 0, 163, 0.18);
+    box-shadow: 0 10px 26px rgba(72, 19, 93, 0.07);
+}
+
+html[data-theme="light"] .admin-suggestions .admin-search input {
+    color: #48135d;
+}
+
+html[data-theme="light"] .admin-suggestions .admin-search input::placeholder {
+    color: #9b82a3;
+}
+
+html[data-theme="light"] .admin-suggestions-filter,
+html[data-theme="light"] .admin-suggestions .admin-select {
+    color: #48135d;
+    background: #ffffff;
+    border-color: rgba(109, 0, 163, 0.18);
+}
+
+html[data-theme="light"] .admin-suggestions-filter option,
+html[data-theme="light"] .admin-suggestions .admin-select option {
+    color: #48135d;
+    background: #ffffff;
+}
+
+html[data-theme="light"] .admin-suggestions .admin-message--success {
+    color: #087c68;
+    background: rgba(8, 124, 104, 0.07);
+    border-color: rgba(8, 124, 104, 0.24);
+}
+
+html[data-theme="light"] .admin-suggestions .admin-message--error {
+    color: #c62563;
+    background: rgba(198, 37, 99, 0.07);
+    border-color: rgba(198, 37, 99, 0.25);
+}
+
+html[data-theme="light"] .admin-suggestions .admin-loading,
+html[data-theme="light"] .admin-suggestions .admin-empty {
+    color: #74527f;
+    background: #ffffff;
+    border-color: rgba(109, 0, 163, 0.16);
+    box-shadow: 0 14px 32px rgba(72, 19, 93, 0.08);
+}
+
+html[data-theme="light"] .admin-suggestions .admin-empty h3 {
+    color: #48135d;
+}
+
+html[data-theme="light"] .admin-suggestions .admin-empty p {
+    color: #74527f;
+}
+
+html[data-theme="light"] .admin-suggestion-card {
+    color: #48135d;
+    background: linear-gradient(145deg, #ffffff, #fbf6ff);
+    border-color: rgba(109, 0, 163, 0.18);
+    box-shadow: 0 16px 38px rgba(72, 19, 93, 0.10);
+}
+
+html[data-theme="light"] .admin-suggestion-card:hover {
+    border-color: rgba(194, 24, 120, 0.25);
+}
+
+html[data-theme="light"] .admin-suggestion-card__top time {
+    color: #9b82a3 !important;
+}
+
+html[data-theme="light"] .admin-suggestion-card__content h3 {
+    color: #48135d !important;
+}
+
+html[data-theme="light"] .admin-suggestion-card__content p {
+    color: #74527f !important;
+}
+
+html[data-theme="light"] .admin-suggestion-card__empty-description {
+    color: #9b82a3 !important;
+}
+
+html[data-theme="light"] .admin-suggestion-category {
+    color: #6d00a3 !important;
+    background: rgba(109, 0, 163, 0.06);
+    border-color: rgba(109, 0, 163, 0.18);
+}
+
+html[data-theme="light"] .admin-suggestion-status--pending {
+    color: #8a5a00 !important;
+    background: rgba(255, 187, 0, 0.08);
+    border-color: rgba(150, 100, 0, 0.22);
+}
+
+html[data-theme="light"] .admin-suggestion-status--approved {
+    color: #087c68 !important;
+    background: rgba(8, 124, 104, 0.07);
+    border-color: rgba(8, 124, 104, 0.24);
+}
+
+html[data-theme="light"] .admin-suggestion-status--rejected {
+    color: #c62563 !important;
+    background: rgba(198, 37, 99, 0.07);
+    border-color: rgba(198, 37, 99, 0.24);
+}
+
+html[data-theme="light"] .admin-suggestion-card__user {
+    color: #48135d;
+    background: #ffffff;
+    border-color: rgba(109, 0, 163, 0.16);
+    box-shadow: 0 8px 22px rgba(72, 19, 93, 0.06);
+}
+
+html[data-theme="light"] .admin-suggestion-card__user-avatar {
+    background: rgba(109, 0, 163, 0.08);
+    border-color: rgba(109, 0, 163, 0.16);
+}
+
+html[data-theme="light"] .admin-suggestion-card__user-info small {
+    color: #008f91 !important;
+}
+
+html[data-theme="light"] .admin-suggestion-card__user-info strong {
+    color: #48135d !important;
+}
+
+html[data-theme="light"] .admin-suggestion-card__username {
+    color: #74527f !important;
+}
+
+html[data-theme="light"] .admin-suggestion-card__user-id,
+html[data-theme="light"] .admin-suggestion-card__anonymous {
+    color: #9b82a3 !important;
+}
+
+html[data-theme="light"] .admin-suggestion-card__actions {
+    border-top-color: rgba(109, 0, 163, 0.12);
+}
+
+html[data-theme="light"] .admin-suggestion-card__actions .admin-button--secondary {
+    color: #48135d !important;
+    background: #ffffff;
+    border-color: rgba(109, 0, 163, 0.18);
+}
+
+html[data-theme="light"] .admin-suggestion-card__actions .admin-button--success {
+    color: #087c68 !important;
+    background: rgba(8, 124, 104, 0.07);
+    border-color: rgba(8, 124, 104, 0.24);
+}
+
+html[data-theme="light"] .admin-suggestion-card__actions .admin-button--warning {
+    color: #8a5a00 !important;
+    background: rgba(255, 187, 0, 0.08);
+    border-color: rgba(150, 100, 0, 0.22);
+}
+
+html[data-theme="light"] .admin-suggestion-card__actions .admin-button--danger {
+    color: #c62563 !important;
+    background: rgba(198, 37, 99, 0.06);
+    border-color: rgba(198, 37, 99, 0.24);
+}
+
+html[data-theme="light"] .admin-suggestion-card__actions .admin-button--primary {
+    color: #ffffff !important;
+}
+
+html[data-theme="light"] .admin-suggestion-card__actions button:disabled {
+    opacity: 0.52;
+}
+
+html[data-theme="light"] .admin-suggestion-card__loading {
+    color: #48135d;
+    background: rgba(255, 255, 255, 0.78);
+}
+
 
 </style>

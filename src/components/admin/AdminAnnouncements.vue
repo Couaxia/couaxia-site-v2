@@ -1664,7 +1664,7 @@ onMounted(
 </template>
 
 
-<style scoped>
+<style>
 
 .admin-announcements {
     display: flex;
@@ -2153,5 +2153,379 @@ button:disabled {
     }
 
 }
+
+
+/* =========================================================
+   LIGHT MODE
+========================================================= */
+
+html[data-theme="light"] .admin-announcements {
+    color: #48135d;
+}
+
+
+/* =========================================================
+   LIGHT MODE — HEADER
+========================================================= */
+
+html[data-theme="light"] .admin-announcements__header {
+    border-bottom-color: rgba(109, 0, 163, 0.16);
+}
+
+html[data-theme="light"] .admin-announcements__eyebrow {
+    color: #008f91;
+}
+
+html[data-theme="light"] .admin-announcements__header h1 {
+    color: #48135d;
+}
+
+html[data-theme="light"] .admin-announcements__header p {
+    color: #74527f;
+}
+
+
+/* =========================================================
+   LIGHT MODE — ALERTS
+========================================================= */
+
+html[data-theme="light"] .admin-announcements__alert--error {
+    color: #c62563;
+    background: rgba(198, 37, 99, 0.07);
+    border-color: rgba(198, 37, 99, 0.25);
+}
+
+html[data-theme="light"] .admin-announcements__alert--success {
+    color: #087c68;
+    background: rgba(8, 124, 104, 0.07);
+    border-color: rgba(8, 124, 104, 0.24);
+}
+
+
+/* =========================================================
+   LIGHT MODE — STATS
+========================================================= */
+
+html[data-theme="light"] .admin-announcements__stats article {
+    background:
+        linear-gradient(
+            145deg,
+            #ffffff,
+            #f8effd
+        );
+
+    border-color: rgba(109, 0, 163, 0.18);
+
+    box-shadow:
+        0
+        14px
+        34px
+        rgba(72, 19, 93, 0.10);
+}
+
+html[data-theme="light"] .admin-announcements__stats span {
+    color: #74527f;
+}
+
+html[data-theme="light"] .admin-announcements__stats strong {
+    color: #48135d;
+}
+
+
+/* =========================================================
+   LIGHT MODE — SEARCH / FILTER
+========================================================= */
+
+html[data-theme="light"] .admin-announcements__search {
+    background: #ffffff;
+    border-color: rgba(109, 0, 163, 0.18);
+
+    box-shadow:
+        0
+        10px
+        26px
+        rgba(72, 19, 93, 0.07);
+}
+
+html[data-theme="light"] .admin-announcements__search input {
+    color: #48135d;
+}
+
+html[data-theme="light"] .admin-announcements__search input::placeholder {
+    color: #9b82a3;
+}
+
+html[data-theme="light"] .admin-announcements__filter {
+    color: #48135d;
+    background: #ffffff;
+    border-color: rgba(109, 0, 163, 0.18);
+}
+
+html[data-theme="light"] .admin-announcements__filter option {
+    color: #48135d;
+    background: #ffffff;
+}
+
+
+/* =========================================================
+   LIGHT MODE — EMPTY
+========================================================= */
+
+html[data-theme="light"] .admin-announcements__empty {
+    color: #74527f;
+    background: rgba(255, 255, 255, 0.72);
+    border-color: rgba(109, 0, 163, 0.18);
+
+    box-shadow:
+        0
+        12px
+        28px
+        rgba(72, 19, 93, 0.07);
+}
+
+html[data-theme="light"] .admin-announcements__empty strong {
+    color: #48135d;
+}
+
+
+/* =========================================================
+   LIGHT MODE — ANNOUNCEMENT CARDS
+========================================================= */
+
+html[data-theme="light"] .announcement-card {
+    color: #48135d;
+
+    background:
+        linear-gradient(
+            145deg,
+            #ffffff,
+            #f8effd
+        );
+
+    border-color: rgba(109, 0, 163, 0.18);
+
+    box-shadow:
+        0
+        16px
+        38px
+        rgba(72, 19, 93, 0.10);
+}
+
+html[data-theme="light"] .announcement-card--pinned {
+    border-color: rgba(0, 143, 145, 0.28);
+}
+
+html[data-theme="light"] .announcement-card--important {
+    box-shadow:
+        inset 4px 0 0 #c62563,
+        0
+        16px
+        38px
+        rgba(72, 19, 93, 0.10);
+}
+
+html[data-theme="light"] .announcement-card__icon {
+    background: rgba(109, 0, 163, 0.07);
+    border-color: rgba(109, 0, 163, 0.18);
+}
+
+html[data-theme="light"] .announcement-card__top h2 {
+    color: #48135d;
+}
+
+html[data-theme="light"] .announcement-card__badges span {
+    color: #74527f;
+    background: rgba(109, 0, 163, 0.035);
+    border-color: rgba(109, 0, 163, 0.14);
+}
+
+html[data-theme="light"] .announcement-card__badges .is-published {
+    color: #008f91;
+}
+
+html[data-theme="light"] .announcement-card__badges .is-draft {
+    color: #8a5a00;
+}
+
+html[data-theme="light"] .announcement-card__badges .is-important {
+    color: #c62563;
+}
+
+html[data-theme="light"] .announcement-card__message {
+    color: #74527f;
+}
+
+html[data-theme="light"] .announcement-card__meta {
+    color: #9b82a3;
+}
+
+
+/* =========================================================
+   LIGHT MODE — CARD ACTIONS
+========================================================= */
+
+html[data-theme="light"] .announcement-card__actions button,
+html[data-theme="light"] .announcement-form__actions button {
+    color: #48135d;
+    background: #ffffff;
+    border-color: rgba(109, 0, 163, 0.18);
+}
+
+html[data-theme="light"] .announcement-card__actions button:hover,
+html[data-theme="light"] .announcement-form__actions button:hover {
+    background: #f6eefe;
+    border-color: rgba(194, 24, 120, 0.25);
+}
+
+html[data-theme="light"] .announcement-card__actions .is-danger {
+    color: #c62563;
+    background: rgba(198, 37, 99, 0.055);
+    border-color: rgba(198, 37, 99, 0.24);
+}
+
+
+/* =========================================================
+   LIGHT MODE — MODAL
+========================================================= */
+
+html[data-theme="light"] .announcement-modal {
+    background: rgba(72, 19, 93, 0.28);
+}
+
+html[data-theme="light"] .announcement-modal__dialog {
+    color: #48135d;
+
+    background:
+        linear-gradient(
+            145deg,
+            #ffffff,
+            #f8effd
+        );
+
+    border-color: rgba(109, 0, 163, 0.20);
+
+    box-shadow:
+        0
+        28px
+        80px
+        rgba(72, 19, 93, 0.22);
+}
+
+html[data-theme="light"] .announcement-modal__header {
+    background: rgba(255, 251, 255, 0.97);
+    border-bottom-color: rgba(109, 0, 163, 0.15);
+}
+
+html[data-theme="light"] .announcement-modal__header span {
+    color: #008f91;
+}
+
+html[data-theme="light"] .announcement-modal__header h2 {
+    color: #48135d;
+}
+
+html[data-theme="light"] .announcement-modal__header > button {
+    color: #48135d;
+    background: #f7eefb;
+    border-color: rgba(109, 0, 163, 0.16);
+}
+
+
+/* =========================================================
+   LIGHT MODE — FORM
+========================================================= */
+
+html[data-theme="light"] .announcement-form {
+    color: #48135d;
+}
+
+html[data-theme="light"] .announcement-form label {
+    color: #48135d;
+}
+
+html[data-theme="light"] .announcement-form input,
+html[data-theme="light"] .announcement-form textarea,
+html[data-theme="light"] .announcement-form select {
+    color: #48135d;
+    background: #ffffff;
+    border-color: rgba(109, 0, 163, 0.18);
+}
+
+html[data-theme="light"] .announcement-form input::placeholder,
+html[data-theme="light"] .announcement-form textarea::placeholder {
+    color: #9b82a3;
+}
+
+html[data-theme="light"] .announcement-form select option {
+    color: #48135d;
+    background: #ffffff;
+}
+
+html[data-theme="light"] .announcement-form small {
+    color: #74527f;
+}
+
+html[data-theme="light"] .announcement-form__options label {
+    color: #48135d;
+    background: #f7eefb;
+    border-color: rgba(109, 0, 163, 0.16);
+}
+
+html[data-theme="light"] .announcement-form__advanced {
+    background: rgba(255, 255, 255, 0.58);
+    border-color: rgba(109, 0, 163, 0.16);
+}
+
+html[data-theme="light"] .announcement-form__advanced summary {
+    color: #48135d;
+}
+
+html[data-theme="light"] .announcement-form__actions {
+    border-top-color: rgba(109, 0, 163, 0.13);
+}
+
+html[data-theme="light"] .announcement-form__actions .is-primary {
+    color: #ffffff;
+
+    background:
+        linear-gradient(
+            135deg,
+            #9f20ff,
+            #f000ad
+        );
+
+    border-color: rgba(255, 0, 174, 0.7);
+}
+
+
+/* =========================================================
+   LIGHT MODE — PREVIEW
+========================================================= */
+
+html[data-theme="light"] .announcement-form__preview,
+html[data-theme="light"] .announcement-card__image {
+    background: #efe4f4;
+}
+
+
+/* =========================================================
+   LIGHT MODE — FOCUS
+========================================================= */
+
+html[data-theme="light"] .announcement-form input:focus,
+html[data-theme="light"] .announcement-form textarea:focus,
+html[data-theme="light"] .announcement-form select:focus,
+html[data-theme="light"] .admin-announcements__filter:focus,
+html[data-theme="light"] .admin-announcements__search:focus-within {
+    border-color: rgba(194, 24, 120, 0.45);
+
+    box-shadow:
+        0
+        0
+        0
+        3px
+        rgba(194, 24, 120, 0.08);
+}
+
 
 </style>
