@@ -133,7 +133,6 @@ const recommendationGroups =
                 "petiteorca",
                 "piikanva",
                 "rybyabyss",
-                "selini_s",
                 "sorine_e",
                 "subbarath",
                 "vaxiria",

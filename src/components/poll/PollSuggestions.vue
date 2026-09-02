@@ -428,7 +428,7 @@ async function submitSuggestion() {
 
 
         sendMascotMessage(
-            "Une nouvelle idée pour les sondages ! Je transmets ça à Couaxia. 💡🐙"
+            "Votre réponse sera dans votre profil POUP 💜"
         );
 
     }
