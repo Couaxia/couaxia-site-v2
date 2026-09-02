@@ -19,6 +19,10 @@ import {
     type CreditRow
 } from "../../services/credits.service";
 
+import {
+    supabase
+} from "../../lib/supabase";
+
 
 /* =========================================================
    TYPES
@@ -84,6 +88,32 @@ const highlightedArtworkId =
     ref<string | number | null>(
         null
     );
+
+
+/* =========================================================
+   AUTH / LIKES
+========================================================= */
+
+const currentUserId =
+    ref<string | null>(
+        null
+    );
+
+
+const togglingLikeIds =
+    ref<Set<string>>(
+        new Set()
+    );
+
+
+let authSubscription:
+    {
+        unsubscribe:
+            () => void;
+    }
+    |
+    null =
+        null;
 
 
 /* =========================================================
@@ -730,6 +760,277 @@ const resultCount =
 
 
 /* =========================================================
+   MASCOT MESSAGE
+========================================================= */
+
+function sendMascotMessage(
+    message:
+        string
+) {
+
+    if (
+        !message.trim()
+    ) {
+
+        return;
+
+    }
+
+
+    window.dispatchEvent(
+        new CustomEvent(
+            "couaxia-mascot-message",
+            {
+                detail: {
+                    message
+                }
+            }
+        )
+    );
+
+}
+
+
+/* =========================================================
+   CURRENT USER
+========================================================= */
+
+async function loadCurrentUser():
+    Promise<void> {
+
+    const {
+        data,
+        error
+    } =
+        await supabase
+            .auth
+            .getUser();
+
+
+    if (
+        error
+    ) {
+
+        currentUserId.value =
+            null;
+
+
+        return;
+
+    }
+
+
+    currentUserId.value =
+        data.user?.id
+        ??
+        null;
+
+}
+
+
+/* =========================================================
+   LOAD LIKES
+========================================================= */
+
+async function loadArtworkLikes():
+    Promise<void> {
+
+    /*
+     * On remet toujours les compteurs à zéro avant
+     * de recharger les données Supabase.
+     */
+
+    artworks.value.forEach(
+        artwork => {
+
+            artwork.likes =
+                0;
+
+
+            artwork.liked =
+                false;
+
+        }
+    );
+
+
+    if (
+        artworks.value.length ===
+        0
+    ) {
+
+        return;
+
+    }
+
+
+    const artworkIds =
+        artworks.value.map(
+            artwork =>
+                String(
+                    artwork.id
+                )
+        );
+
+
+    const {
+        data,
+        error
+    } =
+        await supabase
+            .from(
+                "artwork_likes"
+            )
+            .select(
+                "artwork_id,user_id"
+            )
+            .in(
+                "artwork_id",
+                artworkIds
+            );
+
+
+    if (
+        error
+    ) {
+
+        console.error(
+            "Erreur récupération likes artworks :",
+            error
+        );
+
+
+        /*
+         * Si la table existe mais que SELECT est refusé,
+         * on ne casse pas toute la galerie.
+         */
+
+        return;
+
+    }
+
+
+    const rows =
+        data
+        ??
+        [];
+
+
+    const counts =
+        new Map<
+            string,
+            number
+        >();
+
+
+    const likedByCurrentUser =
+        new Set<string>();
+
+
+    rows.forEach(
+        row => {
+
+            const artworkId =
+                String(
+                    row.artwork_id
+                );
+
+
+            counts.set(
+                artworkId,
+                (
+                    counts.get(
+                        artworkId
+                    )
+                    ??
+                    0
+                )
+                +
+                1
+            );
+
+
+            if (
+                currentUserId.value
+                &&
+                row.user_id ===
+                currentUserId.value
+            ) {
+
+                likedByCurrentUser.add(
+                    artworkId
+                );
+
+            }
+
+        }
+    );
+
+
+    artworks.value.forEach(
+        artwork => {
+
+            const artworkId =
+                String(
+                    artwork.id
+                );
+
+
+            artwork.likes =
+                counts.get(
+                    artworkId
+                )
+                ??
+                0;
+
+
+            artwork.liked =
+                likedByCurrentUser.has(
+                    artworkId
+                );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   AUTH CHANGES
+========================================================= */
+
+function subscribeToAuth() {
+
+    const {
+        data
+    } =
+        supabase
+            .auth
+            .onAuthStateChange(
+                async (
+                    _event,
+                    session
+                ) => {
+
+                    currentUserId.value =
+                        session?.user?.id
+                        ??
+                        null;
+
+
+                    await loadArtworkLikes();
+
+                }
+            );
+
+
+    authSubscription =
+        data.subscription;
+
+}
+
+
+/* =========================================================
    LOAD ARTWORKS
 ========================================================= */
 
@@ -761,6 +1062,12 @@ async function loadArtworks():
                             artwork.imageUrl
                         )
                 );
+
+
+        await loadCurrentUser();
+
+
+        await loadArtworkLikes();
 
 
         console.table(
@@ -866,10 +1173,11 @@ function handleFilterEvent(
    LIKE
 ========================================================= */
 
-function toggleLike(
+async function toggleLike(
     selectedArtwork:
         CreditArtwork
-) {
+):
+    Promise<void> {
 
     const artwork =
         artworks.value.find(
@@ -897,9 +1205,55 @@ function toggleLike(
     }
 
 
+    if (
+        !currentUserId.value
+    ) {
+
+        sendMascotMessage(
+            "Connecte-toi pour garder tes arts favoris ! 💜"
+        );
+
+
+        return;
+
+    }
+
+
+    const artworkId =
+        String(
+            artwork.id
+        );
+
+
+    if (
+        togglingLikeIds.value.has(
+            artworkId
+        )
+    ) {
+
+        return;
+
+    }
+
+
+    togglingLikeIds.value =
+        new Set([
+            ...togglingLikeIds.value,
+            artworkId
+        ]);
+
+
     const wasLiked =
         artwork.liked;
 
+
+    const previousLikes =
+        artwork.likes;
+
+
+    /*
+     * Mise à jour immédiate de l'interface.
+     */
 
     artwork.liked =
         !wasLiked;
@@ -908,8 +1262,8 @@ function toggleLike(
     artwork.likes =
         Math.max(
             0,
-
-            artwork.likes +
+            previousLikes
+            +
             (
                 wasLiked
                     ? -1
@@ -917,12 +1271,142 @@ function toggleLike(
             )
         );
 
+
+    try {
+
+        if (
+            wasLiked
+        ) {
+
+            const {
+                error
+            } =
+                await supabase
+                    .from(
+                        "artwork_likes"
+                    )
+                    .delete()
+                    .eq(
+                        "user_id",
+                        currentUserId.value
+                    )
+                    .eq(
+                        "artwork_id",
+                        artworkId
+                    );
+
+
+            if (
+                error
+            ) {
+
+                throw error;
+
+            }
+
+        }
+
+        else {
+
+            const {
+                error
+            } =
+                await supabase
+                    .from(
+                        "artwork_likes"
+                    )
+                    .upsert(
+                        {
+                            user_id:
+                                currentUserId.value,
+
+                            artwork_id:
+                                artworkId
+                        },
+                        {
+                            onConflict:
+                                "user_id,artwork_id",
+
+                            ignoreDuplicates:
+                                true
+                        }
+                    );
+
+
+            if (
+                error
+            ) {
+
+                throw error;
+
+            }
+
+        }
+
+
+        /*
+         * On recharge depuis Supabase après l'écriture.
+         * Ainsi le compteur et l'état du cœur reflètent
+         * exactement les données réellement enregistrées.
+         */
+
+        await loadArtworkLikes();
+
+    }
+
+    catch (
+        error
+    ) {
+
+        console.error(
+            "Erreur sauvegarde like artwork :",
+            error
+        );
+
+
+        /*
+         * Rollback visuel si Supabase refuse l'opération.
+         */
+
+        artwork.liked =
+            wasLiked;
+
+
+        artwork.likes =
+            previousLikes;
+
+
+        sendMascotMessage(
+            "Oups, je n'ai pas réussi à enregistrer ce favori. 🥺"
+        );
+
+    }
+
+    finally {
+
+        const nextIds =
+            new Set(
+                togglingLikeIds.value
+            );
+
+
+        nextIds.delete(
+            artworkId
+        );
+
+
+        togglingLikeIds.value =
+            nextIds;
+
+    }
+
 }
 
 
 /* =========================================================
    OPEN ARTWORK
 ========================================================= */
+
 
 function openArtwork(
     artwork:
@@ -1204,7 +1688,10 @@ onMounted(
         );
 
 
-        loadArtworks();
+        void loadArtworks();
+
+
+        subscribeToAuth();
 
     }
 );
@@ -1227,6 +1714,14 @@ onBeforeUnmount(
             "couaxia-credits-random",
             handleRandomEvent
         );
+
+
+        authSubscription
+            ?.unsubscribe();
+
+
+        authSubscription =
+            null;
 
     }
 );
