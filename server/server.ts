@@ -83,8 +83,8 @@ const indexPath =
         distPath,
         "index.html"
     );
-
-
+import cors from "cors";
+import "dotenv/config";
 /* =========================================================
    TRUST PROXY — RENDER
 ========================================================= */

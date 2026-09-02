@@ -82,7 +82,7 @@ interface RawTwitchGame {
 ========================================================= */
 
 const TWITCH_GAMES_API =
-    "/api/twitch/games";
+    "https://couaxia-api.onrender.com/api/twitch/games";
 
 
 /* =========================================================

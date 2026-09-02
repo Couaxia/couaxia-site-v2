@@ -37,6 +37,7 @@ const HOST = "0.0.0.0";
  */
 const distPath = path.resolve(process.cwd(), "dist");
 const indexPath = path.join(distPath, "index.html");
+import "dotenv/config";
 /* =========================================================
    TRUST PROXY — RENDER
 ========================================================= */
