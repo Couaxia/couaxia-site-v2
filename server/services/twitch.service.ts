@@ -3,68 +3,162 @@
 ========================================================= */
 
 interface TwitchTokenResponse {
-    access_token: string;
-    expires_in: number;
-    token_type: string;
+
+    access_token:
+        string;
+
+    expires_in:
+        number;
+
+    token_type:
+        string;
+
 }
 
 
+/* =========================================================
+   TWITCH USER
+========================================================= */
+
 interface TwitchUser {
-    id: string;
-    login: string;
-    display_name: string;
-    profile_image_url: string;
-    offline_image_url: string;
+
+    id:
+        string;
+
+    login:
+        string;
+
+    display_name:
+        string;
+
+    description:
+        string;
+
+    profile_image_url:
+        string;
+
+    offline_image_url:
+        string;
+
+    broadcaster_type:
+        string;
+
+    created_at:
+        string;
+
 }
 
 
 interface TwitchUsersResponse {
-    data: TwitchUser[];
+
+    data:
+        TwitchUser[];
+
 }
 
 
+/* =========================================================
+   TWITCH STREAM
+========================================================= */
+
 interface TwitchStream {
-    id: string;
-    user_id: string;
-    user_login: string;
-    user_name: string;
-    game_id: string;
-    game_name: string;
-    type: string;
-    title: string;
-    viewer_count: number;
-    started_at: string;
-    language: string;
-    thumbnail_url: string;
-    is_mature: boolean;
+
+    id:
+        string;
+
+    user_id:
+        string;
+
+    user_login:
+        string;
+
+    user_name:
+        string;
+
+    game_id:
+        string;
+
+    game_name:
+        string;
+
+    type:
+        string;
+
+    title:
+        string;
+
+    viewer_count:
+        number;
+
+    started_at:
+        string;
+
+    language:
+        string;
+
+    thumbnail_url:
+        string;
+
+    is_mature:
+        boolean;
+
 }
 
 
 interface TwitchStreamsResponse {
-    data: TwitchStream[];
+
+    data:
+        TwitchStream[];
+
 }
 
+
+/* =========================================================
+   FOLLOWERS
+========================================================= */
 
 interface TwitchFollowersResponse {
-    total: number;
 
-    data: Array<{
-        user_id: string;
-        user_login: string;
-        user_name: string;
-        followed_at: string;
-    }>;
+    total:
+        number;
+
+    data:
+        Array<{
+
+            user_id:
+                string;
+
+            user_login:
+                string;
+
+            user_name:
+                string;
+
+            followed_at:
+                string;
+
+        }>;
+
 }
 
 
-interface TwitchRecommendation {
-    login: string;
+/* =========================================================
+   RECOMMENDATIONS
+========================================================= */
 
-    displayName: string;
+export interface TwitchRecommendation {
 
-    avatar: string;
+    login:
+        string;
 
-    url: string;
+    displayName:
+        string;
+
+    avatar:
+        string;
+
+    url:
+        string;
 
     status:
         | "online"
@@ -78,43 +172,61 @@ interface TwitchRecommendation {
 
     title:
         string | null;
+
 }
 
 
 /* =========================================================
-   CLIPS TYPES
+   CLIPS
 ========================================================= */
 
 interface TwitchClip {
-    id: string;
 
-    url: string;
+    id:
+        string;
 
-    embed_url: string;
+    url:
+        string;
 
-    broadcaster_id: string;
+    embed_url:
+        string;
 
-    broadcaster_name: string;
+    broadcaster_id:
+        string;
 
-    creator_id: string;
+    broadcaster_name:
+        string;
 
-    creator_name: string;
+    creator_id:
+        string;
 
-    video_id: string;
+    creator_name:
+        string;
 
-    game_id: string;
+    video_id:
+        string;
 
-    language: string;
+    game_id:
+        string;
 
-    title: string;
+    language:
+        string;
 
-    view_count: number;
+    title:
+        string;
 
-    created_at: string;
+    view_count:
+        number;
 
-    thumbnail_url: string;
+    created_at:
+        string;
 
-    duration: number;
+    thumbnail_url:
+        string;
+
+    duration:
+        number;
+
 }
 
 
@@ -123,78 +235,162 @@ interface TwitchClipsResponse {
     data:
         TwitchClip[];
 
-    pagination: {
-        cursor?: string;
-    };
+    pagination?:
+        {
+
+            cursor?:
+                string;
+
+        };
 
 }
+
+
 /* =========================================================
-   VIDEO
+   VIDEOS
 ========================================================= */
 
 interface TwitchVideo {
-    id: string;
-    stream_id: string | null;
 
-    user_id: string;
-    user_login: string;
-    user_name: string;
+    id:
+        string;
 
-    title: string;
-    description: string;
+    stream_id:
+        string | null;
 
-    created_at: string;
-    published_at: string;
+    user_id:
+        string;
 
-    url: string;
+    user_login:
+        string;
 
-    thumbnail_url: string;
+    user_name:
+        string;
 
-    viewable: string;
+    title:
+        string;
 
-    view_count: number;
+    description:
+        string;
 
-    language: string;
+    created_at:
+        string;
 
-    type: string;
+    published_at:
+        string;
 
-    duration: string;
+    url:
+        string;
 
-    muted_segments?: Array<{
-        duration: number;
-        offset: number;
-    }> | null;
+    thumbnail_url:
+        string;
+
+    viewable:
+        string;
+
+    view_count:
+        number;
+
+    language:
+        string;
+
+    type:
+        string;
+
+    duration:
+        string;
+
+    muted_segments?:
+        unknown;
+
 }
 
 
 interface TwitchVideosResponse {
-    data: TwitchVideo[];
 
-    pagination: {
-        cursor?: string;
-    };
+    data:
+        TwitchVideo[];
+
+    pagination?:
+        {
+
+            cursor?:
+                string;
+
+        };
+
 }
 
+
 /* =========================================================
-   TWITCH GAME
+   GAMES
 ========================================================= */
 
-export interface TwitchGame {
+interface TwitchGame {
 
-    id: string;
+    id:
+        string;
 
-    name: string;
+    name:
+        string;
 
-    box_art_url: string;
+    box_art_url:
+        string;
+
+    igdb_id?:
+        string;
 
 }
 
 
 interface TwitchGamesResponse {
 
-    data: TwitchGame[];
+    data:
+        TwitchGame[];
 
 }
+
+
+/* =========================================================
+   CATEGORY SEARCH
+========================================================= */
+
+interface TwitchCategorySearchResponse {
+
+    data:
+        TwitchGame[];
+
+    pagination?:
+        {
+
+            cursor?:
+                string;
+
+        };
+
+}
+
+
+/* =========================================================
+   PUBLIC GAME DATA
+========================================================= */
+
+export interface TwitchGameData {
+
+    id:
+        string;
+
+    name:
+        string;
+
+    boxArtUrl:
+        string | null;
+
+    rawBoxArtUrl:
+        string | null;
+
+}
+
 
 /* =========================================================
    CONFIG TWITCH
@@ -211,11 +407,14 @@ function getTwitchConfig() {
 
 
     const channel =
-        process.env.TWITCH_CHANNEL ||
+        process.env.TWITCH_CHANNEL
+        ||
         "couaxia";
 
 
-    if (!clientId) {
+    if (
+        !clientId
+    ) {
 
         throw new Error(
             "TWITCH_CLIENT_ID is missing."
@@ -224,7 +423,9 @@ function getTwitchConfig() {
     }
 
 
-    if (!clientSecret) {
+    if (
+        !clientSecret
+    ) {
 
         throw new Error(
             "TWITCH_CLIENT_SECRET is missing."
@@ -234,9 +435,13 @@ function getTwitchConfig() {
 
 
     return {
+
         clientId,
+
         clientSecret,
+
         channel
+
     };
 
 }
@@ -248,7 +453,7 @@ function getTwitchConfig() {
 
 let cachedAccessToken:
     string | null =
-    null;
+        null;
 
 
 let accessTokenExpiresAt =
@@ -269,14 +474,16 @@ async function getTwitchAccessToken():
         getTwitchConfig();
 
 
-    /* -----------------------------------------------------
-       USE CACHED TOKEN
-    ----------------------------------------------------- */
+    /* =====================================================
+       CACHE
+    ====================================================== */
 
     if (
-        cachedAccessToken &&
-        Date.now() <
-            accessTokenExpiresAt
+        cachedAccessToken
+        &&
+        Date.now()
+        <
+        accessTokenExpiresAt
     ) {
 
         return cachedAccessToken;
@@ -284,9 +491,9 @@ async function getTwitchAccessToken():
     }
 
 
-    /* -----------------------------------------------------
+    /* =====================================================
        TOKEN REQUEST
-    ----------------------------------------------------- */
+    ====================================================== */
 
     const params =
         new URLSearchParams({
@@ -325,11 +532,9 @@ async function getTwitchAccessToken():
         );
 
 
-    /* -----------------------------------------------------
-       ERROR
-    ----------------------------------------------------- */
-
-    if (!response.ok) {
+    if (
+        !response.ok
+    ) {
 
         const error =
             await response.text();
@@ -342,28 +547,33 @@ async function getTwitchAccessToken():
     }
 
 
-    /* -----------------------------------------------------
-       RESPONSE
-    ----------------------------------------------------- */
-
     const data =
-    (await response.json()) as TwitchTokenResponse;
+        (
+            await response.json()
+        ) as TwitchTokenResponse;
 
-
-    /* -----------------------------------------------------
-       CACHE
-    ----------------------------------------------------- */
 
     cachedAccessToken =
         data.access_token;
 
 
+    /*
+     * On enlève 60 secondes pour éviter
+     * d'utiliser un token juste au moment
+     * de son expiration.
+     */
+
     accessTokenExpiresAt =
-        Date.now() +
+        Date.now()
+        +
         Math.max(
-            data.expires_in - 60,
+            data.expires_in
+            -
+            60,
             0
-        ) * 1000;
+        )
+        *
+        1000;
 
 
     return data.access_token;
@@ -372,11 +582,16 @@ async function getTwitchAccessToken():
 
 
 /* =========================================================
-   TWITCH API REQUEST
+   TWITCH FETCH
 ========================================================= */
 
 async function twitchFetch<T>(
-    url: string
+    url:
+        string,
+
+    retry:
+        boolean =
+            true
 ): Promise<T> {
 
     const {
@@ -394,13 +609,19 @@ async function twitchFetch<T>(
             url,
             {
 
+                method:
+                    "GET",
+
                 headers: {
 
                     "Client-Id":
                         clientId,
 
                     Authorization:
-                        `Bearer ${accessToken}`
+                        `Bearer ${accessToken}`,
+
+                    Accept:
+                        "application/json"
 
                 }
 
@@ -408,11 +629,41 @@ async function twitchFetch<T>(
         );
 
 
-    /* -----------------------------------------------------
-       ERROR
-    ----------------------------------------------------- */
+    /* =====================================================
+       TOKEN EXPIRED / INVALID
+    ====================================================== */
 
-    if (!response.ok) {
+    if (
+        response.status
+        ===
+        401
+        &&
+        retry
+    ) {
+
+        cachedAccessToken =
+            null;
+
+
+        accessTokenExpiresAt =
+            0;
+
+
+        return twitchFetch<T>(
+            url,
+            false
+        );
+
+    }
+
+
+    /* =====================================================
+       ERROR
+    ====================================================== */
+
+    if (
+        !response.ok
+    ) {
 
         const error =
             await response.text();
@@ -425,15 +676,219 @@ async function twitchFetch<T>(
     }
 
 
-    /* -----------------------------------------------------
-       RESPONSE
-    ----------------------------------------------------- */
+    /* =====================================================
+       JSON
+    ====================================================== */
 
-    const data =
-    (await response.json()) as T;
+    return (
+        await response.json()
+    ) as T;
+
+}
 
 
-    return data;
+/* =========================================================
+   NORMALIZE LIMIT
+========================================================= */
+
+function normalizeLimit(
+    value:
+        number,
+
+    fallback:
+        number =
+            20
+): number {
+
+    if (
+        !Number.isFinite(
+            value
+        )
+    ) {
+
+        return fallback;
+
+    }
+
+
+    return Math.min(
+        Math.max(
+            Math.floor(
+                value
+            ),
+            1
+        ),
+        100
+    );
+
+}
+
+
+/* =========================================================
+   FORMAT BOX ART
+========================================================= */
+
+export function formatTwitchBoxArt(
+    value:
+        string | null | undefined,
+
+    width:
+        number =
+            285,
+
+    height:
+        number =
+            380
+): string | null {
+
+    if (
+        !value
+    ) {
+
+        return null;
+
+    }
+
+
+    const url =
+        value.trim();
+
+
+    if (
+        !url
+    ) {
+
+        return null;
+
+    }
+
+
+    return url
+        .replaceAll(
+            "{width}",
+            String(
+                width
+            )
+        )
+        .replaceAll(
+            "{height}",
+            String(
+                height
+            )
+        )
+        .replaceAll(
+            "%{width}",
+            String(
+                width
+            )
+        )
+        .replaceAll(
+            "%{height}",
+            String(
+                height
+            )
+        );
+
+}
+
+
+/* =========================================================
+   FORMAT THUMBNAIL
+========================================================= */
+
+function formatThumbnail(
+    value:
+        string | null | undefined,
+
+    width:
+        number =
+            1280,
+
+    height:
+        number =
+            720
+): string | null {
+
+    if (
+        !value
+    ) {
+
+        return null;
+
+    }
+
+
+    return value
+        .replaceAll(
+            "{width}",
+            String(
+                width
+            )
+        )
+        .replaceAll(
+            "{height}",
+            String(
+                height
+            )
+        )
+        .replaceAll(
+            "%{width}",
+            String(
+                width
+            )
+        )
+        .replaceAll(
+            "%{height}",
+            String(
+                height
+            )
+        );
+
+}
+
+
+/* =========================================================
+   FORMAT GAME
+========================================================= */
+
+function formatGame(
+    game:
+        TwitchGame
+): TwitchGameData {
+
+    const rawBoxArtUrl =
+        game.box_art_url
+            ?.trim()
+        ||
+        null;
+
+
+    return {
+
+        id:
+            String(
+                game.id
+                ??
+                ""
+            ).trim(),
+
+        name:
+            String(
+                game.name
+                ??
+                ""
+            ).trim(),
+
+        boxArtUrl:
+            formatTwitchBoxArt(
+                rawBoxArtUrl,
+                285,
+                380
+            ),
+
+        rawBoxArtUrl
+
+    };
 
 }
 
@@ -442,7 +897,8 @@ async function twitchFetch<T>(
    GET TWITCH USER
 ========================================================= */
 
-async function getTwitchUser() {
+async function getTwitchUser():
+    Promise<TwitchUser | null> {
 
     const {
         channel
@@ -468,22 +924,48 @@ async function getTwitchUser() {
         );
 
 
-    return response.data[0] ??
-        null;
+    return (
+        response.data[0]
+        ??
+        null
+    );
 
 }
 
 
 /* =========================================================
-   GET MULTIPLE TWITCH USERS
+   GET TWITCH USERS
 ========================================================= */
 
 async function getTwitchUsers(
-    logins: string[]
+    logins:
+        string[]
 ): Promise<TwitchUser[]> {
 
+    const cleanLogins =
+        [
+            ...new Set(
+                logins
+                    .map(
+                        login =>
+                            login
+                                .trim()
+                                .toLowerCase()
+                    )
+                    .filter(
+                        Boolean
+                    )
+            )
+        ]
+            .slice(
+                0,
+                100
+            );
+
+
     if (
-        logins.length ===
+        cleanLogins.length
+        ===
         0
     ) {
 
@@ -498,16 +980,18 @@ async function getTwitchUsers(
         );
 
 
-    logins.forEach(
-        login => {
+    for (
+        const login
+        of
+        cleanLogins
+    ) {
 
-            url.searchParams.append(
-                "login",
-                login
-            );
+        url.searchParams.append(
+            "login",
+            login
+        );
 
-        }
-    );
+    }
 
 
     const response =
@@ -516,21 +1000,44 @@ async function getTwitchUsers(
         );
 
 
-    return response.data;
+    return response.data
+        ??
+        [];
 
 }
 
 
 /* =========================================================
-   GET MULTIPLE TWITCH STREAMS
+   GET TWITCH STREAMS
 ========================================================= */
 
 async function getTwitchStreams(
-    userIds: string[]
+    userIds:
+        string[]
 ): Promise<TwitchStream[]> {
 
+    const cleanIds =
+        [
+            ...new Set(
+                userIds
+                    .map(
+                        id =>
+                            id.trim()
+                    )
+                    .filter(
+                        Boolean
+                    )
+            )
+        ]
+            .slice(
+                0,
+                100
+            );
+
+
     if (
-        userIds.length ===
+        cleanIds.length
+        ===
         0
     ) {
 
@@ -545,16 +1052,18 @@ async function getTwitchStreams(
         );
 
 
-    userIds.forEach(
-        userId => {
+    for (
+        const userId
+        of
+        cleanIds
+    ) {
 
-            url.searchParams.append(
-                "user_id",
-                userId
-            );
+        url.searchParams.append(
+            "user_id",
+            userId
+        );
 
-        }
-    );
+    }
 
 
     const response =
@@ -563,7 +1072,9 @@ async function getTwitchStreams(
         );
 
 
-    return response.data;
+    return response.data
+        ??
+        [];
 
 }
 
@@ -580,15 +1091,13 @@ export async function getTwitchLive() {
         getTwitchConfig();
 
 
-    /* -----------------------------------------------------
-       USER
-    ----------------------------------------------------- */
-
     const user =
         await getTwitchUser();
 
 
-    if (!user) {
+    if (
+        !user
+    ) {
 
         throw new Error(
             `Twitch channel "${channel}" not found.`
@@ -596,10 +1105,6 @@ export async function getTwitchLive() {
 
     }
 
-
-    /* -----------------------------------------------------
-       STREAM
-    ----------------------------------------------------- */
 
     const url =
         new URL(
@@ -625,9 +1130,11 @@ export async function getTwitchLive() {
 
     /* =====================================================
        OFFLINE
-    ===================================================== */
+    ====================================================== */
 
-    if (!stream) {
+    if (
+        !stream
+    ) {
 
         return {
 
@@ -642,6 +1149,9 @@ export async function getTwitchLive() {
 
             displayName:
                 user.display_name,
+
+            description:
+                user.description,
 
             profileImageUrl:
                 user.profile_image_url,
@@ -680,7 +1190,7 @@ export async function getTwitchLive() {
 
     /* =====================================================
        ONLINE
-    ===================================================== */
+    ====================================================== */
 
     return {
 
@@ -695,6 +1205,9 @@ export async function getTwitchLive() {
 
         displayName:
             user.display_name,
+
+        description:
+            user.description,
 
         profileImageUrl:
             user.profile_image_url,
@@ -721,15 +1234,11 @@ export async function getTwitchLive() {
             stream.language,
 
         thumbnailUrl:
-            stream.thumbnail_url
-                .replace(
-                    "{width}",
-                    "1280"
-                )
-                .replace(
-                    "{height}",
-                    "720"
-                ),
+            formatThumbnail(
+                stream.thumbnail_url,
+                1280,
+                720
+            ),
 
         isMature:
             stream.is_mature
@@ -749,7 +1258,9 @@ export async function getTwitchFollowers() {
         await getTwitchUser();
 
 
-    if (!user) {
+    if (
+        !user
+    ) {
 
         throw new Error(
             "Twitch user not found."
@@ -797,31 +1308,13 @@ export async function getTwitchFollowers() {
 ========================================================= */
 
 export async function getTwitchRecommendations(
-    logins: string[]
+    logins:
+        string[]
 ): Promise<TwitchRecommendation[]> {
-
-    /* -----------------------------------------------------
-       EMPTY
-    ----------------------------------------------------- */
-
-    if (
-        logins.length ===
-        0
-    ) {
-
-        return [];
-
-    }
-
-
-    /* -----------------------------------------------------
-       NORMALIZE
-    ----------------------------------------------------- */
 
     const normalizedLogins =
         [
             ...new Set(
-
                 logins
                     .map(
                         login =>
@@ -832,13 +1325,13 @@ export async function getTwitchRecommendations(
                     .filter(
                         Boolean
                     )
-
             )
         ];
 
 
     if (
-        normalizedLogins.length ===
+        normalizedLogins.length
+        ===
         0
     ) {
 
@@ -847,9 +1340,9 @@ export async function getTwitchRecommendations(
     }
 
 
-    /* -----------------------------------------------------
+    /* =====================================================
        USERS
-    ----------------------------------------------------- */
+    ====================================================== */
 
     const users =
         await getTwitchUsers(
@@ -858,7 +1351,8 @@ export async function getTwitchRecommendations(
 
 
     if (
-        users.length ===
+        users.length
+        ===
         0
     ) {
 
@@ -867,43 +1361,39 @@ export async function getTwitchRecommendations(
     }
 
 
-    /* -----------------------------------------------------
+    /* =====================================================
        STREAMS
-    ----------------------------------------------------- */
+    ====================================================== */
 
     const streams =
         await getTwitchStreams(
-
             users.map(
                 user =>
                     user.id
             )
-
         );
 
 
-    /* -----------------------------------------------------
-       MAP STREAM BY USER ID
-    ----------------------------------------------------- */
-
     const streamByUserId =
-        new Map(
-
+        new Map<
+            string,
+            TwitchStream
+        >(
             streams.map(
                 stream => [
 
                     stream.user_id,
+
                     stream
 
                 ]
             )
-
         );
 
 
-    /* -----------------------------------------------------
+    /* =====================================================
        RESULT
-    ----------------------------------------------------- */
+    ====================================================== */
 
     return users.map(
         user => {
@@ -935,15 +1425,18 @@ export async function getTwitchRecommendations(
 
                 gameName:
                     stream?.game_name
-                    ?? null,
+                    ??
+                    null,
 
                 viewers:
                     stream?.viewer_count
-                    ?? 0,
+                    ??
+                    0,
 
                 title:
                     stream?.title
-                    ?? null
+                    ??
+                    null
 
             };
 
@@ -958,18 +1451,18 @@ export async function getTwitchRecommendations(
 ========================================================= */
 
 export async function getTwitchClips(
-    first = 100
+    first:
+        number =
+            100
 ) {
-
-    /* -----------------------------------------------------
-       USER
-    ----------------------------------------------------- */
 
     const user =
         await getTwitchUser();
 
 
-    if (!user) {
+    if (
+        !user
+    ) {
 
         throw new Error(
             "Twitch user not found."
@@ -978,27 +1471,12 @@ export async function getTwitchClips(
     }
 
 
-    /* -----------------------------------------------------
-       SAFE LIMIT
-
-       Twitch accepte entre 1 et 100 clips par requête.
-    ----------------------------------------------------- */
-
-    const safeFirst =
-        Math.min(
-            Math.max(
-                Math.floor(
-                    first
-                ),
-                1
-            ),
+    const limit =
+        normalizeLimit(
+            first,
             100
         );
 
-
-    /* -----------------------------------------------------
-       URL
-    ----------------------------------------------------- */
 
     const url =
         new URL(
@@ -1015,14 +1493,10 @@ export async function getTwitchClips(
     url.searchParams.set(
         "first",
         String(
-            safeFirst
+            limit
         )
     );
 
-
-    /* -----------------------------------------------------
-       REQUEST
-    ----------------------------------------------------- */
 
     const response =
         await twitchFetch<TwitchClipsResponse>(
@@ -1030,21 +1504,15 @@ export async function getTwitchClips(
         );
 
 
-    /* -----------------------------------------------------
-       NORMALIZE RESULT
-    ----------------------------------------------------- */
-
-    return response.data.map(
+    return (
+        response.data
+        ??
+        []
+    ).map(
         clip => ({
 
             id:
                 clip.id,
-
-            title:
-                clip.title,
-
-            creatorName:
-                clip.creator_name,
 
             url:
                 clip.url,
@@ -1052,45 +1520,69 @@ export async function getTwitchClips(
             embedUrl:
                 clip.embed_url,
 
-            thumbnailUrl:
-                clip.thumbnail_url,
+            broadcasterId:
+                clip.broadcaster_id,
 
-            views:
+            broadcasterName:
+                clip.broadcaster_name,
+
+            creatorId:
+                clip.creator_id,
+
+            creatorName:
+                clip.creator_name,
+
+            videoId:
+                clip.video_id
+                ||
+                null,
+
+            gameId:
+                clip.game_id
+                ||
+                null,
+
+            language:
+                clip.language,
+
+            title:
+                clip.title,
+
+            viewCount:
                 clip.view_count,
 
             createdAt:
                 clip.created_at,
 
+            thumbnailUrl:
+                clip.thumbnail_url,
+
             duration:
-                clip.duration,
-
-            gameId:
-                clip.game_id,
-
-            videoId:
-                clip.video_id
+                clip.duration
 
         })
     );
+
 }
 
-    /* =========================================================
+
+/* =========================================================
    GET VIDEOS
 ========================================================= */
 
 export async function getTwitchVideos(
-    first = 100
+    first:
+        number =
+            100
 ) {
-
-    /* -----------------------------------------------------
-       USER
-    ----------------------------------------------------- */
 
     const user =
         await getTwitchUser();
 
 
-    if (!user) {
+    if (
+        !user
+    ) {
 
         throw new Error(
             "Twitch user not found."
@@ -1099,25 +1591,12 @@ export async function getTwitchVideos(
     }
 
 
-    /* -----------------------------------------------------
-       SAFE LIMIT
-    ----------------------------------------------------- */
-
-    const safeFirst =
-        Math.min(
-            Math.max(
-                Math.floor(
-                    first
-                ),
-                1
-            ),
+    const limit =
+        normalizeLimit(
+            first,
             100
         );
 
-
-    /* -----------------------------------------------------
-       URL
-    ----------------------------------------------------- */
 
     const url =
         new URL(
@@ -1134,24 +1613,22 @@ export async function getTwitchVideos(
     url.searchParams.set(
         "first",
         String(
-            safeFirst
+            limit
         )
     );
 
 
-    /*
-     * archive = rediffusions de streams
-     */
-
     url.searchParams.set(
         "type",
-        "archive"
+        "all"
     );
 
 
-    /* -----------------------------------------------------
-       REQUEST
-    ----------------------------------------------------- */
+    url.searchParams.set(
+        "sort",
+        "time"
+    );
+
 
     const response =
         await twitchFetch<TwitchVideosResponse>(
@@ -1159,15 +1636,27 @@ export async function getTwitchVideos(
         );
 
 
-    /* -----------------------------------------------------
-       NORMALIZE
-    ----------------------------------------------------- */
-
-    return response.data.map(
+    return (
+        response.data
+        ??
+        []
+    ).map(
         video => ({
 
             id:
                 video.id,
+
+            streamId:
+                video.stream_id,
+
+            userId:
+                video.user_id,
+
+            userLogin:
+                video.user_login,
+
+            userName:
+                video.user_name,
 
             title:
                 video.title,
@@ -1175,54 +1664,68 @@ export async function getTwitchVideos(
             description:
                 video.description,
 
-            url:
-                video.url,
-
-            thumbnailUrl:
-                video.thumbnail_url,
-
-            views:
-                video.view_count,
-
             createdAt:
                 video.created_at,
 
             publishedAt:
                 video.published_at,
 
-            duration:
-                video.duration,
+            url:
+                video.url,
+
+            thumbnailUrl:
+                formatThumbnail(
+                    video.thumbnail_url,
+                    640,
+                    360
+                ),
+
+            viewable:
+                video.viewable,
+
+            viewCount:
+                video.view_count,
 
             language:
                 video.language,
 
             type:
-                video.type
+                video.type,
+
+            duration:
+                video.duration
 
         })
     );
 
 }
 
+
 /* =========================================================
    GET TWITCH GAMES
 ========================================================= */
 
+/**
+ * Récupère les informations Twitch de jeux
+ * à partir de leurs twitch_game_id.
+ *
+ * Cette fonction est utilisée lorsqu'un jeu
+ * existe déjà dans Supabase.
+ */
 export async function getTwitchGames(
-    gameIds: string[]
-) {
+    gameIds:
+        string[]
+): Promise<TwitchGameData[]> {
 
-    /* =====================================================
-       CLEAN IDS
-    ===================================================== */
-
-    const ids =
+    const cleanIds =
         [
             ...new Set(
                 gameIds
                     .map(
                         id =>
-                            id.trim()
+                            String(
+                                id
+                            ).trim()
                     )
                     .filter(
                         Boolean
@@ -1232,7 +1735,9 @@ export async function getTwitchGames(
 
 
     if (
-        ids.length === 0
+        cleanIds.length
+        ===
+        0
     ) {
 
         return [];
@@ -1240,63 +1745,273 @@ export async function getTwitchGames(
     }
 
 
-    /*
-     * Twitch accepte plusieurs paramètres id.
-     *
-     * Exemple :
-     *
-     * /helix/games?id=123&id=456
-     */
+    const games:
+        TwitchGameData[] =
+            [];
 
-    const url =
-        new URL(
-            "https://api.twitch.tv/helix/games"
-        );
+
+    /*
+     * Twitch accepte jusqu'à 100 jeux
+     * dans cette requête.
+     */
+    const chunkSize =
+        100;
 
 
     for (
-        const id of ids
+        let index = 0;
+        index < cleanIds.length;
+        index += chunkSize
     ) {
 
-        url.searchParams.append(
-            "id",
-            id
+        const currentIds =
+            cleanIds.slice(
+                index,
+                index
+                +
+                chunkSize
+            );
+
+
+        const url =
+            new URL(
+                "https://api.twitch.tv/helix/games"
+            );
+
+
+        for (
+            const gameId
+            of
+            currentIds
+        ) {
+
+            url.searchParams.append(
+                "id",
+                gameId
+            );
+
+        }
+
+
+        const response =
+            await twitchFetch<TwitchGamesResponse>(
+                url.toString()
+            );
+
+
+        const currentGames =
+            (
+                response.data
+                ??
+                []
+            )
+                .map(
+                    formatGame
+                )
+                .filter(
+                    game =>
+                        Boolean(
+                            game.id
+                        )
+                        &&
+                        Boolean(
+                            game.name
+                        )
+                );
+
+
+        games.push(
+            ...currentGames
         );
 
     }
 
 
+    return games;
+
+}
+
+
+/* =========================================================
+   GET ONE TWITCH GAME
+========================================================= */
+
+export async function getTwitchGameById(
+    gameId:
+        string
+): Promise<TwitchGameData | null> {
+
+    const id =
+        gameId.trim();
+
+
+    if (
+        !id
+    ) {
+
+        return null;
+
+    }
+
+
+    const games =
+        await getTwitchGames([
+            id
+        ]);
+
+
+    return (
+        games[0]
+        ??
+        null
+    );
+
+}
+
+
+/* =========================================================
+   SEARCH TWITCH GAMES
+========================================================= */
+
+/**
+ * Recherche les catégories / jeux Twitch
+ * à partir du NOM du jeu.
+ *
+ * Exemple :
+ *
+ * searchTwitchGames(
+ *     "Party Animals"
+ * );
+ *
+ * Twitch nous renvoie automatiquement :
+ *
+ * - l'identifiant Twitch
+ * - le nom
+ * - l'URL de la jaquette
+ *
+ * L'ID n'a donc jamais besoin d'être saisi
+ * manuellement dans l'administration.
+ */
+export async function searchTwitchGames(
+    query:
+        string,
+
+    first:
+        number =
+            20
+): Promise<TwitchGameData[]> {
+
+    /* =====================================================
+       QUERY
+    ====================================================== */
+
+    const cleanQuery =
+        query
+            .trim();
+
+
+    if (
+        cleanQuery.length
+        <
+        2
+    ) {
+
+        return [];
+
+    }
+
+
+    /* =====================================================
+       LIMIT
+    ====================================================== */
+
+    const limit =
+        normalizeLimit(
+            first,
+            20
+        );
+
+
+    /* =====================================================
+       URL
+    ====================================================== */
+
+    const url =
+        new URL(
+            "https://api.twitch.tv/helix/search/categories"
+        );
+
+
+    url.searchParams.set(
+        "query",
+        cleanQuery
+    );
+
+
+    url.searchParams.set(
+        "first",
+        String(
+            limit
+        )
+    );
+
+
+    /* =====================================================
+       REQUEST
+    ====================================================== */
+
     const response =
-        await twitchFetch<TwitchGamesResponse>(
+        await twitchFetch<TwitchCategorySearchResponse>(
             url.toString()
         );
 
 
-    return response.data.map(
-        game => {
+    /* =====================================================
+       RESULT
+    ====================================================== */
 
-            return {
+    return (
+        response.data
+        ??
+        []
+    )
+        .map(
+            formatGame
+        )
+        .filter(
+            game =>
+                Boolean(
+                    game.id
+                )
+                &&
+                Boolean(
+                    game.name
+                )
+        );
 
-                id:
-                    game.id,
+}
 
-                name:
-                    game.name,
 
-                boxArtUrl:
-                    game.box_art_url
-                        .replace(
-                            "{width}",
-                            "600"
-                        )
-                        .replace(
-                            "{height}",
-                            "800"
-                        )
+/* =========================================================
+   SEARCH FIRST TWITCH GAME
+========================================================= */
 
-            };
+export async function searchFirstTwitchGame(
+    query:
+        string
+): Promise<TwitchGameData | null> {
 
-        }
+    const results =
+        await searchTwitchGames(
+            query,
+            10
+        );
+
+
+    return (
+        results[0]
+        ??
+        null
     );
 
 }

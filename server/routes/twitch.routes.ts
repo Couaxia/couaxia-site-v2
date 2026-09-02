@@ -8,7 +8,8 @@ import {
     getTwitchLive,
     getTwitchRecommendations,
     getTwitchVideos,
-    getTwitchGames
+    getTwitchGames,
+    searchTwitchGames
 } from "../services/twitch.service.js";
 
 
@@ -509,6 +510,26 @@ router.get(
    GET /api/twitch/games
 ========================================================= */
 
+/*
+ * Cette route possède maintenant DEUX modes :
+ *
+ * 1.
+ * Recherche par nom :
+ *
+ * /api/twitch/games?search=Party%20Animals
+ *
+ *
+ * 2.
+ * Recherche par IDs :
+ *
+ * /api/twitch/games?ids=123,456
+ *
+ *
+ * Le mode IDs reste utilisé par les pages publiques
+ * pour récupérer les informations Twitch des jeux
+ * déjà présents dans Supabase.
+ */
+
 router.get(
     "/games",
 
@@ -519,64 +540,125 @@ router.get(
 
         try {
 
-            /* =============================================
-               IDS
-            ============================================== */
+            /* =================================================
+               PARAMÈTRES
+            ================================================== */
+
+            const rawSearch =
+                req.query.search;
+
 
             const rawIds =
                 req.query.ids;
 
 
+            const rawFirst =
+                req.query.first;
+
+
+            /* =================================================
+               MODE 1 — SEARCH
+            ================================================== */
+
             if (
-                typeof rawIds !==
+                typeof rawSearch
+                ===
                 "string"
             ) {
 
-                res
-                    .status(400)
-                    .json({
-                        success:
-                            false,
+                const search =
+                    rawSearch
+                        .trim();
 
-                        message:
-                            "Le paramètre ids est obligatoire."
+
+                /*
+                 * Pas de recherche Twitch pour une seule lettre.
+                 */
+
+                if (
+                    search.length
+                    <
+                    2
+                ) {
+
+                    res.json({
+
+                        success:
+                            true,
+
+                        data:
+                            []
+
                     });
 
 
-                return;
+                    return;
 
-            }
+                }
 
 
-            /* =============================================
-               SPLIT
-            ============================================== */
+                /* =============================================
+                   LIMIT
+                ============================================== */
 
-            const gameIds =
-                rawIds
-                    .split(",")
-                    .map(
-                        id =>
-                            id.trim()
-                    )
-                    .filter(
-                        Boolean
+                let first =
+                    20;
+
+
+                if (
+                    typeof rawFirst
+                    ===
+                    "string"
+                ) {
+
+                    const parsed =
+                        Number(
+                            rawFirst
+                        );
+
+
+                    if (
+                        Number.isFinite(
+                            parsed
+                        )
+                    ) {
+
+                        first =
+                            Math.min(
+                                Math.max(
+                                    Math.floor(
+                                        parsed
+                                    ),
+                                    1
+                                ),
+                                100
+                            );
+
+                    }
+
+                }
+
+
+                /* =============================================
+                   TWITCH SEARCH
+                ============================================== */
+
+                const games =
+                    await searchTwitchGames(
+                        search,
+                        first
                     );
 
 
-            if (
-                gameIds.length === 0
-            ) {
+                res.json({
 
-                res
-                    .status(400)
-                    .json({
-                        success:
-                            false,
+                    success:
+                        true,
 
-                        message:
-                            "Aucun identifiant Twitch fourni."
-                    });
+                    data:
+                        games
+
+                });
 
 
                 return;
@@ -584,31 +666,118 @@ router.get(
             }
 
 
-            /* =============================================
-               TWITCH
-            ============================================== */
+            /* =================================================
+               MODE 2 — IDS
+            ================================================== */
 
-            const games =
-                await getTwitchGames(
-                    gameIds
-                );
+            if (
+                typeof rawIds
+                ===
+                "string"
+            ) {
+
+                const gameIds =
+                    [
+                        ...new Set(
+                            rawIds
+                                .split(
+                                    ","
+                                )
+                                .map(
+                                    id =>
+                                        id.trim()
+                                )
+                                .filter(
+                                    Boolean
+                                )
+                        )
+                    ]
+                        .slice(
+                            0,
+                            100
+                        );
 
 
-            /* =============================================
-               RESPONSE
-            ============================================== */
+                /* =============================================
+                   EMPTY IDS
+                ============================================== */
 
-            res.json({
-                success:
-                    true,
+                if (
+                    gameIds.length
+                    ===
+                    0
+                ) {
 
-                data:
-                    games
-            });
+                    res.json({
+
+                        success:
+                            true,
+
+                        data:
+                            []
+
+                    });
+
+
+                    return;
+
+                }
+
+
+                /* =============================================
+                   GET GAMES
+                ============================================== */
+
+                const games =
+                    await getTwitchGames(
+                        gameIds
+                    );
+
+
+                res.json({
+
+                    success:
+                        true,
+
+                    data:
+                        games
+
+                });
+
+
+                return;
+
+            }
+
+
+            /* =================================================
+               AUCUN PARAMÈTRE
+            ================================================== */
+
+            res
+                .status(
+                    400
+                )
+                .json({
+
+                    success:
+                        false,
+
+                    message:
+                        "Utilise le paramètre search ou ids."
+
+                });
 
         }
 
-        catch (error) {
+
+        /* =====================================================
+           ERROR
+        ====================================================== */
+
+        catch (
+            error
+        ) {
 
             console.error(
                 "Twitch games error:",
@@ -618,13 +787,18 @@ router.get(
 
             const message =
                 error instanceof Error
+
                     ? error.message
+
                     : "Erreur Twitch inconnue";
 
 
             res
-                .status(500)
+                .status(
+                    500
+                )
                 .json({
+
                     success:
                         false,
 
@@ -633,6 +807,7 @@ router.get(
 
                     error:
                         message
+
                 });
 
         }
