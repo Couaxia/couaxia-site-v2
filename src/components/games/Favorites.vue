@@ -7,17 +7,15 @@ import {
     ref
 } from "vue";
 
-
 import {
     getGames,
     type Game,
     type GameStatus
 } from "../../services/games.service";
 
-
 import {
     getTwitchGamesByIds,
-    type TwitchGameData
+    type TwitchGame
 } from "../../services/twitch-games.service";
 
 
@@ -49,7 +47,7 @@ const twitchGames =
     ref<
         Record<
             string,
-            TwitchGameData
+            TwitchGame
         >
     >(
         {}
@@ -115,6 +113,7 @@ const filteredGames =
 const filters = [
 
     {
+
         value:
             "all",
 
@@ -123,9 +122,11 @@ const filters = [
 
         icon:
             "🎮"
+
     },
 
     {
+
         value:
             "current",
 
@@ -134,9 +135,11 @@ const filters = [
 
         icon:
             "🔥"
+
     },
 
     {
+
         value:
             "regular",
 
@@ -145,9 +148,11 @@ const filters = [
 
         icon:
             "🔁"
+
     },
 
     {
+
         value:
             "backlog",
 
@@ -156,9 +161,24 @@ const filters = [
 
         icon:
             "📚"
+
     },
 
     {
+
+        value:
+            "paused",
+
+        label:
+            "En pause",
+
+        icon:
+            "⏸️"
+
+    },
+
+    {
+
         value:
             "finished",
 
@@ -167,6 +187,7 @@ const filters = [
 
         icon:
             "🏆"
+
     }
 
 ] as const;
@@ -196,65 +217,119 @@ async function loadGames() {
             await getGames();
 
 
-        /* =============================================
-           TWITCH IDS
-        ============================================== */
-
-        const twitchIds =
-            games.value
-                .map(
-                    game =>
-                        game.twitch_game_id
-                )
-                .filter(
-                    (
-                        id
-                    ): id is string =>
-                        Boolean(
-                            id
-                        )
-                );
-
-
-        /* =============================================
-           TWITCH
-        ============================================== */
-
-        const twitchData =
-            await getTwitchGamesByIds(
-                twitchIds
-            );
-
-
-        /* =============================================
-           LOOKUP
-        ============================================== */
-
-        twitchGames.value =
-            Object.fromEntries(
-                twitchData.map(
-                    game => [
-                        game.id,
-                        game
-                    ]
-                )
-            );
-
-
         console.log(
             "🎮 Supabase :",
             games.value
         );
 
 
-        console.log(
-            "🟣 Twitch :",
-            twitchGames.value
-        );
+        /* =============================================
+           TWITCH IDS
+        ============================================== */
+
+        const twitchIds =
+            [
+                ...new Set(
+                    games.value
+                        .map(
+                            game =>
+                                game.twitch_game_id
+                        )
+                        .filter(
+                            (
+                                id
+                            ): id is string =>
+                                Boolean(
+                                    id
+                                )
+                        )
+                )
+            ];
+
+
+        /* =============================================
+           NO TWITCH IDS
+        ============================================== */
+
+        if (
+            twitchIds.length ===
+            0
+        ) {
+
+            twitchGames.value =
+                {};
+
+
+            return;
+
+        }
+
+
+        /* =============================================
+           TWITCH
+
+           Une erreur Twitch ne doit PAS empêcher
+           l'affichage des jeux Supabase.
+        ============================================== */
+
+        try {
+
+            const twitchData =
+                await getTwitchGamesByIds(
+                    twitchIds
+                );
+
+
+            /* =========================================
+               LOOKUP
+            ========================================== */
+
+            twitchGames.value =
+                Object.fromEntries(
+                    twitchData.map(
+                        game => [
+
+                            game.id,
+
+                            game
+
+                        ]
+                    )
+                );
+
+
+            console.log(
+                "🟣 Twitch :",
+                twitchGames.value
+            );
+
+        }
+        catch (
+            twitchError
+        ) {
+
+            console.warn(
+                "Impossible de récupérer les données Twitch :",
+                twitchError
+            );
+
+
+            /*
+             * On conserve la bibliothèque Supabase.
+             *
+             * getGameName() utilisera twitch_name
+             * comme fallback.
+             */
+
+            twitchGames.value =
+                {};
+
+        }
 
     }
-
-    catch (err) {
+    catch (
+        err
+    ) {
 
         console.error(
             "Erreur GamesFavorites :",
@@ -268,7 +343,6 @@ async function loadGames() {
                 : "Impossible de récupérer les jeux.";
 
     }
-
     finally {
 
         loading.value =
@@ -287,7 +361,7 @@ function getTwitchGame(
     game:
         Game
 ):
-    TwitchGameData | null {
+    TwitchGame | null {
 
     if (
         !game.twitch_game_id
@@ -332,6 +406,61 @@ function getGameName(
         ??
         "Jeu sans nom"
     );
+
+}
+
+
+/* =========================================================
+   GAME COVER
+========================================================= */
+
+function getGameCover(
+    game:
+        Game
+):
+    string | null {
+
+    const twitchGame =
+        getTwitchGame(
+            game
+        );
+
+
+    /*
+     * Priorité à Twitch.
+     */
+
+    if (
+        twitchGame?.boxArtUrl
+    ) {
+
+        return twitchGame.boxArtUrl;
+
+    }
+
+
+    /*
+     * Fallback Supabase.
+     */
+
+    if (
+        game.box_art_url
+    ) {
+
+        return game.box_art_url
+            .replace(
+                "{width}",
+                "600"
+            )
+            .replace(
+                "{height}",
+                "800"
+            );
+
+    }
+
+
+    return null;
 
 }
 
@@ -446,7 +575,8 @@ function getRandomMessage(
     string {
 
     if (
-        messages.length === 0
+        messages.length ===
+        0
     ) {
 
         return "";
@@ -456,7 +586,8 @@ function getRandomMessage(
 
     const randomIndex =
         Math.floor(
-            Math.random() *
+            Math.random()
+            *
             messages.length
         );
 
@@ -494,9 +625,13 @@ function sendMascotMessage(
         new CustomEvent(
             "couaxia-mascot-message",
             {
+
                 detail: {
+
                     message
+
                 }
+
             }
         )
     );
@@ -656,6 +791,17 @@ function speakAboutFilter(
             ],
 
 
+            paused: [
+
+                "Ces aventures sont en pause pour le moment !",
+
+                "On y reviendra peut-être plus tard. 👀",
+
+                "Même mes tentacules ont parfois besoin d'une petite pause !"
+
+            ],
+
+
             finished: [
 
                 "Mission accomplie ! 🏆",
@@ -748,7 +894,7 @@ function speakAboutGame(
 
                 `On reviendra peut-être sur ${gameName} plus tard !`,
 
-                `Même les Kraduks ont parfois besoin d'une pause !`,
+                "Même les Kraduks ont parfois besoin d'une pause !",
 
                 `${gameName} attend sagement que je revienne.`
 
@@ -830,9 +976,11 @@ function speakAboutRating(
 ) {
 
     if (
-        game.rating === null
+        game.rating ===
+        null
         ||
-        game.rating === undefined
+        game.rating ===
+        undefined
     ) {
 
         return;
@@ -862,7 +1010,8 @@ function speakAboutRating(
 
 
     if (
-        rating >= 9
+        rating >=
+        9
     ) {
 
         messages.push(
@@ -870,9 +1019,9 @@ function speakAboutRating(
         );
 
     }
-
     else if (
-        rating >= 7
+        rating >=
+        7
     ) {
 
         messages.push(
@@ -880,9 +1029,9 @@ function speakAboutRating(
         );
 
     }
-
     else if (
-        rating >= 5
+        rating >=
+        5
     ) {
 
         messages.push(
@@ -890,7 +1039,6 @@ function speakAboutRating(
         );
 
     }
-
     else {
 
         messages.push(
@@ -1012,27 +1160,24 @@ onBeforeUnmount(
 
         <header
             class="games-favorites__header"
-
             tabindex="0"
-
             @mouseenter="
                 speakAboutLibrary
             "
-
             @mouseleave="
                 stopMascotHover
             "
-
             @focus="
                 speakAboutLibrary
             "
-
             @blur="
                 stopMascotHover
             "
         >
 
-            <div class="games-favorites__heading">
+            <div
+                class="games-favorites__heading"
+            >
 
                 <span
                     class="games-favorites__heading-icon"
@@ -1044,7 +1189,9 @@ onBeforeUnmount(
 
                 <div>
 
-                    <p class="games-favorites__eyebrow">
+                    <p
+                        class="games-favorites__eyebrow"
+                    >
                         MA BIBLIOTHÈQUE
                     </p>
 
@@ -1067,7 +1214,9 @@ onBeforeUnmount(
             </div>
 
 
-            <p class="games-favorites__description">
+            <p
+                class="games-favorites__description"
+            >
 
                 Quelques jeux et aventures que j'aime
                 particulièrement retrouver en stream
@@ -1083,7 +1232,9 @@ onBeforeUnmount(
         ================================================== -->
 
         <div
-            v-if="loading"
+            v-if="
+                loading
+            "
             class="games-library__loading"
         >
 
@@ -1107,11 +1258,15 @@ onBeforeUnmount(
         ================================================== -->
 
         <div
-            v-else-if="error"
+            v-else-if="
+                error
+            "
             class="games-library__error"
         >
 
-            <span aria-hidden="true">
+            <span
+                aria-hidden="true"
+            >
                 ⚠️
             </span>
 
@@ -1131,10 +1286,7 @@ onBeforeUnmount(
             v-else-if="
                 favoriteGames.length === 0
             "
-
-            class="
-                games-library__empty
-            "
+            class="games-library__empty"
         >
 
             <span
@@ -1164,60 +1316,59 @@ onBeforeUnmount(
              GAMES
         ================================================== -->
 
-        <template v-else>
+        <template
+            v-else
+        >
 
             <!-- =============================================
                  FILTERS
             ============================================== -->
 
-            <div class="games-favorites__filters">
+            <div
+                class="games-favorites__filters"
+            >
 
                 <button
-                    v-for="filter in filters"
-
+                    v-for="
+                        filter
+                        in
+                        filters
+                    "
                     :key="
                         filter.value
                     "
-
                     type="button"
-
-                    class="
-                        games-favorites__filter
-                    "
-
+                    class="games-favorites__filter"
                     :class="{
                         'games-favorites__filter--active':
                             selectedStatus ===
                             filter.value
                     }"
-
                     @click="
                         selectedStatus =
                             filter.value
                     "
-
                     @mouseenter="
                         speakAboutFilter(
                             filter
                         )
                     "
-
                     @mouseleave="
                         stopMascotHover
                     "
-
                     @focus="
                         speakAboutFilter(
                             filter
                         )
                     "
-
                     @blur="
                         stopMascotHover
                     "
                 >
 
-                    <span aria-hidden="true">
+                    <span
+                        aria-hidden="true"
+                    >
                         {{ filter.icon }}
                     </span>
 
@@ -1239,10 +1390,7 @@ onBeforeUnmount(
                 v-if="
                     filteredGames.length === 0
                 "
-
-                class="
-                    games-library__empty
-                "
+                class="games-library__empty"
             >
 
                 <span
@@ -1275,38 +1423,32 @@ onBeforeUnmount(
             >
 
                 <article
-                    v-for="game in filteredGames"
-
+                    v-for="
+                        game
+                        in
+                        filteredGames
+                    "
                     :key="
                         game.id
                     "
-
-                    class="
-                        game-favorite-card
-                    "
-
+                    class="game-favorite-card"
                     :class="[
                         `game-favorite-card--${game.status}`
                     ]"
-
                     tabindex="0"
-
                     @mouseenter="
                         speakAboutGame(
                             game
                         )
                     "
-
                     @mouseleave="
                         stopMascotHover
                     "
-
                     @focus="
                         speakAboutGame(
                             game
                         )
                     "
-
                     @blur="
                         stopMascotHover
                     "
@@ -1316,31 +1458,29 @@ onBeforeUnmount(
                          VISUAL
                     ====================================== -->
 
-                    <div class="game-favorite-card__visual">
+                    <div
+                        class="game-favorite-card__visual"
+                    >
 
-                        <!-- TWITCH COVER -->
+                        <!-- COVER -->
 
                         <img
                             v-if="
-                                getTwitchGame(
+                                getGameCover(
                                     game
-                                )?.boxArtUrl
+                                )
                             "
-
                             :src="
-                                getTwitchGame(
+                                getGameCover(
                                     game
-                                )!.boxArtUrl
+                                )
+                                ??
+                                ''
                             "
-
                             :alt="
                                 `Jaquette de ${getGameName(game)}`
                             "
-
-                            class="
-                                game-favorite-card__image
-                            "
-
+                            class="game-favorite-card__image"
                             loading="lazy"
                         >
 
@@ -1349,11 +1489,7 @@ onBeforeUnmount(
 
                         <div
                             v-else
-
-                            class="
-                                game-favorite-card__placeholder
-                            "
-
+                            class="game-favorite-card__placeholder"
                             aria-hidden="true"
                         >
                             🎮
@@ -1363,16 +1499,15 @@ onBeforeUnmount(
                         <!-- STATUS -->
 
                         <span
-                            class="
-                                game-favorite-card__status
-                            "
-
+                            class="game-favorite-card__status"
                             :class="[
                                 `game-favorite-card__status--${game.status}`
                             ]"
                         >
 
-                            <span aria-hidden="true">
+                            <span
+                                aria-hidden="true"
+                            >
 
                                 {{
                                     getStatusIcon(
@@ -1398,14 +1533,14 @@ onBeforeUnmount(
                          CONTENT
                     ====================================== -->
 
-                    <div class="game-favorite-card__content">
+                    <div
+                        class="game-favorite-card__content"
+                    >
 
                         <!-- GAME NAME -->
 
                         <h3
-                            class="
-                                game-favorite-card__title
-                            "
+                            class="game-favorite-card__title"
                         >
 
                             {{
@@ -1421,46 +1556,39 @@ onBeforeUnmount(
 
                         <div
                             v-if="
-                                game.tags &&
+                                game.tags
+                                &&
                                 game.tags.length > 0
                             "
-
-                            class="
-                                game-favorite-card__tags
-                            "
+                            class="game-favorite-card__tags"
                         >
 
                             <span
-                                v-for="tag in game.tags"
-
+                                v-for="
+                                    tag
+                                    in
+                                    game.tags
+                                "
                                 :key="
                                     tag
                                 "
-
-                                class="
-                                    game-favorite-card__tag
-                                "
-
+                                class="game-favorite-card__tag"
                                 tabindex="0"
-
                                 @mouseenter.stop="
                                     speakAboutTag(
                                         game,
                                         tag
                                     )
                                 "
-
                                 @mouseleave.stop="
                                     stopMascotHover
                                 "
-
                                 @focus.stop="
                                     speakAboutTag(
                                         game,
                                         tag
                                     )
                                 "
-
                                 @blur.stop="
                                     stopMascotHover
                                 "
@@ -1479,10 +1607,7 @@ onBeforeUnmount(
                             v-if="
                                 game.description
                             "
-
-                            class="
-                                game-favorite-card__description
-                            "
+                            class="game-favorite-card__description"
                         >
 
                             {{ game.description }}
@@ -1492,44 +1617,41 @@ onBeforeUnmount(
 
                         <!-- FOOTER -->
 
-                        <div class="game-favorite-card__footer">
+                        <div
+                            class="game-favorite-card__footer"
+                        >
 
                             <!-- RATING -->
 
                             <div
                                 v-if="
-                                    game.rating !== null &&
+                                    game.rating !== null
+                                    &&
                                     game.rating !== undefined
                                 "
-
-                                class="
-                                    game-favorite-card__rating
-                                "
-
+                                class="game-favorite-card__rating"
                                 tabindex="0"
-
                                 @mouseenter.stop="
                                     speakAboutRating(
                                         game
                                     )
                                 "
-
                                 @mouseleave.stop="
                                     stopMascotHover
                                 "
-
                                 @focus.stop="
                                     speakAboutRating(
                                         game
                                     )
                                 "
-
                                 @blur.stop="
                                     stopMascotHover
                                 "
                             >
 
-                                <span aria-hidden="true">
+                                <span
+                                    aria-hidden="true"
+                                >
                                     ⭐
                                 </span>
 
@@ -1552,43 +1674,33 @@ onBeforeUnmount(
                                 v-if="
                                     game.youtube_playlist
                                 "
-
                                 :href="
                                     game.youtube_playlist
                                 "
-
                                 target="_blank"
-
-                                rel="
-                                    noopener noreferrer
-                                "
-
-                                class="
-                                    game-favorite-card__youtube
-                                "
-
+                                rel="noopener noreferrer"
+                                class="game-favorite-card__youtube"
                                 @mouseenter.stop="
                                     speakAboutPlaylist(
                                         game
                                     )
                                 "
-
                                 @mouseleave.stop="
                                     stopMascotHover
                                 "
-
                                 @focus.stop="
                                     speakAboutPlaylist(
                                         game
                                     )
                                 "
-
                                 @blur.stop="
                                     stopMascotHover
                                 "
                             >
 
-                                <span aria-hidden="true">
+                                <span
+                                    aria-hidden="true"
+                                >
                                     ▶️
                                 </span>
 
@@ -1605,35 +1717,29 @@ onBeforeUnmount(
                             v-if="
                                 game.poll_enabled
                             "
-
-                            class="
-                                game-favorite-card__poll
-                            "
-
+                            class="game-favorite-card__poll"
                             tabindex="0"
-
                             @mouseenter.stop="
                                 speakAboutPoll(
                                     game
                                 )
                             "
-
                             @mouseleave.stop="
                                 stopMascotHover
                             "
-
                             @focus.stop="
                                 speakAboutPoll(
                                     game
                                 )
                             "
-
                             @blur.stop="
                                 stopMascotHover
                             "
                         >
 
-                            <span aria-hidden="true">
+                            <span
+                                aria-hidden="true"
+                            >
                                 🗳️
                             </span>
 
