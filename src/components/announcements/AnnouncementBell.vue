@@ -111,6 +111,38 @@ const errorMessage =
     );
 
 
+/* =========================================================
+   READ STATE
+========================================================= */
+
+const currentUserId =
+    ref<string | null>(
+        null
+    );
+
+
+const readAnnouncementIds =
+    ref<Set<string>>(
+        new Set()
+    );
+
+
+const markingReadId =
+    ref<string | null>(
+        null
+    );
+
+
+let authSubscription:
+    {
+        unsubscribe:
+            () => void;
+    }
+    |
+    null =
+        null;
+
+
 let announcementsChannel:
     ReturnType<
         typeof supabase.channel
@@ -124,11 +156,435 @@ let announcementsChannel:
    NOTIFICATION COUNT
 ========================================================= */
 
+const unreadAnnouncements =
+    computed(
+        () =>
+            announcements.value.filter(
+                announcement =>
+                    !readAnnouncementIds.value.has(
+                        announcement.id
+                    )
+            )
+    );
+
+
 const notificationCount =
     computed(
         () =>
-            announcements.value.length
+            unreadAnnouncements.value.length
     );
+
+
+/* =========================================================
+   LOCAL STORAGE
+========================================================= */
+
+const anonymousReadStorageKey =
+    "couaxia-announcements-read";
+
+
+function saveAnonymousReadState() {
+
+    try {
+
+        window.localStorage.setItem(
+            anonymousReadStorageKey,
+            JSON.stringify(
+                Array.from(
+                    readAnnouncementIds.value
+                )
+            )
+        );
+
+    }
+
+    catch (
+        error
+    ) {
+
+        console.debug(
+            "Impossible d'enregistrer les notifications lues localement :",
+            error
+        );
+
+    }
+
+}
+
+
+function loadAnonymousReadState() {
+
+    try {
+
+        const stored =
+            window.localStorage.getItem(
+                anonymousReadStorageKey
+            );
+
+
+        if (
+            !stored
+        ) {
+
+            readAnnouncementIds.value =
+                new Set();
+
+
+            return;
+
+        }
+
+
+        const values =
+            JSON.parse(
+                stored
+            );
+
+
+        if (
+            !Array.isArray(
+                values
+            )
+        ) {
+
+            readAnnouncementIds.value =
+                new Set();
+
+
+            return;
+
+        }
+
+
+        readAnnouncementIds.value =
+            new Set(
+                values.filter(
+                    value =>
+                        typeof value ===
+                        "string"
+                )
+            );
+
+    }
+
+    catch (
+        error
+    ) {
+
+        console.debug(
+            "Impossible de lire les notifications lues localement :",
+            error
+        );
+
+
+        readAnnouncementIds.value =
+            new Set();
+
+    }
+
+}
+
+
+/* =========================================================
+   LOAD CURRENT USER
+========================================================= */
+
+async function loadCurrentUser() {
+
+    const {
+        data,
+        error
+    } =
+        await supabase
+            .auth
+            .getUser();
+
+
+    if (
+        error
+    ) {
+
+        console.debug(
+            "Aucun utilisateur connecté pour les notifications :",
+            error.message
+        );
+
+
+        currentUserId.value =
+            null;
+
+
+        return;
+
+    }
+
+
+    currentUserId.value =
+        data.user?.id
+        ??
+        null;
+
+}
+
+
+/* =========================================================
+   LOAD READ STATE
+========================================================= */
+
+async function loadReadState() {
+
+    if (
+        !currentUserId.value
+    ) {
+
+        loadAnonymousReadState();
+
+
+        return;
+
+    }
+
+
+    const {
+        data,
+        error
+    } =
+        await supabase
+            .from(
+                "announcement_reads"
+            )
+            .select(
+                "announcement_id"
+            )
+            .eq(
+                "user_id",
+                currentUserId.value
+            );
+
+
+    if (
+        error
+    ) {
+
+        console.error(
+            "Erreur récupération notifications lues :",
+            error
+        );
+
+
+        readAnnouncementIds.value =
+            new Set();
+
+
+        return;
+
+    }
+
+
+    readAnnouncementIds.value =
+        new Set(
+            (
+                data
+                ??
+                []
+            )
+                .map(
+                    row =>
+                        row.announcement_id
+                )
+                .filter(
+                    (
+                        value
+                    ):
+                        value is string =>
+                            typeof value ===
+                            "string"
+                )
+        );
+
+}
+
+
+/* =========================================================
+   IS READ
+========================================================= */
+
+function isAnnouncementRead(
+    announcementId:
+        string
+):
+    boolean {
+
+    return readAnnouncementIds.value.has(
+        announcementId
+    );
+
+}
+
+
+/* =========================================================
+   MARK AS READ
+========================================================= */
+
+async function markAsRead(
+    announcement:
+        Announcement
+) {
+
+    if (
+        isAnnouncementRead(
+            announcement.id
+        )
+        ||
+        markingReadId.value ===
+        announcement.id
+    ) {
+
+        return;
+
+    }
+
+
+    markingReadId.value =
+        announcement.id;
+
+
+    try {
+
+        /*
+         * On met à jour l'interface tout de suite :
+         * le badge de la cloche diminue instantanément.
+         */
+
+        readAnnouncementIds.value =
+            new Set(
+                [
+                    ...readAnnouncementIds.value,
+                    announcement.id
+                ]
+            );
+
+
+        if (
+            currentUserId.value
+        ) {
+
+            const {
+                error
+            } =
+                await supabase
+                    .from(
+                        "announcement_reads"
+                    )
+                    .insert({
+                        user_id:
+                            currentUserId.value,
+
+                        announcement_id:
+                            announcement.id
+                    });
+
+
+            /*
+             * 23505 = déjà marqué comme lu.
+             * Ce cas n'est pas une vraie erreur.
+             */
+
+            if (
+                error
+                &&
+                error.code !==
+                "23505"
+            ) {
+
+                throw error;
+
+            }
+
+        }
+
+        else {
+
+            saveAnonymousReadState();
+
+        }
+
+    }
+
+    catch (
+        error
+    ) {
+
+        console.error(
+            "Erreur marquage notification comme lue :",
+            error
+        );
+
+
+        /*
+         * Si Supabase refuse l'écriture, on restaure
+         * l'état afin que le compteur reste cohérent.
+         */
+
+        const restored =
+            new Set(
+                readAnnouncementIds.value
+            );
+
+
+        restored.delete(
+            announcement.id
+        );
+
+
+        readAnnouncementIds.value =
+            restored;
+
+    }
+
+    finally {
+
+        markingReadId.value =
+            null;
+
+    }
+
+}
+
+
+/* =========================================================
+   AUTH LISTENER
+========================================================= */
+
+function subscribeToAuth() {
+
+    const {
+        data
+    } =
+        supabase
+            .auth
+            .onAuthStateChange(
+                async (
+                    _event,
+                    session
+                ) => {
+
+                    currentUserId.value =
+                        session?.user?.id
+                        ??
+                        null;
+
+
+                    await loadReadState();
+
+                }
+            );
+
+
+    authSubscription =
+        data.subscription;
+
+}
 
 
 /* =========================================================
@@ -761,10 +1217,19 @@ function openAnnouncementLink(
 onMounted(
     async () => {
 
-        await loadAnnouncements();
+        await loadCurrentUser();
+
+
+        await Promise.all([
+            loadAnnouncements(),
+            loadReadState()
+        ]);
 
 
         subscribeToAnnouncements();
+
+
+        subscribeToAuth();
 
     }
 );
@@ -791,6 +1256,14 @@ onBeforeUnmount(
                 null;
 
         }
+
+
+        authSubscription
+            ?.unsubscribe();
+
+
+        authSubscription =
+            null;
 
     }
 );
@@ -1019,7 +1492,11 @@ onBeforeUnmount(
                                 'announcement-bell__item--important':
                                     announcement.is_important,
                                 'announcement-bell__item--pinned':
-                                    announcement.is_pinned
+                                    announcement.is_pinned,
+                                'announcement-bell__item--read':
+                                    isAnnouncementRead(
+                                        announcement.id
+                                    )
                             }"
                         >
 
@@ -1131,30 +1608,72 @@ onBeforeUnmount(
                                      LINK
                                 ================================== -->
 
-                                <button
-                                    v-if="
-                                        announcement.link_url
-                                    "
-                                    type="button"
-                                    class="announcement-bell__item-link"
-                                    @click="
-                                        openAnnouncementLink(
-                                            announcement
-                                        )
-                                    "
+                                <div
+                                    class="announcement-bell__item-actions"
                                 >
-                                    {{
-                                        announcement.link_label
-                                        ||
-                                        "Voir"
-                                    }}
 
-                                    <span
-                                        aria-hidden="true"
+                                    <button
+                                        v-if="
+                                            announcement.link_url
+                                        "
+                                        type="button"
+                                        class="announcement-bell__item-link"
+                                        @click="
+                                            openAnnouncementLink(
+                                                announcement
+                                            )
+                                        "
                                     >
-                                        ↗
-                                    </span>
-                                </button>
+                                        {{
+                                            announcement.link_label
+                                            ||
+                                            "Voir"
+                                        }}
+
+                                        <span
+                                            aria-hidden="true"
+                                        >
+                                            ↗
+                                        </span>
+                                    </button>
+
+
+                                    <button
+                                        type="button"
+                                        class="announcement-bell__read-button"
+                                        :class="{
+                                            'is-read':
+                                                isAnnouncementRead(
+                                                    announcement.id
+                                                )
+                                        }"
+                                        :disabled="
+                                            isAnnouncementRead(
+                                                announcement.id
+                                            )
+                                            ||
+                                            markingReadId ===
+                                            announcement.id
+                                        "
+                                        @click="
+                                            markAsRead(
+                                                announcement
+                                            )
+                                        "
+                                    >
+                                        {{
+                                            markingReadId ===
+                                            announcement.id
+                                                ? "Enregistrement..."
+                                                : isAnnouncementRead(
+                                                    announcement.id
+                                                )
+                                                    ? "✓ Lu"
+                                                    : "✓ Marquer comme lu"
+                                        }}
+                                    </button>
+
+                                </div>
 
                             </div>
 
@@ -2051,6 +2570,25 @@ onBeforeUnmount(
 }
 
 
+.announcement-bell__item--read {
+
+    opacity:
+        0.66;
+
+    border-color:
+        var(--announcement-soft-border);
+
+}
+
+
+.announcement-bell__item--read:hover {
+
+    opacity:
+        0.82;
+
+}
+
+
 /* =========================================================
    ITEM ICON
 ========================================================= */
@@ -2319,6 +2857,135 @@ onBeforeUnmount(
 
     filter:
         brightness(1.08);
+
+}
+
+
+/* =========================================================
+   ITEM ACTIONS
+========================================================= */
+
+.announcement-bell__item-actions {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    flex-wrap:
+        wrap;
+
+    gap:
+        8px;
+
+    margin-top:
+        10px;
+
+}
+
+
+.announcement-bell__item-actions
+.announcement-bell__item-link {
+
+    margin-top:
+        0;
+
+}
+
+
+/* =========================================================
+   MARK AS READ
+========================================================= */
+
+.announcement-bell__read-button {
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    min-height:
+        34px;
+
+    padding:
+        7px 11px;
+
+    color:
+        var(--announcement-text);
+
+    border:
+        1px solid
+        var(--announcement-soft-border);
+
+    border-radius:
+        11px;
+
+    background:
+        var(--announcement-button-bg);
+
+    font:
+        inherit;
+
+    font-size:
+        0.68rem;
+
+    font-weight:
+        900;
+
+    cursor:
+        pointer;
+
+    transition:
+        color 0.2s ease,
+        background 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease;
+
+}
+
+
+.announcement-bell__read-button:hover:not(:disabled) {
+
+    color:
+        #22f2ef;
+
+    border-color:
+        rgba(
+            34,
+            242,
+            239,
+            0.42
+        );
+
+    transform:
+        translateY(-1px);
+
+}
+
+
+.announcement-bell__read-button.is-read {
+
+    color:
+        var(--announcement-text-muted);
+
+    border-color:
+        transparent;
+
+    background:
+        transparent;
+
+}
+
+
+.announcement-bell__read-button:disabled {
+
+    cursor:
+        default;
 
 }
 
