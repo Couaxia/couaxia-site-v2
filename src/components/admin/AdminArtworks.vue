@@ -10,7 +10,8 @@ import {
     createAdminArtwork,
     deleteAdminArtwork,
     getAdminArtworks,
-    updateAdminArtwork
+    updateAdminArtwork,
+    uploadAdminArtworkFile
 } from "../../services/admin.service";
 
 import type {
@@ -156,6 +157,130 @@ const successMessage =
     ref(
         ""
     );
+
+
+/* =========================================================
+   UPLOAD FILE
+========================================================= */
+
+const selectedFile =
+    ref<File | null>(
+        null
+    );
+
+
+const localPreviewUrl =
+    ref(
+        ""
+    );
+
+
+function clearLocalPreview() {
+
+    if (
+        localPreviewUrl.value
+    ) {
+
+        URL.revokeObjectURL(
+            localPreviewUrl.value
+        );
+
+
+        localPreviewUrl.value =
+            "";
+
+    }
+
+}
+
+
+function detectMediaType(
+    file:
+        File
+): ArtworkMediaType {
+
+    if (
+        file.type ===
+        "image/gif"
+    ) {
+
+        return "gif";
+
+    }
+
+
+    if (
+        file.type.startsWith(
+            "video/"
+        )
+    ) {
+
+        return "video";
+
+    }
+
+
+    return "image";
+
+}
+
+
+function onArtworkFileChange(
+    event:
+        Event
+) {
+
+    const input =
+        event.target as HTMLInputElement;
+
+
+    const file =
+        input.files?.[0]
+        ??
+        null;
+
+
+    clearLocalPreview();
+
+
+    selectedFile.value =
+        file;
+
+
+    if (
+        !file
+    ) {
+
+        return;
+
+    }
+
+
+    form.value.media_type =
+        detectMediaType(
+            file
+        );
+
+
+    localPreviewUrl.value =
+        URL.createObjectURL(
+            file
+        );
+
+
+    if (
+        !form.value.image_alt.trim()
+    ) {
+
+        form.value.image_alt =
+            file.name.replace(
+                /\.[^.]+$/,
+                ""
+            );
+
+    }
+
+}
 
 
 /* =========================================================
@@ -563,8 +688,11 @@ const canSave =
 
 
             if (
-                !form.value.image_url
-                    .trim()
+                !editing.value
+                &&
+                !selectedFile.value
+                &&
+                !form.value.image_url.trim()
             ) {
 
                 return false;
@@ -633,6 +761,8 @@ function getArtworkTags(
 const previewUrl =
     computed(
         () =>
+            localPreviewUrl.value
+            ||
             form.value.image_url
                 .trim()
     );
@@ -698,6 +828,13 @@ function openCreate() {
         false;
 
 
+    clearLocalPreview();
+
+
+    selectedFile.value =
+        null;
+
+
     form.value =
         createEmptyForm();
 
@@ -739,6 +876,13 @@ function openEdit(
 
     successMessage.value =
         "";
+
+
+    clearLocalPreview();
+
+
+    selectedFile.value =
+        null;
 
 
     form.value = {
@@ -873,6 +1017,44 @@ function closeForm() {
 
 
     selectedArtwork.value =
+        null;
+
+
+    clearLocalPreview();
+
+
+    selectedFile.value =
+        null;
+
+
+    form.value =
+        createEmptyForm();
+
+}
+
+
+/* =========================================================
+   FORCE CLOSE MODAL
+========================================================= */
+
+function forceCloseForm() {
+
+    formOpen.value =
+        false;
+
+
+    editing.value =
+        false;
+
+
+    selectedArtwork.value =
+        null;
+
+
+    clearLocalPreview();
+
+
+    selectedFile.value =
         null;
 
 
@@ -1036,6 +1218,34 @@ async function saveArtwork() {
 
     try {
 
+        if (
+            selectedFile.value
+        ) {
+
+            const uploadedUrl =
+                await uploadAdminArtworkFile(
+                    selectedFile.value,
+                    "credits"
+                );
+
+
+            form.value.image_url =
+                uploadedUrl;
+
+        }
+
+
+        if (
+            !form.value.image_url.trim()
+        ) {
+
+            throw new Error(
+                "Choisis une image ou une vidéo avant d'enregistrer."
+            );
+
+        }
+
+
         const payload =
             createPayload();
 
@@ -1082,7 +1292,7 @@ async function saveArtwork() {
         await loadArtworks();
 
 
-        closeForm();
+        forceCloseForm();
 
     }
     catch (
@@ -2344,21 +2554,38 @@ onMounted(
                                 >
 
                                     <label
-                                        for="artwork-url"
+                                        for="artwork-file"
                                     >
-                                        URL de l'image *
+                                        Image ou vidéo *
                                     </label>
 
 
                                     <input
-                                        id="artwork-url"
-                                        v-model="
+                                        id="artwork-file"
+                                        type="file"
+                                        accept="image/png,image/jpeg,image/webp,image/gif,video/mp4,video/webm,video/quicktime"
+                                        @change="
+                                            onArtworkFileChange
+                                        "
+                                    >
+
+
+                                    <small>
+                                        PNG, JPG, WEBP, GIF, MP4, WEBM ou MOV — 50 Mo maximum.
+                                    </small>
+
+
+                                    <small
+                                        v-if="
+                                            editing
+                                            &&
+                                            !selectedFile
+                                            &&
                                             form.image_url
                                         "
-                                        type="text"
-                                        required
-                                        placeholder="/images/credits/art.png"
                                     >
+                                        Laisse vide pour conserver le média actuel.
+                                    </small>
 
                                 </div>
 
@@ -2378,34 +2605,18 @@ onMounted(
                                         </label>
 
 
-                                        <select
+                                        <input
                                             id="artwork-media-type"
-                                            v-model="
-                                                form.media_type
+                                            :value="
+                                                form.media_type === 'video'
+                                                    ? 'Vidéo'
+                                                    : form.media_type === 'gif'
+                                                        ? 'GIF'
+                                                        : 'Image'
                                             "
+                                            type="text"
+                                            readonly
                                         >
-
-                                            <option
-                                                value="image"
-                                            >
-                                                Image
-                                            </option>
-
-
-                                            <option
-                                                value="gif"
-                                            >
-                                                GIF
-                                            </option>
-
-
-                                            <option
-                                                value="video"
-                                            >
-                                                Vidéo
-                                            </option>
-
-                                        </select>
 
                                     </div>
 

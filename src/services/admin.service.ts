@@ -3644,7 +3644,11 @@ export async function uploadAdminArtworkFile(
         "image/png",
         "image/jpeg",
         "image/webp",
-        "image/gif"
+        "image/gif",
+
+        "video/mp4",
+        "video/webm",
+        "video/quicktime"
 
     ];
 
@@ -3656,18 +3660,22 @@ export async function uploadAdminArtworkFile(
     ) {
 
         throw new Error(
-            "Format non autorisé."
+            "Format non autorisé. Utilise PNG, JPG, WEBP, GIF, MP4, WEBM ou MOV."
         );
 
     }
 
 
-    /* =====================================================
-       MAX 10 MO
-    ====================================================== */
+    /*
+     * Autorise les médias de plus de 20 Mo.
+     * Limite applicative : 50 Mo.
+     *
+     * Pense aussi à régler la limite du bucket Supabase
+     * \"artworks\" à au moins 50 Mo.
+     */
 
     const maxSize =
-        10
+        50
         *
         1024
         *
@@ -3681,7 +3689,7 @@ export async function uploadAdminArtworkFile(
     ) {
 
         throw new Error(
-            "Le fichier ne peut pas dépasser 10 Mo."
+            "Le fichier ne peut pas dépasser 50 Mo."
         );
 
     }
@@ -3693,7 +3701,13 @@ export async function uploadAdminArtworkFile(
             .pop()
             ?.toLowerCase()
         ??
-        "webp";
+        (
+            file.type.startsWith(
+                "video/"
+            )
+                ? "mp4"
+                : "webp"
+        );
 
 
     const safeFolder =
@@ -3751,7 +3765,9 @@ export async function uploadAdminArtworkFile(
         );
 
 
-        throw error;
+        throw new Error(
+            `Impossible d'envoyer le média : ${error.message}`
+        );
 
     }
 
@@ -3767,6 +3783,17 @@ export async function uploadAdminArtworkFile(
             .getPublicUrl(
                 path
             );
+
+
+    if (
+        !data.publicUrl
+    ) {
+
+        throw new Error(
+            "Supabase n'a pas renvoyé l'URL publique du média."
+        );
+
+    }
 
 
     return data.publicUrl;
