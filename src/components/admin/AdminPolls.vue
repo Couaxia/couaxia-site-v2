@@ -3,7 +3,8 @@
 import {
     computed,
     onMounted,
-    ref
+    ref,
+    watch
 } from "vue";
 
 import {
@@ -20,8 +21,7 @@ import {
 import type {
     AdminGame,
     AdminPoll,
-    AdminPollOption,
-    CreatePollPayload
+    AdminPollOption
 } from "../../services/admin.service";
 
 
@@ -36,26 +36,81 @@ type PollStatus =
 
 
 interface PollForm {
-    title: string;
 
-    question: string;
+    title:
+        string;
 
-    slug: string;
+    question:
+        string;
 
-    description: string;
+    slug:
+        string;
 
-    category: string;
+    description:
+        string;
 
-    status: PollStatus;
+    category:
+        string;
 
-    starts_at: string;
+    status:
+        PollStatus;
 
-    ends_at: string;
+    starts_at:
+        string;
 
-    results_visible: boolean;
+    ends_at:
+        string;
 
-    allow_suggestions: boolean;
+    results_visible:
+        boolean;
+
+    allow_suggestions:
+        boolean;
+
 }
+
+
+/* =========================================================
+   SUGGESTION DRAFT
+========================================================= */
+
+export interface PollDraftFromSuggestion {
+
+    suggestionId:
+        string;
+
+    title:
+        string;
+
+    question:
+        string;
+
+    description:
+        string;
+
+    category:
+        string;
+
+}
+
+
+/* =========================================================
+   PROPS
+========================================================= */
+
+const props =
+    withDefaults(
+        defineProps<{
+
+            suggestionDraft?:
+                PollDraftFromSuggestion | null;
+
+        }>(),
+        {
+            suggestionDraft:
+                null
+        }
+    );
 
 
 /* =========================================================
@@ -63,67 +118,89 @@ interface PollForm {
 ========================================================= */
 
 const polls =
-    ref<AdminPoll[]>([]);
-
+    ref<AdminPoll[]>(
+        []
+    );
 
 const games =
-    ref<AdminGame[]>([]);
-
+    ref<AdminGame[]>(
+        []
+    );
 
 const selectedPoll =
     ref<AdminPoll | null>(
         null
     );
 
-
 const selectedPollOptions =
-    ref<AdminPollOption[]>([]);
-
+    ref<AdminPollOption[]>(
+        []
+    );
 
 const selectedGameIds =
-    ref<string[]>([]);
-
-
-const loading =
-    ref(true);
-
-
-const saving =
-    ref(false);
-
-
-const deletingPollId =
-    ref<string | null>(
-        null
+    ref<string[]>(
+        []
     );
 
 
+const loading =
+    ref(
+        true
+    );
+
+const saving =
+    ref(
+        false
+    );
+
+const deleting =
+    ref(
+        false
+    );
+
 const loadingOptions =
-    ref(false);
+    ref(
+        false
+    );
 
 
 const formOpen =
-    ref(false);
-
+    ref(
+        false
+    );
 
 const editing =
-    ref(false);
+    ref(
+        false
+    );
 
 
 const errorMessage =
-    ref("");
-
+    ref(
+        ""
+    );
 
 const successMessage =
-    ref("");
+    ref(
+        ""
+    );
 
 
 const search =
-    ref("");
-
+    ref(
+        ""
+    );
 
 const gameSearch =
-    ref("");
+    ref(
+        ""
+    );
+
+
+const sourceSuggestionId =
+    ref<string | null>(
+        null
+    );
 
 
 /* =========================================================
@@ -134,6 +211,7 @@ function createEmptyForm():
     PollForm {
 
     return {
+
         title:
             "",
 
@@ -163,7 +241,9 @@ function createEmptyForm():
 
         allow_suggestions:
             false
+
     };
+
 }
 
 
@@ -174,7 +254,7 @@ const form =
 
 
 /* =========================================================
-   COMPUTED — POLLS
+   COMPUTED
 ========================================================= */
 
 const filteredPolls =
@@ -187,68 +267,58 @@ const filteredPolls =
                     .toLowerCase();
 
 
-            if (!query) {
+            if (
+                !query
+            ) {
+
                 return polls.value;
+
             }
 
 
             return polls.value.filter(
                 poll => {
 
-                    const title =
+                    return (
+
                         poll.title
                             ?.toLowerCase()
-                        ??
-                        "";
+                            .includes(
+                                query
+                            )
 
+                        ||
 
-                    const question =
                         poll.question
                             ?.toLowerCase()
-                        ??
-                        "";
+                            .includes(
+                                query
+                            )
 
+                        ||
 
-                    const category =
                         poll.category
                             ?.toLowerCase()
-                        ??
-                        "";
+                            .includes(
+                                query
+                            )
 
+                        ||
 
-                    const status =
                         poll.status
                             ?.toLowerCase()
-                        ??
-                        "";
+                            .includes(
+                                query
+                            )
 
-
-                    return (
-                        title.includes(
-                            query
-                        )
-                        ||
-                        question.includes(
-                            query
-                        )
-                        ||
-                        category.includes(
-                            query
-                        )
-                        ||
-                        status.includes(
-                            query
-                        )
                     );
+
                 }
             );
+
         }
     );
 
-
-/* =========================================================
-   COMPUTED — GAMES
-========================================================= */
 
 const pollEnabledGames =
     computed(
@@ -272,33 +342,27 @@ const filteredGames =
                     .toLowerCase();
 
 
-            if (!query) {
+            if (
+                !query
+            ) {
+
                 return pollEnabledGames.value;
+
             }
 
 
             return pollEnabledGames.value.filter(
-                game => {
-
-                    const gameName =
-                        game.twitch_name
-                            ?.toLowerCase()
-                        ??
-                        "";
-
-
-                    return gameName.includes(
-                        query
-                    );
-                }
+                game =>
+                    game.twitch_name
+                        ?.toLowerCase()
+                        .includes(
+                            query
+                        )
             );
+
         }
     );
 
-
-/* =========================================================
-   COMPUTED — STATS
-========================================================= */
 
 const activePollsCount =
     computed(
@@ -336,30 +400,34 @@ const closedPollsCount =
     );
 
 
-/* =========================================================
-   COMPUTED — FORM
-========================================================= */
-
 const canSave =
     computed(
         () => {
 
-            if (saving.value) {
+            if (
+                saving.value
+            ) {
+
                 return false;
+
             }
 
 
             if (
                 !form.value.title.trim()
             ) {
+
                 return false;
+
             }
 
 
             if (
                 !form.value.question.trim()
             ) {
+
                 return false;
+
             }
 
 
@@ -368,11 +436,14 @@ const canSave =
                 <
                 2
             ) {
+
                 return false;
+
             }
 
 
             return true;
+
         }
     );
 
@@ -386,8 +457,12 @@ function formatDate(
         string | null
 ): string {
 
-    if (!value) {
+    if (
+        !value
+    ) {
+
         return "—";
+
     }
 
 
@@ -402,7 +477,9 @@ function formatDate(
             date.getTime()
         )
     ) {
+
         return "—";
+
     }
 
 
@@ -418,11 +495,12 @@ function formatDate(
     ).format(
         date
     );
+
 }
 
 
 /* =========================================================
-   DATABASE DATE -> DATETIME-LOCAL
+   DATABASE DATE -> INPUT DATE
 ========================================================= */
 
 function toInputDate(
@@ -430,8 +508,12 @@ function toInputDate(
         string | null
 ): string {
 
-    if (!value) {
+    if (
+        !value
+    ) {
+
         return "";
+
     }
 
 
@@ -446,7 +528,9 @@ function toInputDate(
             date.getTime()
         )
     ) {
+
         return "";
+
     }
 
 
@@ -472,11 +556,12 @@ function toInputDate(
             0,
             16
         );
+
 }
 
 
 /* =========================================================
-   DATETIME-LOCAL -> ISO
+   INPUT DATE -> ISO
 ========================================================= */
 
 function toIsoDate(
@@ -484,8 +569,12 @@ function toIsoDate(
         string
 ): string | null {
 
-    if (!value) {
+    if (
+        !value
+    ) {
+
         return null;
+
     }
 
 
@@ -500,11 +589,14 @@ function toIsoDate(
             date.getTime()
         )
     ) {
+
         return null;
+
     }
 
 
     return date.toISOString();
+
 }
 
 
@@ -533,8 +625,8 @@ function generateSlug(
         )
         .replace(
             /^-+|-+$/g,
-            ""
-        );
+            "");
+
 }
 
 
@@ -544,14 +636,14 @@ function generateSlug(
 
 function handleTitleChange() {
 
-    /*
-     * En modification :
-     * on ne touche pas automatiquement
-     * au slug existant.
-     */
+    if (
+        editing.value
+        ||
+        form.value.slug
+    ) {
 
-    if (editing.value) {
         return;
+
     }
 
 
@@ -559,6 +651,7 @@ function handleTitleChange() {
         generateSlug(
             form.value.title
         );
+
 }
 
 
@@ -570,6 +663,7 @@ async function loadPolls() {
 
     polls.value =
         await getAdminPolls();
+
 }
 
 
@@ -581,6 +675,7 @@ async function loadGames() {
 
     games.value =
         await getAdminGames();
+
 }
 
 
@@ -605,6 +700,7 @@ async function loadData() {
             loadGames()
         ]);
 
+
     } catch (error) {
 
         console.error(
@@ -614,15 +710,186 @@ async function loadData() {
 
 
         errorMessage.value =
+
             error instanceof Error
+
                 ? error.message
+
                 : "Impossible de charger les sondages.";
 
     } finally {
 
         loading.value =
             false;
+
     }
+
+}
+
+
+/* =========================================================
+   NORMALIZE SUGGESTION CATEGORY
+========================================================= */
+
+function normalizeSuggestionCategory(
+    value:
+        string
+):
+    string {
+
+    const category =
+        value
+            .trim()
+            .toLowerCase();
+
+
+    switch (
+        category
+    ) {
+
+        case "jeu":
+        case "jeux":
+        case "game":
+        case "games":
+
+            return "games";
+
+
+        case "stream":
+        case "live":
+
+            return "stream";
+
+
+        case "communaute":
+        case "communauté":
+        case "community":
+
+            return "community";
+
+
+        case "evenement":
+        case "événement":
+        case "event":
+
+            return "event";
+
+
+        case "autre":
+        case "other":
+
+            return "other";
+
+
+        default:
+
+            return category
+                ||
+                "games";
+
+    }
+
+}
+
+
+/* =========================================================
+   APPLY SUGGESTION DRAFT
+========================================================= */
+
+function applySuggestionDraft(
+    draft:
+        PollDraftFromSuggestion
+) {
+
+    selectedPoll.value =
+        null;
+
+
+    selectedPollOptions.value =
+        [];
+
+
+    selectedGameIds.value =
+        [];
+
+
+    const title =
+        draft.title
+            ?.trim()
+        ||
+        draft.question
+            ?.trim()
+        ||
+        "Sondage proposé";
+
+
+    const question =
+        draft.question
+            ?.trim()
+        ||
+        title;
+
+
+    form.value = {
+
+        ...createEmptyForm(),
+
+        title,
+
+        question,
+
+        slug:
+            generateSlug(
+                title
+            ),
+
+        description:
+            draft.description
+                ?.trim()
+            ||
+            "",
+
+        category:
+            normalizeSuggestionCategory(
+                draft.category
+                ??
+                ""
+            ),
+
+        /*
+         * Une suggestion approuvée ne doit jamais
+         * publier automatiquement un sondage.
+         */
+
+        status:
+            "draft"
+
+    };
+
+
+    sourceSuggestionId.value =
+        draft.suggestionId;
+
+
+    editing.value =
+        false;
+
+
+    formOpen.value =
+        true;
+
+
+    gameSearch.value =
+        "";
+
+
+    errorMessage.value =
+        "";
+
+
+    successMessage.value =
+        "";
+
 }
 
 
@@ -631,6 +898,10 @@ async function loadData() {
 ========================================================= */
 
 function openCreate() {
+
+    sourceSuggestionId.value =
+        null;
+
 
     selectedPoll.value =
         null;
@@ -648,10 +919,6 @@ function openCreate() {
         createEmptyForm();
 
 
-    gameSearch.value =
-        "";
-
-
     editing.value =
         false;
 
@@ -666,6 +933,7 @@ function openCreate() {
 
     successMessage.value =
         "";
+
 }
 
 
@@ -696,6 +964,7 @@ async function loadPollOptions(
                     option.game_id
             );
 
+
     } catch (error) {
 
         console.error(
@@ -706,11 +975,14 @@ async function loadPollOptions(
 
         throw error;
 
+
     } finally {
 
         loadingOptions.value =
             false;
+
     }
+
 }
 
 
@@ -722,6 +994,10 @@ async function openEdit(
     poll:
         AdminPoll
 ) {
+
+    sourceSuggestionId.value =
+        null;
+
 
     selectedPoll.value =
         poll;
@@ -735,10 +1011,6 @@ async function openEdit(
         true;
 
 
-    gameSearch.value =
-        "";
-
-
     errorMessage.value =
         "";
 
@@ -748,6 +1020,7 @@ async function openEdit(
 
 
     form.value = {
+
         title:
             poll.title
             ??
@@ -795,6 +1068,7 @@ async function openEdit(
 
         allow_suggestions:
             poll.allow_suggestions
+
     };
 
 
@@ -804,13 +1078,19 @@ async function openEdit(
             poll
         );
 
+
     } catch (error) {
 
         errorMessage.value =
+
             error instanceof Error
+
                 ? error.message
+
                 : "Impossible de charger les jeux du sondage.";
+
     }
+
 }
 
 
@@ -820,8 +1100,12 @@ async function openEdit(
 
 function closeForm() {
 
-    if (saving.value) {
+    if (
+        saving.value
+    ) {
+
         return;
+
     }
 
 
@@ -849,8 +1133,13 @@ function closeForm() {
         "";
 
 
+    sourceSuggestionId.value =
+        null;
+
+
     form.value =
         createEmptyForm();
+
 }
 
 
@@ -870,9 +1159,7 @@ function toggleGame(
 
 
     if (
-        index
-        >=
-        0
+        index >= 0
     ) {
 
         selectedGameIds.value.splice(
@@ -881,12 +1168,14 @@ function toggleGame(
         );
 
         return;
+
     }
 
 
     selectedGameIds.value.push(
         gameId
     );
+
 }
 
 
@@ -912,9 +1201,9 @@ async function syncPollOptions(
         );
 
 
-    /* =====================================================
-       REMOVE OPTIONS
-    ====================================================== */
+    /* -----------------------------------------------------
+       DELETE REMOVED
+    ------------------------------------------------------ */
 
     const optionsToDelete =
         currentOptions.filter(
@@ -934,12 +1223,13 @@ async function syncPollOptions(
         await deleteAdminPollOption(
             option.id
         );
+
     }
 
 
-    /* =====================================================
-       ADD OPTIONS
-    ====================================================== */
+    /* -----------------------------------------------------
+       ADD NEW
+    ------------------------------------------------------ */
 
     const gameIdsToAdd =
         selectedGameIds.value.filter(
@@ -963,26 +1253,35 @@ async function syncPollOptions(
 
 
         await addAdminPollOption({
+
             poll_id:
                 pollId,
 
             game_id:
                 gameId,
 
-            position
+            position:
+                position
+
         });
+
     }
+
 }
 
 
 /* =========================================================
-   SAVE POLL
+   SAVE
 ========================================================= */
 
 async function savePoll() {
 
-    if (!canSave.value) {
+    if (
+        !canSave.value
+    ) {
+
         return;
+
     }
 
 
@@ -1012,10 +1311,6 @@ async function savePoll() {
             );
 
 
-        /* =================================================
-           DATE VALIDATION
-        ================================================== */
-
         if (
             startsAt
             &&
@@ -1033,21 +1328,19 @@ async function savePoll() {
             throw new Error(
                 "La date de fin doit être après la date de début."
             );
+
         }
 
 
-        /* =================================================
-           PAYLOAD
-        ================================================== */
-
-        const payload:
-            CreatePollPayload = {
+        const payload = {
 
             title:
-                form.value.title.trim(),
+                form.value.title
+                    .trim(),
 
             question:
-                form.value.question.trim(),
+                form.value.question
+                    .trim(),
 
             slug:
                 form.value.slug
@@ -1083,16 +1376,13 @@ async function savePoll() {
 
             allow_suggestions:
                 form.value.allow_suggestions
+
         };
 
 
         let savedPoll:
             AdminPoll;
 
-
-        /* =================================================
-           UPDATE
-        ================================================== */
 
         if (
             editing.value
@@ -1106,48 +1396,36 @@ async function savePoll() {
                     payload
                 );
 
-        }
 
-        /* =================================================
-           CREATE
-        ================================================== */
-
-        else {
+        } else {
 
             savedPoll =
                 await createAdminPoll(
                     payload
                 );
+
         }
 
-
-        /* =================================================
-           OPTIONS
-        ================================================== */
 
         await syncPollOptions(
             savedPoll.id
         );
 
 
-        /* =================================================
-           REFRESH
-        ================================================== */
-
         await loadPolls();
 
 
-        const wasEditing =
-            editing.value;
+        successMessage.value =
+
+            editing.value
+
+                ? "Le sondage a bien été modifié. 💜"
+
+                : "Le sondage a bien été créé. 💜";
 
 
         closeForm();
 
-
-        successMessage.value =
-            wasEditing
-                ? "Le sondage a bien été modifié. 💜"
-                : "Le sondage a bien été créé. 💜";
 
     } catch (error) {
 
@@ -1158,15 +1436,20 @@ async function savePoll() {
 
 
         errorMessage.value =
+
             error instanceof Error
+
                 ? error.message
+
                 : "Impossible d'enregistrer le sondage.";
 
     } finally {
 
         saving.value =
             false;
+
     }
+
 }
 
 
@@ -1177,7 +1460,6 @@ async function savePoll() {
 async function changeStatus(
     poll:
         AdminPoll,
-
     status:
         PollStatus
 ) {
@@ -1211,18 +1493,18 @@ async function changeStatus(
 
 
         if (
-            index
-            >=
-            0
+            index >= 0
         ) {
 
             polls.value[index] =
                 updated;
+
         }
 
 
         successMessage.value =
-            "Statut du sondage mis à jour. 💜";
+            "Statut du sondage mis à jour.";
+
 
     } catch (error) {
 
@@ -1233,45 +1515,79 @@ async function changeStatus(
 
 
         errorMessage.value =
+
             error instanceof Error
+
                 ? error.message
+
                 : "Impossible de modifier le statut.";
+
     }
+
 }
 
 
 /* =========================================================
-   HANDLE STATUS CHANGE
+   STATUS SELECT CHANGE
 ========================================================= */
 
 function handleStatusChange(
-    poll: AdminPoll,
-    event: Event
+    poll:
+        AdminPoll,
+    event:
+        Event
 ) {
 
     const target =
-        event.target as HTMLSelectElement | null;
+        event.target;
 
 
-    if (!target) {
+    if (
+        !(
+            target
+            instanceof
+            HTMLSelectElement
+        )
+    ) {
+
         return;
+
     }
 
 
-    const status =
-        target.value as PollStatus;
+    const value =
+        target.value;
+
+
+    if (
+        value
+        !==
+        "draft"
+        &&
+        value
+        !==
+        "active"
+        &&
+        value
+        !==
+        "closed"
+    ) {
+
+        return;
+
+    }
 
 
     void changeStatus(
         poll,
-        status
+        value
     );
 
 }
 
 
 /* =========================================================
-   DELETE POLL
+   DELETE
 ========================================================= */
 
 async function removePoll(
@@ -1280,33 +1596,31 @@ async function removePoll(
 ) {
 
     if (
-        deletingPollId.value
+        deleting.value
     ) {
+
         return;
+
     }
-
-
-    const pollName =
-        poll.title
-        ??
-        poll.question
-        ??
-        "Sans titre";
 
 
     const confirmed =
         window.confirm(
-            `Supprimer définitivement le sondage "${pollName}" ?`
+            `Supprimer définitivement le sondage "${poll.title ?? poll.question ?? "Sans titre"}" ?`
         );
 
 
-    if (!confirmed) {
+    if (
+        !confirmed
+    ) {
+
         return;
+
     }
 
 
-    deletingPollId.value =
-        poll.id;
+    deleting.value =
+        true;
 
 
     errorMessage.value =
@@ -1336,6 +1650,7 @@ async function removePoll(
         successMessage.value =
             "Le sondage a été supprimé.";
 
+
     } catch (error) {
 
         console.error(
@@ -1345,15 +1660,20 @@ async function removePoll(
 
 
         errorMessage.value =
+
             error instanceof Error
+
                 ? error.message
+
                 : "Impossible de supprimer le sondage.";
 
     } finally {
 
-        deletingPollId.value =
-            null;
+        deleting.value =
+            false;
+
     }
+
 }
 
 
@@ -1366,7 +1686,9 @@ function getStatusLabel(
         string
 ): string {
 
-    switch (status) {
+    switch (
+        status
+    ) {
 
         case "active":
 
@@ -1386,7 +1708,9 @@ function getStatusLabel(
         default:
 
             return status;
+
     }
+
 }
 
 
@@ -1402,7 +1726,9 @@ function getGameImage(
     if (
         !game.box_art_url
     ) {
+
         return null;
+
     }
 
 
@@ -1415,7 +1741,57 @@ function getGameImage(
             "{height}",
             "380"
         );
+
 }
+
+
+/* =========================================================
+   WATCH SUGGESTION DRAFT
+========================================================= */
+
+watch(
+    () =>
+        props.suggestionDraft,
+
+    draft => {
+
+        if (
+            !draft
+        ) {
+
+            return;
+
+        }
+
+
+        /*
+         * Évite de rouvrir le même brouillon
+         * si le parent réutilise exactement la même suggestion.
+         */
+
+        if (
+            sourceSuggestionId.value
+            ===
+            draft.suggestionId
+            &&
+            formOpen.value
+        ) {
+
+            return;
+
+        }
+
+
+        applySuggestionDraft(
+            draft
+        );
+
+    },
+    {
+        deep:
+            true
+    }
+);
 
 
 /* =========================================================
@@ -1423,7 +1799,22 @@ function getGameImage(
 ========================================================= */
 
 onMounted(
-    loadData
+    async () => {
+
+        await loadData();
+
+
+        if (
+            props.suggestionDraft
+        ) {
+
+            applySuggestionDraft(
+                props.suggestionDraft
+            );
+
+        }
+
+    }
 );
 
 </script>
@@ -1471,7 +1862,9 @@ onMounted(
                     admin-button
                     admin-button--primary
                 "
-                @click="openCreate"
+                @click="
+                    openCreate
+                "
             >
                 ＋ Nouveau sondage
             </button>
@@ -1484,7 +1877,9 @@ onMounted(
         ================================================== -->
 
         <div
-            v-if="successMessage"
+            v-if="
+                successMessage
+            "
             class="
                 admin-message
                 admin-message--success
@@ -1495,7 +1890,9 @@ onMounted(
 
 
         <div
-            v-if="errorMessage"
+            v-if="
+                errorMessage
+            "
             class="
                 admin-message
                 admin-message--error
@@ -1510,7 +1907,9 @@ onMounted(
         ================================================== -->
 
         <div
-            v-if="loading"
+            v-if="
+                loading
+            "
             class="admin-loading"
         >
 
@@ -1518,17 +1917,12 @@ onMounted(
                 🐙
             </span>
 
-
             <strong>
                 Chargement des sondages...
             </strong>
 
         </div>
 
-
-        <!-- =================================================
-             CONTENT
-        ================================================== -->
 
         <template
             v-else
@@ -1545,64 +1939,52 @@ onMounted(
                 <article
                     class="admin-mini-stat"
                 >
-
                     <span>
                         Total
                     </span>
 
-
                     <strong>
                         {{ polls.length }}
                     </strong>
-
                 </article>
 
 
                 <article
                     class="admin-mini-stat"
                 >
-
                     <span>
                         Actifs
                     </span>
 
-
                     <strong>
                         {{ activePollsCount }}
                     </strong>
-
                 </article>
 
 
                 <article
                     class="admin-mini-stat"
                 >
-
                     <span>
                         Brouillons
                     </span>
 
-
                     <strong>
                         {{ draftPollsCount }}
                     </strong>
-
                 </article>
 
 
                 <article
                     class="admin-mini-stat"
                 >
-
                     <span>
                         Terminés
                     </span>
 
-
                     <strong>
                         {{ closedPollsCount }}
                     </strong>
-
                 </article>
 
             </div>
@@ -1628,7 +2010,9 @@ onMounted(
 
 
                     <input
-                        v-model="search"
+                        v-model="
+                            search
+                        "
                         type="search"
                         placeholder="Rechercher un sondage..."
                     >
@@ -1639,8 +2023,9 @@ onMounted(
                 <span
                     class="admin-toolbar__count"
                 >
-                    {{ filteredPolls.length }}
-
+                    {{
+                        filteredPolls.length
+                    }}
                     sondage{{
                         filteredPolls.length > 1
                             ? "s"
@@ -1675,22 +2060,23 @@ onMounted(
 
 
                 <p>
-                    {{
-                        search
-                            ? "Aucun sondage ne correspond à ta recherche."
-                            : "Crée ton premier sondage pour commencer."
-                    }}
+                    Crée ton premier sondage
+                    pour commencer.
                 </p>
 
 
                 <button
-                    v-if="!search"
+                    v-if="
+                        !search
+                    "
                     type="button"
                     class="
                         admin-button
                         admin-button--primary
                     "
-                    @click="openCreate"
+                    @click="
+                        openCreate
+                    "
                 >
                     Créer un sondage
                 </button>
@@ -1713,13 +2099,13 @@ onMounted(
                         in
                         filteredPolls
                     "
-                    :key="poll.id"
+                    :key="
+                        poll.id
+                    "
                     class="admin-poll-card"
                 >
 
-                    <!-- =====================================
-                         STATUS
-                    ====================================== -->
+                    <!-- STATUS -->
 
                     <div
                         class="
@@ -1737,9 +2123,7 @@ onMounted(
                     </div>
 
 
-                    <!-- =====================================
-                         CONTENT
-                    ====================================== -->
+                    <!-- CONTENT -->
 
                     <div
                         class="
@@ -1783,7 +2167,9 @@ onMounted(
 
 
                         <p
-                            v-if="poll.description"
+                            v-if="
+                                poll.description
+                            "
                             class="
                                 admin-poll-card__description
                             "
@@ -1800,7 +2186,6 @@ onMounted(
 
                             <span>
                                 📅 Début :
-
                                 {{
                                     formatDate(
                                         poll.starts_at
@@ -1811,7 +2196,6 @@ onMounted(
 
                             <span>
                                 🏁 Fin :
-
                                 {{
                                     formatDate(
                                         poll.ends_at
@@ -1842,13 +2226,7 @@ onMounted(
                     </div>
 
 
-                    <!-- =====================================
-                         ACTIONS
-
-                         IMPORTANT :
-                         ici on utilise bien "poll"
-                         et PAS "polls".
-                    ====================================== -->
+                    <!-- ACTIONS -->
 
                     <div
                         class="
@@ -1857,8 +2235,12 @@ onMounted(
                     >
 
                         <select
-                            :value="poll.status"
-                            class="admin-select"
+                            :value="
+                                poll.status
+                            "
+                            class="
+                                admin-select
+                            "
                             @change="
                                 handleStatusChange(
                                     poll,
@@ -1866,13 +2248,11 @@ onMounted(
                                 )
                             "
                         >
-
                             <option
                                 value="draft"
                             >
                                 Brouillon
                             </option>
-
 
                             <option
                                 value="active"
@@ -1880,13 +2260,11 @@ onMounted(
                                 Actif
                             </option>
 
-
                             <option
                                 value="closed"
                             >
                                 Terminé
                             </option>
-
                         </select>
 
 
@@ -1913,9 +2291,7 @@ onMounted(
                                 admin-button--danger
                             "
                             :disabled="
-                                deletingPollId
-                                ===
-                                poll.id
+                                deleting
                             "
                             @click="
                                 removePoll(
@@ -1923,15 +2299,7 @@ onMounted(
                                 )
                             "
                         >
-                            {{
-                                deletingPollId
-                                ===
-                                poll.id
-
-                                    ? "Suppression..."
-
-                                    : "🗑 Supprimer"
-                            }}
+                            🗑 Supprimer
                         </button>
 
                     </div>
@@ -1952,9 +2320,13 @@ onMounted(
         >
 
             <div
-                v-if="formOpen"
+                v-if="
+                    formOpen
+                "
                 class="admin-modal"
-                @click.self="closeForm"
+                @click.self="
+                    closeForm
+                "
             >
 
                 <div
@@ -2001,9 +2373,13 @@ onMounted(
                             class="
                                 admin-modal__close
                             "
-                            :disabled="saving"
+                            :disabled="
+                                saving
+                            "
                             aria-label="Fermer"
-                            @click="closeForm"
+                            @click="
+                                closeForm
+                            "
                         >
                             ×
                         </button>
@@ -2012,60 +2388,93 @@ onMounted(
 
 
                     <!-- =====================================
+                         SUGGESTION SOURCE
+                    ====================================== -->
+
+                    <div
+                        v-if="
+                            sourceSuggestionId
+                            &&
+                            !editing
+                        "
+                        class="
+                            admin-message
+                            admin-message--success
+                        "
+                    >
+                        💡 Formulaire prérempli depuis une suggestion approuvée.
+                        Vérifie les informations, choisis les jeux et crée le sondage
+                        quand tout est prêt.
+                    </div>
+
+
+                    <!-- =====================================
                          FORM
                     ====================================== -->
 
                     <form
                         class="admin-form"
-                        @submit.prevent="savePoll"
+                        @submit.prevent="
+                            savePoll
+                        "
                     >
 
-                        <!-- =================================
-                             TITLE
-                        ================================== -->
+                        <!-- TITLE -->
 
                         <div
                             class="admin-field"
                         >
 
                             <label
-                                for="admin-poll-title"
+                                for="
+                                    admin-poll-title
+                                "
                             >
                                 Titre *
                             </label>
 
 
                             <input
-                                id="admin-poll-title"
-                                v-model="form.title"
+                                id="
+                                    admin-poll-title
+                                "
+                                v-model="
+                                    form.title
+                                "
                                 type="text"
                                 maxlength="120"
                                 placeholder="Quel jeu veux-tu voir en live ?"
                                 required
-                                @input="handleTitleChange"
+                                @input="
+                                    handleTitleChange
+                                "
                             >
 
                         </div>
 
 
-                        <!-- =================================
-                             QUESTION
-                        ================================== -->
+                        <!-- QUESTION -->
 
                         <div
                             class="admin-field"
                         >
 
                             <label
-                                for="admin-poll-question"
+                                for="
+                                    admin-poll-question
+                                "
                             >
                                 Question *
                             </label>
 
 
                             <input
-                                id="admin-poll-question"
-                                v-model="form.question"
+                                id="
+                                    admin-poll-question
+                                "
+                                v-model="
+                                    form.question
+                                "
                                 type="text"
                                 maxlength="200"
                                 placeholder="Pour quel jeu veux-tu voter ?"
@@ -2075,9 +2484,7 @@ onMounted(
                         </div>
 
 
-                        <!-- =================================
-                             SLUG + CATEGORY
-                        ================================== -->
+                        <!-- SLUG + CATEGORY -->
 
                         <div
                             class="
@@ -2090,15 +2497,21 @@ onMounted(
                             >
 
                                 <label
-                                    for="admin-poll-slug"
+                                    for="
+                                        admin-poll-slug
+                                    "
                                 >
                                     Slug
                                 </label>
 
 
                                 <input
-                                    id="admin-poll-slug"
-                                    v-model="form.slug"
+                                    id="
+                                        admin-poll-slug
+                                    "
+                                    v-model="
+                                        form.slug
+                                    "
                                     type="text"
                                     placeholder="jeu-prochain-live"
                                 >
@@ -2111,15 +2524,21 @@ onMounted(
                             >
 
                                 <label
-                                    for="admin-poll-category"
+                                    for="
+                                        admin-poll-category
+                                    "
                                 >
                                     Catégorie
                                 </label>
 
 
                                 <input
-                                    id="admin-poll-category"
-                                    v-model="form.category"
+                                    id="
+                                        admin-poll-category
+                                    "
+                                    v-model="
+                                        form.category
+                                    "
                                     type="text"
                                     placeholder="games"
                                 >
@@ -2129,24 +2548,28 @@ onMounted(
                         </div>
 
 
-                        <!-- =================================
-                             DESCRIPTION
-                        ================================== -->
+                        <!-- DESCRIPTION -->
 
                         <div
                             class="admin-field"
                         >
 
                             <label
-                                for="admin-poll-description"
+                                for="
+                                    admin-poll-description
+                                "
                             >
                                 Description
                             </label>
 
 
                             <textarea
-                                id="admin-poll-description"
-                                v-model="form.description"
+                                id="
+                                    admin-poll-description
+                                "
+                                v-model="
+                                    form.description
+                                "
                                 rows="4"
                                 maxlength="500"
                                 placeholder="Explique le sondage aux POUP..."
@@ -2155,32 +2578,34 @@ onMounted(
                         </div>
 
 
-                        <!-- =================================
-                             STATUS
-                        ================================== -->
+                        <!-- STATUS -->
 
                         <div
                             class="admin-field"
                         >
 
                             <label
-                                for="admin-poll-status"
+                                for="
+                                    admin-poll-status
+                                "
                             >
                                 Statut
                             </label>
 
 
                             <select
-                                id="admin-poll-status"
-                                v-model="form.status"
+                                id="
+                                    admin-poll-status
+                                "
+                                v-model="
+                                    form.status
+                                "
                             >
-
                                 <option
                                     value="draft"
                                 >
                                     Brouillon
                                 </option>
-
 
                                 <option
                                     value="active"
@@ -2188,21 +2613,17 @@ onMounted(
                                     Actif
                                 </option>
 
-
                                 <option
                                     value="closed"
                                 >
                                     Terminé
                                 </option>
-
                             </select>
 
                         </div>
 
 
-                        <!-- =================================
-                             DATES
-                        ================================== -->
+                        <!-- DATES -->
 
                         <div
                             class="
@@ -2215,15 +2636,21 @@ onMounted(
                             >
 
                                 <label
-                                    for="admin-poll-start"
+                                    for="
+                                        admin-poll-start
+                                    "
                                 >
                                     Date de début
                                 </label>
 
 
                                 <input
-                                    id="admin-poll-start"
-                                    v-model="form.starts_at"
+                                    id="
+                                        admin-poll-start
+                                    "
+                                    v-model="
+                                        form.starts_at
+                                    "
                                     type="datetime-local"
                                 >
 
@@ -2235,15 +2662,21 @@ onMounted(
                             >
 
                                 <label
-                                    for="admin-poll-end"
+                                    for="
+                                        admin-poll-end
+                                    "
                                 >
                                     Date de fin
                                 </label>
 
 
                                 <input
-                                    id="admin-poll-end"
-                                    v-model="form.ends_at"
+                                    id="
+                                        admin-poll-end
+                                    "
+                                    v-model="
+                                        form.ends_at
+                                    "
                                     type="datetime-local"
                                 >
 
@@ -2252,9 +2685,7 @@ onMounted(
                         </div>
 
 
-                        <!-- =================================
-                             SETTINGS
-                        ================================== -->
+                        <!-- SETTINGS -->
 
                         <div
                             class="
@@ -2273,7 +2704,6 @@ onMounted(
                                     <strong>
                                         Résultats visibles
                                     </strong>
-
 
                                     <span>
                                         Les POUP peuvent voir
@@ -2304,7 +2734,6 @@ onMounted(
                                     <strong>
                                         Suggestions
                                     </strong>
-
 
                                     <span>
                                         Autoriser les suggestions
@@ -2374,7 +2803,6 @@ onMounted(
                                     {{
                                         selectedGameIds.length
                                     }}
-
                                     sélectionné{{
                                         selectedGameIds.length > 1
                                             ? "s"
@@ -2385,10 +2813,6 @@ onMounted(
                             </header>
 
 
-                            <!-- =============================
-                                 GAME SEARCH
-                            ============================== -->
-
                             <div
                                 class="
                                     admin-search
@@ -2396,15 +2820,15 @@ onMounted(
                                 "
                             >
 
-                                <span
-                                    aria-hidden="true"
-                                >
+                                <span>
                                     🔎
                                 </span>
 
 
                                 <input
-                                    v-model="gameSearch"
+                                    v-model="
+                                        gameSearch
+                                    "
                                     type="search"
                                     placeholder="Rechercher un jeu..."
                                 >
@@ -2412,12 +2836,10 @@ onMounted(
                             </div>
 
 
-                            <!-- =============================
-                                 LOADING OPTIONS
-                            ============================== -->
-
                             <div
-                                v-if="loadingOptions"
+                                v-if="
+                                    loadingOptions
+                                "
                                 class="
                                     admin-loading
                                     admin-loading--small
@@ -2426,10 +2848,6 @@ onMounted(
                                 Chargement des jeux...
                             </div>
 
-
-                            <!-- =============================
-                                 GAMES GRID
-                            ============================== -->
 
                             <div
                                 v-else-if="
@@ -2446,7 +2864,9 @@ onMounted(
                                         in
                                         filteredGames
                                     "
-                                    :key="game.id"
+                                    :key="
+                                        game.id
+                                    "
                                     type="button"
                                     class="
                                         admin-poll-game
@@ -2491,7 +2911,6 @@ onMounted(
 
                                         <span
                                             v-else
-                                            aria-hidden="true"
                                         >
                                             🎮
                                         </span>
@@ -2506,7 +2925,6 @@ onMounted(
                                             class="
                                                 admin-poll-game__check
                                             "
-                                            aria-hidden="true"
                                         >
                                             ✓
                                         </span>
@@ -2527,10 +2945,6 @@ onMounted(
                             </div>
 
 
-                            <!-- =============================
-                                 NO GAMES
-                            ============================== -->
-
                             <div
                                 v-else
                                 class="
@@ -2544,44 +2958,14 @@ onMounted(
                                 </span>
 
 
-                                <strong>
-                                    Aucun jeu disponible
-                                </strong>
-
-
                                 <p>
-                                    {{
-                                        gameSearch
-
-                                            ? "Aucun jeu ne correspond à ta recherche."
-
-                                            : "Active des jeux pour les sondages dans l'onglet Jeux."
-                                    }}
+                                    Aucun jeu activé pour
+                                    les sondages.
                                 </p>
 
                             </div>
 
                         </section>
-
-
-                        <!-- =================================
-                             FORM INFO
-                        ================================== -->
-
-                        <p
-                            v-if="
-                                selectedGameIds.length
-                                <
-                                2
-                            "
-                            class="
-                                admin-form__validation
-                            "
-                        >
-                            ⚠️ Sélectionne au minimum
-                            2 jeux pour pouvoir enregistrer
-                            le sondage.
-                        </p>
 
 
                         <!-- =================================
@@ -2600,8 +2984,12 @@ onMounted(
                                     admin-button
                                     admin-button--secondary
                                 "
-                                :disabled="saving"
-                                @click="closeForm"
+                                :disabled="
+                                    saving
+                                "
+                                @click="
+                                    closeForm
+                                "
                             >
                                 Annuler
                             </button>
@@ -2613,7 +3001,9 @@ onMounted(
                                     admin-button
                                     admin-button--primary
                                 "
-                                :disabled="!canSave"
+                                :disabled="
+                                    !canSave
+                                "
                             >
 
                                 {{

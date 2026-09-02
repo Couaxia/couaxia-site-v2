@@ -35,6 +35,46 @@ type SuggestionFilter =
 
 
 /* =========================================================
+   CREATE POLL DRAFT
+========================================================= */
+
+export interface PollDraftFromSuggestion {
+
+    suggestionId:
+        string;
+
+    title:
+        string;
+
+    question:
+        string;
+
+    description:
+        string;
+
+    category:
+        string;
+
+}
+
+
+/* =========================================================
+   EMITS
+========================================================= */
+
+const emit =
+    defineEmits<{
+
+        createPollFromSuggestion:
+            [
+                draft:
+                    PollDraftFromSuggestion
+            ];
+
+    }>();
+
+
+/* =========================================================
    STATE
 ========================================================= */
 
@@ -116,6 +156,18 @@ const filteredSuggestions =
                         "",
 
                         suggestion.category
+                        ??
+                        "",
+
+                        suggestion.profile?.display_name
+                        ??
+                        "",
+
+                        suggestion.profile?.username
+                        ??
+                        "",
+
+                        suggestion.user_id
                         ??
                         ""
 
@@ -438,6 +490,112 @@ async function removeSuggestion(
             null;
 
     }
+
+}
+
+
+/* =========================================================
+   CREATE POLL FROM SUGGESTION
+========================================================= */
+
+function createPollFromSuggestion(
+    suggestion:
+        AdminSuggestion
+) {
+
+    /*
+     * Par sécurité, on ne permet la création
+     * d'un sondage qu'à partir d'une suggestion approuvée.
+     */
+
+    if (
+        suggestion.status
+        !==
+        "approved"
+    ) {
+
+        errorMessage.value =
+            "Tu dois d'abord approuver cette suggestion.";
+
+
+        return;
+
+    }
+
+
+    errorMessage.value =
+        "";
+
+
+    successMessage.value =
+        "";
+
+
+    const question =
+        (
+            suggestion.question
+            ??
+            ""
+        ).trim();
+
+
+    const description =
+        (
+            suggestion.description
+            ??
+            ""
+        ).trim();
+
+
+    const category =
+        (
+            suggestion.category
+            ??
+            "games"
+        ).trim()
+        ||
+        "games";
+
+
+    const draft:
+        PollDraftFromSuggestion = {
+
+            suggestionId:
+                suggestion.id,
+
+            /*
+             * On réutilise la question comme titre initial.
+             * AdminPolls pourra ensuite être modifié librement
+             * avant l'enregistrement.
+             */
+
+            title:
+                question
+                ||
+                "Sondage proposé",
+
+            question:
+                question,
+
+            description:
+                description,
+
+            category:
+                category
+
+        };
+
+
+    /*
+     * Le parent Admin.vue recevra cet événement,
+     * changera d'onglet vers "polls" et transmettra
+     * le brouillon à AdminPolls.vue.
+     */
+
+    emit(
+        "createPollFromSuggestion",
+        draft
+    );
 
 }
 
@@ -1026,25 +1184,109 @@ onMounted(
                     class="admin-suggestion-card__user"
                 >
 
-                    <span>
-                        👤
-                    </span>
+                    <!-- =====================================
+                         AVATAR
+                    ====================================== -->
+
+                    <div
+                        class="
+                            admin-suggestion-card__user-avatar
+                        "
+                    >
+
+                        <img
+                            v-if="
+                                suggestion.profile?.avatar_url
+                            "
+                            :src="
+                                suggestion.profile.avatar_url
+                            "
+                            :alt="
+                                `Avatar de ${
+                                    suggestion.profile.display_name
+                                    ||
+                                    suggestion.profile.username
+                                    ||
+                                    'POUP'
+                                }`
+                            "
+                        >
 
 
-                    <div>
+                        <span
+                            v-else
+                            aria-hidden="true"
+                        >
+                            👤
+                        </span>
+
+                    </div>
+
+
+                    <!-- =====================================
+                         INFOS
+                    ====================================== -->
+
+                    <div
+                        class="
+                            admin-suggestion-card__user-info
+                        "
+                    >
 
                         <small>
-                            Utilisateur
+                            UTILISATEUR
                         </small>
 
 
-                        <code>
+                        <strong>
+                            {{
+                                suggestion.profile?.display_name
+                                ||
+                                suggestion.profile?.username
+                                ||
+                                "POUP"
+                            }}
+                        </strong>
+
+
+                        <span
+                            v-if="
+                                suggestion.profile?.username
+                            "
+                            class="
+                                admin-suggestion-card__username
+                            "
+                        >
+                            @{{ suggestion.profile.username }}
+                        </span>
+
+
+                        <code
+                            v-if="
+                                suggestion.user_id
+                            "
+                            class="
+                                admin-suggestion-card__user-id
+                            "
+                            :title="
+                                suggestion.user_id
+                            "
+                        >
+                            ID :
                             {{
                                 suggestion.user_id
-                                ||
-                                "Anonyme"
                             }}
                         </code>
+
+
+                        <span
+                            v-else
+                            class="
+                                admin-suggestion-card__anonymous
+                            "
+                        >
+                            Suggestion anonyme
+                        </span>
 
                     </div>
 
@@ -1110,6 +1352,36 @@ onMounted(
                         "
                     >
                         ✕ Refuser
+                    </button>
+
+
+                    <!-- =====================================
+                         CREATE POLL
+                    ====================================== -->
+
+                    <button
+                        v-if="
+                            suggestion.status
+                            ===
+                            'approved'
+                        "
+                        type="button"
+                        class="
+                            admin-button
+                            admin-button--primary
+                        "
+                        :disabled="
+                            actionLoading
+                            ===
+                            suggestion.id
+                        "
+                        @click="
+                            createPollFromSuggestion(
+                                suggestion
+                            )
+                        "
+                    >
+                        🗳️ Créer un sondage
                     </button>
 
 
@@ -1187,3 +1459,316 @@ onMounted(
     </section>
 
 </template>
+
+<style scoped>
+
+/* =========================================================
+   SUGGESTION USER
+========================================================= */
+
+.admin-suggestion-card__user {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        14px;
+
+    margin-top:
+        18px;
+
+    padding:
+        14px
+        16px;
+
+    border:
+        1px solid
+        var(
+            --border-primary,
+            rgba(
+                255,
+                255,
+                255,
+                0.1
+            )
+        );
+
+    border-radius:
+        16px;
+
+    background:
+        var(
+            --surface-background-secondary,
+            rgba(
+                255,
+                255,
+                255,
+                0.035
+            )
+        );
+
+}
+
+
+/* =========================================================
+   AVATAR
+========================================================= */
+
+.admin-suggestion-card__user-avatar {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    flex:
+        0
+        0
+        48px;
+
+    width:
+        48px;
+
+    height:
+        48px;
+
+    overflow:
+        hidden;
+
+    border:
+        1px solid
+        var(
+            --border-primary,
+            rgba(
+                255,
+                255,
+                255,
+                0.12
+            )
+        );
+
+    border-radius:
+        14px;
+
+    background:
+        rgba(
+            109,
+            0,
+            163,
+            0.2
+        );
+
+    font-size:
+        1.3rem;
+
+}
+
+
+.admin-suggestion-card__user-avatar img {
+
+    display:
+        block;
+
+    width:
+        100%;
+
+    height:
+        100%;
+
+    object-fit:
+        cover;
+
+}
+
+
+/* =========================================================
+   USER INFOS
+========================================================= */
+
+.admin-suggestion-card__user-info {
+
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    align-items:
+        flex-start;
+
+    min-width:
+        0;
+
+}
+
+
+.admin-suggestion-card__user-info small {
+
+    margin-bottom:
+        3px;
+
+    color:
+        var(
+            --color-cyan,
+            #22f2ef
+        );
+
+    font-size:
+        0.65rem;
+
+    font-weight:
+        900;
+
+    letter-spacing:
+        0.12em;
+
+}
+
+
+.admin-suggestion-card__user-info strong {
+
+    max-width:
+        100%;
+
+    color:
+        var(
+            --text-primary,
+            #ffffff
+        );
+
+    overflow:
+        hidden;
+
+    font-size:
+        0.95rem;
+
+    text-overflow:
+        ellipsis;
+
+    white-space:
+        nowrap;
+
+}
+
+
+.admin-suggestion-card__username {
+
+    margin-top:
+        2px;
+
+    color:
+        var(
+            --text-secondary,
+            rgba(
+                255,
+                255,
+                255,
+                0.7
+            )
+        );
+
+    font-size:
+        0.78rem;
+
+}
+
+
+.admin-suggestion-card__user-id {
+
+    display:
+        block;
+
+    max-width:
+        min(
+            100%,
+            500px
+        );
+
+    margin-top:
+        7px;
+
+    color:
+        var(
+            --text-muted,
+            rgba(
+                255,
+                255,
+                255,
+                0.45
+            )
+        );
+
+    overflow:
+        hidden;
+
+    background:
+        transparent;
+
+    font-size:
+        0.64rem;
+
+    text-overflow:
+        ellipsis;
+
+    white-space:
+        nowrap;
+
+}
+
+
+.admin-suggestion-card__anonymous {
+
+    margin-top:
+        3px;
+
+    color:
+        var(
+            --text-muted,
+            rgba(
+                255,
+                255,
+                255,
+                0.45
+            )
+        );
+
+    font-size:
+        0.75rem;
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (
+    max-width:
+    650px
+) {
+
+    .admin-suggestion-card__user {
+
+        align-items:
+            flex-start;
+
+    }
+
+
+    .admin-suggestion-card__user-id {
+
+        max-width:
+            220px;
+
+    }
+
+}
+
+</style>

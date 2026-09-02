@@ -487,6 +487,24 @@
 
 
 /* =========================================================
+   RESULTS — FULL WIDTH
+========================================================= */
+
+/*
+ * PollResults.vue doit rester EN DEHORS de .poll-grid.
+ * Ce bloc garantit que le composant de résultats prend
+ * toute la largeur disponible de la section.
+ */
+
+.poll-section > .poll-results {
+  width: 100%;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+
+/* =========================================================
    GRID
 ========================================================= */
 
