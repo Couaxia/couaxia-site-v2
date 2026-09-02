@@ -448,23 +448,39 @@ function formatBoxArt(
     }
 
 
-    return value
-        .replaceAll(
-            "{width}",
-            String(width)
-        )
-        .replaceAll(
-            "{height}",
-            String(height)
-        )
-        .replaceAll(
-            "%{width}",
-            String(width)
-        )
-        .replaceAll(
-            "%{height}",
-            String(height)
-        );
+    const formattedUrl =
+        value
+            .replaceAll(
+                "{width}",
+                String(width)
+            )
+            .replaceAll(
+                "{height}",
+                String(height)
+            )
+            .replaceAll(
+                "%{width}",
+                String(width)
+            )
+            .replaceAll(
+                "%{height}",
+                String(height)
+            );
+
+
+    /*
+     * Twitch peut aussi renvoyer une URL déjà dimensionnée,
+     * par exemple :
+     *
+     * .../Phasmophobia-285x380.jpg
+     *
+     * On remplace alors cette taille par celle demandée.
+     */
+
+    return formattedUrl.replace(
+        /-\d+x\d+(\.[a-zA-Z0-9]+)(\?.*)?$/,
+        `-${width}x${height}$1$2`
+    );
 
 }
 
@@ -477,7 +493,7 @@ function getGameImage(
     return formatBoxArt(
         game.box_art_url,
         600,
-        338
+        800
     );
 
 }
@@ -852,6 +868,33 @@ function closeForm() {
 
 
 /* =========================================================
+   FORCE CLOSE FORM
+========================================================= */
+
+function forceCloseForm() {
+
+    formOpen.value =
+        false;
+
+
+    selectedGame.value =
+        null;
+
+
+    editing.value =
+        false;
+
+
+    form.value =
+        createEmptyForm();
+
+
+    resetTwitchSearch();
+
+}
+
+
+/* =========================================================
    SEARCH TWITCH
 ========================================================= */
 
@@ -1191,6 +1234,28 @@ async function saveGame() {
         }
 
 
+        const duplicate =
+            games.value.find(
+                game =>
+                    game.twitch_game_id ===
+                    form.value.twitch_game_id.trim()
+                    &&
+                    game.id !==
+                    selectedGame.value?.id
+            );
+
+
+        if (
+            duplicate
+        ) {
+
+            throw new Error(
+                `"${form.value.twitch_name}" est déjà présent dans ta bibliothèque.`
+            );
+
+        }
+
+
         const payload:
             CreateGamePayload = {
 
@@ -1261,7 +1326,7 @@ async function saveGame() {
         await loadGames();
 
 
-        closeForm();
+        forceCloseForm();
 
     }
     catch (error) {
@@ -1807,7 +1872,7 @@ onMounted(
 
         </template>
 
-
+    
         <!-- =================================================
              MODAL
         ================================================== -->
@@ -2137,8 +2202,7 @@ onMounted(
                                 type="button"
                                 class="admin-game-form__cancel"
                                 :disabled="saving"
-                                @click="closeForm"
-                            >
+                                @click="closeForm">
                                 Annuler
                             </button>
 
