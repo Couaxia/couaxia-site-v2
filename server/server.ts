@@ -94,7 +94,36 @@ app.set(
     1
 );
 
+/* =========================================================
+   CORS
+========================================================= */
 
+app.use(
+    cors({
+        origin: [
+            "https://couaxia-hmbf.onrender.com",
+            "https://couaxia-api.onrender.com",
+            "http://localhost:5173"
+        ],
+
+        methods: [
+            "GET",
+            "POST",
+            "PUT",
+            "PATCH",
+            "DELETE",
+            "OPTIONS"
+        ],
+
+        allowedHeaders: [
+            "Content-Type",
+            "Authorization"
+        ],
+
+        credentials:
+            true
+    })
+);
 /* =========================================================
    BODY
 ========================================================= */

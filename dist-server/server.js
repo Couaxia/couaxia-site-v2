@@ -37,11 +37,35 @@ const HOST = "0.0.0.0";
  */
 const distPath = path.resolve(process.cwd(), "dist");
 const indexPath = path.join(distPath, "index.html");
+import cors from "cors";
 import "dotenv/config";
 /* =========================================================
    TRUST PROXY — RENDER
 ========================================================= */
 app.set("trust proxy", 1);
+/* =========================================================
+   CORS
+========================================================= */
+app.use(cors({
+    origin: [
+        "https://couaxia-hmbf.onrender.com",
+        "https://couaxia-api.onrender.com",
+        "http://localhost:5173"
+    ],
+    methods: [
+        "GET",
+        "POST",
+        "PUT",
+        "PATCH",
+        "DELETE",
+        "OPTIONS"
+    ],
+    allowedHeaders: [
+        "Content-Type",
+        "Authorization"
+    ],
+    credentials: true
+}));
 /* =========================================================
    BODY
 ========================================================= */
