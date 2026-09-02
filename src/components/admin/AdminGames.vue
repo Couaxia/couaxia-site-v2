@@ -18,6 +18,14 @@ import type {
     CreateGamePayload
 } from "../../services/admin.service";
 
+import {
+    searchTwitchGames
+} from "../../services/twitch-games.service";
+
+import type {
+    TwitchGame
+} from "../../services/twitch-games.service";
+
 
 /* =========================================================
    TYPES
@@ -74,69 +82,75 @@ interface GameForm {
 ========================================================= */
 
 const games =
-    ref<AdminGame[]>(
-        []
-    );
+    ref<AdminGame[]>([]);
 
 
 const loading =
-    ref(
-        true
-    );
+    ref(true);
 
 
 const saving =
-    ref(
-        false
-    );
+    ref(false);
 
 
 const deletingGameId =
-    ref<string | null>(
-        null
-    );
+    ref<string | null>(null);
 
 
 const selectedGame =
-    ref<AdminGame | null>(
-        null
-    );
+    ref<AdminGame | null>(null);
 
 
 const editing =
-    ref(
-        false
-    );
+    ref(false);
 
 
 const formOpen =
-    ref(
-        false
-    );
+    ref(false);
 
 
 const search =
-    ref(
-        ""
-    );
+    ref("");
 
 
 const filter =
-    ref<GameFilter>(
-        "all"
-    );
+    ref<GameFilter>("all");
 
 
 const errorMessage =
-    ref(
-        ""
-    );
+    ref("");
 
 
 const successMessage =
-    ref(
-        ""
-    );
+    ref("");
+
+
+/* =========================================================
+   TWITCH SEARCH STATE
+========================================================= */
+
+const twitchSearch =
+    ref("");
+
+
+const twitchResults =
+    ref<TwitchGame[]>([]);
+
+
+const twitchSearching =
+    ref(false);
+
+
+const twitchSearchError =
+    ref("");
+
+
+const twitchSearchPerformed =
+    ref(false);
+
+
+const selectedTwitchGame =
+    ref<TwitchGame | null>(null);
 
 
 /* =========================================================
@@ -193,43 +207,25 @@ const form =
 function getTagsText(
     value:
         unknown
-):
-    string {
-
-    /*
-     * Supabase text[]
-     */
+): string {
 
     if (
-        Array.isArray(
-            value
-        )
+        Array.isArray(value)
     ) {
 
         return value
             .map(
                 tag =>
-                    String(
-                        tag
-                    ).trim()
+                    String(tag).trim()
             )
-            .filter(
-                Boolean
-            )
-            .join(
-                ", "
-            );
+            .filter(Boolean)
+            .join(", ");
 
     }
 
 
-    /*
-     * Anciennes données string
-     */
-
     if (
-        typeof value
-        ===
+        typeof value ===
         "string"
     ) {
 
@@ -250,12 +246,9 @@ function getTagsText(
 function normalizeSearchText(
     value:
         unknown
-):
-    string {
+): string {
 
-    return getTagsText(
-        value
-    )
+    return getTagsText(value)
         .toLowerCase()
         .trim();
 
@@ -284,8 +277,7 @@ const filteredGames =
                             game.twitch_name
                             ??
                             ""
-                        )
-                            .toLowerCase();
+                        ).toLowerCase();
 
 
                     const description =
@@ -293,8 +285,7 @@ const filteredGames =
                             game.description
                             ??
                             ""
-                        )
-                            .toLowerCase();
+                        ).toLowerCase();
 
 
                     const tags =
@@ -308,28 +299,19 @@ const filteredGames =
                             game.status
                             ??
                             ""
-                        )
-                            .toLowerCase();
+                        ).toLowerCase();
 
 
                     const matchesSearch =
                         !query
                         ||
-                        name.includes(
-                            query
-                        )
+                        name.includes(query)
                         ||
-                        description.includes(
-                            query
-                        )
+                        description.includes(query)
                         ||
-                        tags.includes(
-                            query
-                        )
+                        tags.includes(query)
                         ||
-                        status.includes(
-                            query
-                        );
+                        status.includes(query);
 
 
                     let matchesFilter =
@@ -337,28 +319,24 @@ const filteredGames =
 
 
                     if (
-                        filter.value
-                        ===
+                        filter.value ===
                         "poll"
                     ) {
 
                         matchesFilter =
-                            game.poll_enabled
-                            ===
+                            game.poll_enabled ===
                             true;
 
                     }
 
 
                     if (
-                        filter.value
-                        ===
+                        filter.value ===
                         "no-poll"
                     ) {
 
                         matchesFilter =
-                            game.poll_enabled
-                            !==
+                            game.poll_enabled !==
                             true;
 
                     }
@@ -386,8 +364,7 @@ const currentGamesCount =
         () =>
             games.value.filter(
                 game =>
-                    game.status
-                    ===
+                    game.status ===
                     "current"
             ).length
     );
@@ -398,8 +375,7 @@ const pollGamesCount =
         () =>
             games.value.filter(
                 game =>
-                    game.poll_enabled
-                    ===
+                    game.poll_enabled ===
                     true
             ).length
     );
@@ -410,8 +386,7 @@ const gamesWithRatingCount =
         () =>
             games.value.filter(
                 game =>
-                    game.rating
-                    !==
+                    game.rating !==
                     null
             ).length
     );
@@ -435,8 +410,9 @@ const canSave =
 
 
             if (
-                !form.value.twitch_name
-                    .trim()
+                !form.value.twitch_game_id.trim()
+                ||
+                !form.value.twitch_name.trim()
             ) {
 
                 return false;
@@ -454,14 +430,17 @@ const canSave =
    GAME IMAGE
 ========================================================= */
 
-function getGameImage(
-    game:
-        AdminGame
-):
-    string | null {
+function formatBoxArt(
+    value:
+        string | null | undefined,
+    width:
+        number = 600,
+    height:
+        number = 800
+): string | null {
 
     if (
-        !game.box_art_url
+        !value
     ) {
 
         return null;
@@ -469,48 +448,66 @@ function getGameImage(
     }
 
 
-    return game.box_art_url
-        .replace(
+    return value
+        .replaceAll(
             "{width}",
-            "600"
+            String(width)
         )
-        .replace(
+        .replaceAll(
             "{height}",
-            "338"
+            String(height)
+        )
+        .replaceAll(
+            "%{width}",
+            String(width)
+        )
+        .replaceAll(
+            "%{height}",
+            String(height)
         );
 
 }
 
 
-/* =========================================================
-   FORM IMAGE
-========================================================= */
+function getGameImage(
+    game:
+        AdminGame
+): string | null {
+
+    return formatBoxArt(
+        game.box_art_url,
+        600,
+        338
+    );
+
+}
+
 
 const formImage =
     computed(
-        () => {
-
-            if (
-                !form.value.box_art_url
-            ) {
-
-                return null;
-
-            }
-
-
-            return form.value.box_art_url
-                .replace(
-                    "{width}",
-                    "400"
-                )
-                .replace(
-                    "{height}",
-                    "533"
-                );
-
-        }
+        () =>
+            formatBoxArt(
+                form.value.box_art_url,
+                400,
+                533
+            )
     );
+
+
+function getTwitchResultImage(
+    game:
+        TwitchGame
+): string | null {
+
+    return formatBoxArt(
+        game.rawBoxArtUrl
+        ??
+        game.boxArtUrl,
+        285,
+        380
+    );
+
+}
 
 
 /* =========================================================
@@ -520,43 +517,27 @@ const formImage =
 function getStatusLabel(
     status:
         string | null
-):
-    string {
+): string {
 
-    switch (
-        status
-    ) {
+    switch (status) {
 
         case "current":
-
             return "En cours";
 
-
         case "regular":
-
             return "Régulier";
 
-
         case "backlog":
-
             return "À faire";
 
-
         case "paused":
-
             return "En pause";
 
-
         case "finished":
-
             return "Terminé";
 
-
         default:
-
-            return status
-                ||
-                "Non défini";
+            return status || "Non défini";
 
     }
 
@@ -570,35 +551,23 @@ function getStatusLabel(
 function getStatusClass(
     status:
         string | null
-):
-    string {
+): string {
 
-    switch (
-        status
-    ) {
+    switch (status) {
 
         case "current":
-
             return "admin-game-status--current";
 
-
         case "regular":
-
             return "admin-game-status--regular";
 
-
         case "finished":
-
             return "admin-game-status--finished";
 
-
         case "paused":
-
             return "admin-game-status--paused";
 
-
         default:
-
             return "admin-game-status--backlog";
 
     }
@@ -626,9 +595,7 @@ async function loadGames() {
             await getAdminGames();
 
     }
-    catch (
-        error
-    ) {
+    catch (error) {
 
         console.error(
             "Erreur chargement jeux admin :",
@@ -653,6 +620,38 @@ async function loadGames() {
 
 
 /* =========================================================
+   RESET TWITCH SEARCH
+========================================================= */
+
+function resetTwitchSearch() {
+
+    twitchSearch.value =
+        "";
+
+
+    twitchResults.value =
+        [];
+
+
+    twitchSearching.value =
+        false;
+
+
+    twitchSearchError.value =
+        "";
+
+
+    twitchSearchPerformed.value =
+        false;
+
+
+    selectedTwitchGame.value =
+        null;
+
+}
+
+
+/* =========================================================
    OPEN CREATE
 ========================================================= */
 
@@ -668,6 +667,9 @@ function openCreate() {
 
     form.value =
         createEmptyForm();
+
+
+    resetTwitchSearch();
 
 
     errorMessage.value =
@@ -709,6 +711,51 @@ function openEdit(
         "";
 
 
+    twitchSearchError.value =
+        "";
+
+
+    twitchSearchPerformed.value =
+        false;
+
+
+    twitchResults.value =
+        [];
+
+
+    twitchSearch.value =
+        game.twitch_name
+        ??
+        "";
+
+
+    selectedTwitchGame.value = {
+
+        id:
+            game.twitch_game_id
+            ??
+            "",
+
+        name:
+            game.twitch_name
+            ??
+            "",
+
+        boxArtUrl:
+            formatBoxArt(
+                game.box_art_url,
+                285,
+                380
+            ),
+
+        rawBoxArtUrl:
+            game.box_art_url
+            ??
+            null
+
+    };
+
+
     form.value = {
 
         twitch_game_id:
@@ -744,14 +791,9 @@ function openEdit(
             "",
 
         rating:
-            game.rating
-            !==
+            game.rating !==
             null
-
-                ? String(
-                    game.rating
-                )
-
+                ? String(game.rating)
                 : "",
 
         youtube_playlist:
@@ -803,6 +845,185 @@ function closeForm() {
     form.value =
         createEmptyForm();
 
+
+    resetTwitchSearch();
+
+}
+
+
+/* =========================================================
+   SEARCH TWITCH
+========================================================= */
+
+async function searchGameOnTwitch() {
+
+    const query =
+        twitchSearch.value.trim();
+
+
+    twitchSearchError.value =
+        "";
+
+
+    twitchSearchPerformed.value =
+        false;
+
+
+    if (
+        query.length <
+        2
+    ) {
+
+        twitchResults.value =
+            [];
+
+
+        twitchSearchError.value =
+            "Écris au moins 2 caractères pour rechercher un jeu.";
+
+
+        return;
+
+    }
+
+
+    twitchSearching.value =
+        true;
+
+
+    try {
+
+        twitchResults.value =
+            await searchTwitchGames(
+                query,
+                20
+            );
+
+
+        twitchSearchPerformed.value =
+            true;
+
+    }
+    catch (error) {
+
+        console.error(
+            "Erreur recherche Twitch :",
+            error
+        );
+
+
+        twitchResults.value =
+            [];
+
+
+        twitchSearchError.value =
+            error instanceof Error
+                ? error.message
+                : "Impossible de rechercher les jeux Twitch.";
+
+    }
+    finally {
+
+        twitchSearching.value =
+            false;
+
+    }
+
+}
+
+
+/* =========================================================
+   SELECT TWITCH GAME
+========================================================= */
+
+function selectTwitchGame(
+    game:
+        TwitchGame
+) {
+
+    const duplicate =
+        games.value.find(
+            currentGame =>
+                currentGame.twitch_game_id ===
+                game.id
+                &&
+                currentGame.id !==
+                selectedGame.value?.id
+        );
+
+
+    if (
+        duplicate
+    ) {
+
+        twitchSearchError.value =
+            `"${game.name}" est déjà présent dans ta bibliothèque.`;
+
+
+        return;
+
+    }
+
+
+    selectedTwitchGame.value =
+        game;
+
+
+    form.value.twitch_game_id =
+        game.id;
+
+
+    form.value.twitch_name =
+        game.name;
+
+
+    form.value.box_art_url =
+        game.rawBoxArtUrl
+        ??
+        game.boxArtUrl
+        ??
+        "";
+
+
+    twitchSearch.value =
+        game.name;
+
+
+    twitchSearchError.value =
+        "";
+
+}
+
+
+/* =========================================================
+   CHANGE TWITCH GAME
+========================================================= */
+
+function changeSelectedTwitchGame() {
+
+    selectedTwitchGame.value =
+        null;
+
+
+    form.value.twitch_game_id =
+        "";
+
+
+    form.value.twitch_name =
+        "";
+
+
+    form.value.box_art_url =
+        "";
+
+
+    twitchResults.value =
+        [];
+
+
+    twitchSearchPerformed.value =
+        false;
+
 }
 
 
@@ -814,8 +1035,7 @@ function parseRating():
     number | null {
 
     const value =
-        form.value.rating
-            .trim();
+        form.value.rating.trim();
 
 
     if (
@@ -837,9 +1057,7 @@ function parseRating():
 
 
     if (
-        Number.isNaN(
-            rating
-        )
+        Number.isNaN(rating)
     ) {
 
         return null;
@@ -860,16 +1078,12 @@ function parseTags():
     string[] {
 
     return form.value.tags
-        .split(
-            ","
-        )
+        .split(",")
         .map(
             tag =>
                 tag.trim()
         )
-        .filter(
-            Boolean
-        );
+        .filter(Boolean);
 
 }
 
@@ -937,22 +1151,30 @@ async function saveGame() {
         }
 
 
+        if (
+            !form.value.twitch_game_id.trim()
+            ||
+            !form.value.twitch_name.trim()
+        ) {
+
+            throw new Error(
+                "Sélectionne d'abord un jeu dans les résultats Twitch."
+            );
+
+        }
+
+
         const payload:
             CreateGamePayload = {
 
             twitch_game_id:
-                form.value.twitch_game_id
-                    .trim()
-                ||
-                null,
+                form.value.twitch_game_id.trim(),
 
             twitch_name:
-                form.value.twitch_name
-                    .trim(),
+                form.value.twitch_name.trim(),
 
             box_art_url:
-                form.value.box_art_url
-                    .trim()
+                form.value.box_art_url.trim()
                 ||
                 null,
 
@@ -963,16 +1185,14 @@ async function saveGame() {
                 parseTags(),
 
             description:
-                form.value.description
-                    .trim()
+                form.value.description.trim()
                 ||
                 null,
 
             rating,
 
             youtube_playlist:
-                form.value.youtube_playlist
-                    .trim()
+                form.value.youtube_playlist.trim()
                 ||
                 null,
 
@@ -1006,7 +1226,7 @@ async function saveGame() {
 
 
             successMessage.value =
-                "Le jeu a bien été ajouté. 🎮";
+                "Le jeu a bien été ajouté depuis Twitch. 🎮";
 
         }
 
@@ -1017,9 +1237,7 @@ async function saveGame() {
         closeForm();
 
     }
-    catch (
-        error
-    ) {
+    catch (error) {
 
         console.error(
             "Erreur sauvegarde jeu :",
@@ -1066,10 +1284,8 @@ async function togglePollEnabled(
             await updateAdminGame(
                 game.id,
                 {
-
                     poll_enabled:
                         !game.poll_enabled
-
                 }
             );
 
@@ -1077,8 +1293,7 @@ async function togglePollEnabled(
         const index =
             games.value.findIndex(
                 currentGame =>
-                    currentGame.id
-                    ===
+                    currentGame.id ===
                     game.id
             );
 
@@ -1095,15 +1310,11 @@ async function togglePollEnabled(
 
         successMessage.value =
             updatedGame.poll_enabled
-
                 ? `${updatedGame.twitch_name ?? "Le jeu"} peut maintenant apparaître dans les sondages.`
-
                 : `${updatedGame.twitch_name ?? "Le jeu"} a été retiré des sondages.`;
 
     }
-    catch (
-        error
-    ) {
+    catch (error) {
 
         console.error(
             "Erreur modification poll_enabled :",
@@ -1182,8 +1393,7 @@ async function removeGame(
         games.value =
             games.value.filter(
                 currentGame =>
-                    currentGame.id
-                    !==
+                    currentGame.id !==
                     game.id
             );
 
@@ -1192,9 +1402,7 @@ async function removeGame(
             `${gameName} a été supprimé.`;
 
     }
-    catch (
-        error
-    ) {
+    catch (error) {
 
         console.error(
             "Erreur suppression jeu :",
@@ -1225,8 +1433,7 @@ async function removeGame(
 function formatRating(
     rating:
         number | null
-):
-    string {
+): string {
 
     if (
         rating === null
@@ -1255,31 +1462,23 @@ onMounted(
 
 <template>
 
-    <section
-        class="admin-games"
-    >
+    <section class="admin-games">
 
         <!-- =================================================
              HEADER
         ================================================== -->
 
-        <header
-            class="admin-section-header"
-        >
+        <header class="admin-section-header">
 
             <div>
 
-                <span
-                    class="admin-section-header__eyebrow"
-                >
+                <span class="admin-section-header__eyebrow">
                     🎮 BIBLIOTHÈQUE
                 </span>
-
 
                 <h2>
                     Jeux
                 </h2>
-
 
                 <p>
                     Gère les jeux présents sur ton site et choisis
@@ -1291,13 +1490,8 @@ onMounted(
 
             <button
                 type="button"
-                class="
-                    admin-button
-                    admin-button--primary
-                "
-                @click="
-                    openCreate
-                "
+                class="admin-button admin-button--primary"
+                @click="openCreate"
             >
                 ＋ Ajouter un jeu
             </button>
@@ -1311,10 +1505,7 @@ onMounted(
 
         <div
             v-if="successMessage"
-            class="
-                admin-message
-                admin-message--success
-            "
+            class="admin-message admin-message--success"
         >
             ✓ {{ successMessage }}
         </div>
@@ -1322,10 +1513,7 @@ onMounted(
 
         <div
             v-if="errorMessage"
-            class="
-                admin-message
-                admin-message--error
-            "
+            class="admin-message admin-message--error"
         >
             ⚠️ {{ errorMessage }}
         </div>
@@ -1355,109 +1543,48 @@ onMounted(
              CONTENT
         ================================================== -->
 
-        <template
-            v-else
-        >
+        <template v-else>
 
-            <!-- =============================================
-                 STATS
-            ============================================== -->
+            <div class="admin-games-stats">
 
-            <div
-                class="admin-games-stats"
-            >
-
-                <article
-                    class="admin-games-stat"
-                >
-                    <span>
-                        Jeux
-                    </span>
-
-                    <strong>
-                        {{ games.length }}
-                    </strong>
+                <article class="admin-games-stat">
+                    <span>Jeux</span>
+                    <strong>{{ games.length }}</strong>
                 </article>
 
-
-                <article
-                    class="admin-games-stat"
-                >
-                    <span>
-                        En cours
-                    </span>
-
-                    <strong>
-                        {{ currentGamesCount }}
-                    </strong>
+                <article class="admin-games-stat">
+                    <span>En cours</span>
+                    <strong>{{ currentGamesCount }}</strong>
                 </article>
 
-
-                <article
-                    class="admin-games-stat"
-                >
-                    <span>
-                        Sondages
-                    </span>
-
-                    <strong>
-                        {{ pollGamesCount }}
-                    </strong>
+                <article class="admin-games-stat">
+                    <span>Sondages</span>
+                    <strong>{{ pollGamesCount }}</strong>
                 </article>
 
-
-                <article
-                    class="admin-games-stat"
-                >
-                    <span>
-                        Notés
-                    </span>
-
-                    <strong>
-                        {{ gamesWithRatingCount }}
-                    </strong>
+                <article class="admin-games-stat">
+                    <span>Notés</span>
+                    <strong>{{ gamesWithRatingCount }}</strong>
                 </article>
 
             </div>
 
 
-            <!-- =============================================
-                 TOOLBAR
-            ============================================== -->
+            <div class="admin-games-toolbar">
 
-            <div
-                class="admin-games-toolbar"
-            >
-
-                <div
-                    class="admin-games-search"
-                >
-
-                    <span
-                        aria-hidden="true"
-                    >
-                        🔎
-                    </span>
-
-
+                <div class="admin-games-search">
+                    <span aria-hidden="true">🔎</span>
                     <input
                         v-model="search"
                         type="search"
-                        placeholder="Rechercher un jeu..."
+                        placeholder="Rechercher dans ta bibliothèque..."
                     >
-
                 </div>
 
             </div>
 
 
-            <!-- =============================================
-                 FILTERS
-            ============================================== -->
-
-            <div
-                class="admin-games-filters"
-            >
+            <div class="admin-games-filters">
 
                 <button
                     type="button"
@@ -1465,13 +1592,10 @@ onMounted(
                         'admin-games-filter--active':
                             filter === 'all'
                     }"
-                    @click="
-                        filter = 'all'
-                    "
+                    @click="filter = 'all'"
                 >
                     Tous
                 </button>
-
 
                 <button
                     type="button"
@@ -1479,13 +1603,10 @@ onMounted(
                         'admin-games-filter--active':
                             filter === 'poll'
                     }"
-                    @click="
-                        filter = 'poll'
-                    "
+                    @click="filter = 'poll'"
                 >
                     🗳️ Sondages
                 </button>
-
 
                 <button
                     type="button"
@@ -1493,9 +1614,7 @@ onMounted(
                         'admin-games-filter--active':
                             filter === 'no-poll'
                     }"
-                    @click="
-                        filter = 'no-poll'
-                    "
+                    @click="filter = 'no-poll'"
                 >
                     Hors sondage
                 </button>
@@ -1503,52 +1622,21 @@ onMounted(
             </div>
 
 
-            <div
-                class="admin-games-count"
-            >
-
+            <div class="admin-games-count">
                 {{ filteredGames.length }}
-
-                jeu{{
-                    filteredGames.length > 1
-                        ? "x"
-                        : ""
-                }}
-
+                jeu{{ filteredGames.length > 1 ? "x" : "" }}
             </div>
 
 
-            <!-- =============================================
-                 EMPTY
-            ============================================== -->
-
             <div
-                v-if="
-                    filteredGames.length === 0
-                "
+                v-if="filteredGames.length === 0"
                 class="admin-games-empty"
             >
-
-                <span>
-                    🎮
-                </span>
-
-
-                <strong>
-                    Aucun jeu
-                </strong>
-
-
-                <p>
-                    Aucun jeu ne correspond à tes critères.
-                </p>
-
+                <span>🎮</span>
+                <strong>Aucun jeu</strong>
+                <p>Aucun jeu ne correspond à tes critères.</p>
             </div>
 
-
-            <!-- =============================================
-                 GRID
-            ============================================== -->
 
             <div
                 v-else
@@ -1556,43 +1644,18 @@ onMounted(
             >
 
                 <article
-                    v-for="
-                        game
-                        in
-                        filteredGames
-                    "
-                    :key="
-                        game.id
-                    "
+                    v-for="game in filteredGames"
+                    :key="game.id"
                     class="admin-game-card"
                 >
 
-                    <!-- IMAGE -->
-
-                    <div
-                        class="admin-game-card__image"
-                    >
+                    <div class="admin-game-card__image">
 
                         <img
-                            v-if="
-                                getGameImage(
-                                    game
-                                )
-                            "
-                            :src="
-                                getGameImage(
-                                    game
-                                )
-                                ??
-                                ''
-                            "
-                            :alt="
-                                game.twitch_name
-                                ||
-                                'Jeu'
-                            "
+                            v-if="getGameImage(game)"
+                            :src="getGameImage(game) ?? ''"
+                            :alt="game.twitch_name || 'Jeu'"
                         >
-
 
                         <div
                             v-else
@@ -1601,29 +1664,15 @@ onMounted(
                             🎮
                         </div>
 
-
                         <span
-                            class="
-                                admin-game-status
-                            "
-                            :class="
-                                getStatusClass(
-                                    game.status
-                                )
-                            "
+                            class="admin-game-status"
+                            :class="getStatusClass(game.status)"
                         >
-                            {{
-                                getStatusLabel(
-                                    game.status
-                                )
-                            }}
+                            {{ getStatusLabel(game.status) }}
                         </span>
 
-
                         <span
-                            v-if="
-                                game.poll_enabled
-                            "
+                            v-if="game.poll_enabled"
                             class="admin-game-card__poll-badge"
                         >
                             🗳️ Sondage
@@ -1632,88 +1681,47 @@ onMounted(
                     </div>
 
 
-                    <!-- CONTENT -->
+                    <div class="admin-game-card__content">
 
-                    <div
-                        class="admin-game-card__content"
-                    >
-
-                        <div
-                            class="admin-game-card__title-row"
-                        >
+                        <div class="admin-game-card__title-row">
 
                             <h3>
-                                {{
-                                    game.twitch_name
-                                    ||
-                                    "Jeu sans nom"
-                                }}
+                                {{ game.twitch_name || "Jeu sans nom" }}
                             </h3>
 
-
-                            <span
-                                class="admin-game-card__rating"
-                            >
-                                ⭐
-                                {{
-                                    formatRating(
-                                        game.rating
-                                    )
-                                }}
+                            <span class="admin-game-card__rating">
+                                ⭐ {{ formatRating(game.rating) }}
                             </span>
 
                         </div>
 
 
                         <p
-                            v-if="
-                                game.description
-                            "
+                            v-if="game.description"
                             class="admin-game-card__description"
                         >
                             {{ game.description }}
                         </p>
 
-
                         <p
                             v-else
-                            class="
-                                admin-game-card__description
-                                admin-game-card__description--empty
-                            "
+                            class="admin-game-card__description admin-game-card__description--empty"
                         >
                             Aucune description.
                         </p>
 
 
                         <div
-                            v-if="
-                                getTagsText(
-                                    game.tags
-                                )
-                            "
+                            v-if="getTagsText(game.tags)"
                             class="admin-game-card__tags"
                         >
 
                             <span
-                                v-for="
-                                    tag
-                                    in
-                                    getTagsText(
-                                        game.tags
-                                    )
-                                        .split(',')
-                                        .map(
-                                            item =>
-                                                item.trim()
-                                        )
-                                        .filter(
-                                            Boolean
-                                        )
-                                "
-                                :key="
-                                    tag
-                                "
+                                v-for="tag in getTagsText(game.tags)
+                                    .split(',')
+                                    .map(item => item.trim())
+                                    .filter(Boolean)"
+                                :key="tag"
                             >
                                 {{ tag }}
                             </span>
@@ -1721,91 +1729,45 @@ onMounted(
                         </div>
 
 
-                        <!-- POLL -->
-
-                        <label
-                            class="admin-game-card__poll-toggle"
-                        >
+                        <label class="admin-game-card__poll-toggle">
 
                             <div>
-
-                                <strong>
-                                    Utilisable en sondage
-                                </strong>
-
-
+                                <strong>Utilisable en sondage</strong>
                                 <span>
                                     {{
                                         game.poll_enabled
-
                                             ? "Ce jeu peut être proposé."
-
                                             : "Ce jeu n'apparaît pas dans les sondages."
                                     }}
                                 </span>
-
                             </div>
-
 
                             <input
                                 type="checkbox"
-                                :checked="
-                                    game.poll_enabled === true
-                                "
-                                @change="
-                                    togglePollEnabled(
-                                        game
-                                    )
-                                "
+                                :checked="game.poll_enabled === true"
+                                @change="togglePollEnabled(game)"
                             >
 
                         </label>
 
 
-                        <!-- ACTIONS -->
-
-                        <div
-                            class="admin-game-card__actions"
-                        >
+                        <div class="admin-game-card__actions">
 
                             <button
                                 type="button"
-                                class="
-                                    admin-game-button
-                                    admin-game-button--edit
-                                "
-                                @click="
-                                    openEdit(
-                                        game
-                                    )
-                                "
+                                class="admin-game-button admin-game-button--edit"
+                                @click="openEdit(game)"
                             >
                                 ✏️ Modifier
                             </button>
 
-
                             <button
                                 type="button"
-                                class="
-                                    admin-game-button
-                                    admin-game-button--delete
-                                "
-                                :disabled="
-                                    deletingGameId === game.id
-                                "
-                                @click="
-                                    removeGame(
-                                        game
-                                    )
-                                "
+                                class="admin-game-button admin-game-button--delete"
+                                :disabled="deletingGameId === game.id"
+                                @click="removeGame(game)"
                             >
-
-                                {{
-                                    deletingGameId === game.id
-                                        ? "..."
-                                        : "🗑️"
-                                }}
-
+                                {{ deletingGameId === game.id ? "..." : "🗑️" }}
                             </button>
 
                         </div>
@@ -1823,55 +1785,30 @@ onMounted(
              MODAL
         ================================================== -->
 
-        <Teleport
-            to="body"
-        >
+        <Teleport to="body">
 
             <div
-                v-if="
-                    formOpen
-                "
+                v-if="formOpen"
                 class="admin-game-modal"
-                @click.self="
-                    closeForm
-                "
+                @click.self="closeForm"
             >
 
-                <div
-                    class="admin-game-modal__dialog"
-                >
+                <div class="admin-game-modal__dialog">
 
-                    <header
-                        class="admin-game-modal__header"
-                    >
+                    <header class="admin-game-modal__header">
 
                         <div>
-
-                            <span>
-                                🎮 JEU
-                            </span>
-
-
+                            <span>🎮 JEU TWITCH</span>
                             <h2>
-                                {{
-                                    editing
-                                        ? "Modifier le jeu"
-                                        : "Ajouter un jeu"
-                                }}
+                                {{ editing ? "Modifier le jeu" : "Ajouter un jeu" }}
                             </h2>
-
                         </div>
-
 
                         <button
                             type="button"
                             class="admin-game-modal__close"
-                            :disabled="
-                                saving
-                            "
-                            @click="
-                                closeForm
-                            "
+                            :disabled="saving"
+                            @click="closeForm"
                         >
                             ×
                         </button>
@@ -1881,224 +1818,215 @@ onMounted(
 
                     <form
                         class="admin-game-form"
-                        @submit.prevent="
-                            saveGame
-                        "
+                        @submit.prevent="saveGame"
                     >
 
-                        <div
-                            class="admin-game-form__layout"
-                        >
+                        <div class="admin-game-form__layout">
 
                             <!-- PREVIEW -->
 
-                            <aside
-                                class="admin-game-form__preview"
-                            >
+                            <aside class="admin-game-form__preview">
 
-                                <div
-                                    class="admin-game-form__cover"
-                                >
+                                <div class="admin-game-form__cover">
 
                                     <img
-                                        v-if="
-                                            formImage
-                                        "
-                                        :src="
-                                            formImage
-                                            ??
-                                            ''
-                                        "
-                                        :alt="
-                                            form.twitch_name
-                                            ||
-                                            'Aperçu'
-                                        "
+                                        v-if="formImage"
+                                        :src="formImage ?? ''"
+                                        :alt="form.twitch_name || 'Aperçu'"
                                     >
 
-
-                                    <span
-                                        v-else
-                                    >
-                                        🎮
-                                    </span>
+                                    <span v-else>🎮</span>
 
                                 </div>
 
-
                                 <strong>
-                                    {{
-                                        form.twitch_name
-                                        ||
-                                        "Nom du jeu"
-                                    }}
+                                    {{ form.twitch_name || "Aucun jeu sélectionné" }}
                                 </strong>
 
+                                <small v-if="form.twitch_game_id">
+                                    Jeu lié automatiquement à Twitch
+                                </small>
 
-                                <small>
-                                    Aperçu
+                                <small v-else>
+                                    Recherche puis sélectionne un jeu
                                 </small>
 
                             </aside>
 
 
-                            <!-- FIELDS -->
+                            <!-- TWITCH SEARCH -->
 
-                            <div
-                                class="admin-game-form__fields"
-                            >
+                            <div class="admin-game-form__fields">
 
-                                <div
-                                    class="admin-game-field"
-                                >
+                                <section class="admin-twitch-search">
 
-                                    <label
-                                        for="admin-game-name"
+                                    <div class="admin-twitch-search__heading">
+                                        <span>🔎 RECHERCHE TWITCH</span>
+                                        <h3>Choisir le jeu</h3>
+                                        <p>
+                                            Recherche simplement son nom. L'ID Twitch et la jaquette
+                                            seront récupérés automatiquement.
+                                        </p>
+                                    </div>
+
+
+                                    <div class="admin-twitch-search__bar">
+
+                                        <input
+                                            v-model="twitchSearch"
+                                            type="search"
+                                            autocomplete="off"
+                                            placeholder="Ex. Party Animals, Phasmophobia..."
+                                            @keydown.enter.prevent="searchGameOnTwitch"
+                                        >
+
+                                        <button
+                                            type="button"
+                                            :disabled="twitchSearching"
+                                            @click="searchGameOnTwitch"
+                                        >
+                                            {{ twitchSearching ? "Recherche..." : "Rechercher" }}
+                                        </button>
+
+                                    </div>
+
+
+                                    <p
+                                        v-if="twitchSearchError"
+                                        class="admin-twitch-search__error"
                                     >
-                                        Nom du jeu *
-                                    </label>
+                                        ⚠️ {{ twitchSearchError }}
+                                    </p>
 
 
-                                    <input
-                                        id="admin-game-name"
-                                        v-model="
-                                            form.twitch_name
-                                        "
-                                        type="text"
-                                        required
-                                        placeholder="Party Animals"
-                                    >
-
-                                </div>
-
-
-                                <div
-                                    class="admin-game-field"
-                                >
-
-                                    <label
-                                        for="admin-game-twitch-id"
-                                    >
-                                        ID Twitch
-                                    </label>
-
-
-                                    <input
-                                        id="admin-game-twitch-id"
-                                        v-model="
-                                            form.twitch_game_id
-                                        "
-                                        type="text"
-                                        placeholder="ID Twitch du jeu"
-                                    >
-
-                                </div>
-
-
-                                <div
-                                    class="admin-game-field"
-                                >
-
-                                    <label
-                                        for="admin-game-image"
-                                    >
-                                        Image Twitch
-                                    </label>
-
-
-                                    <input
-                                        id="admin-game-image"
-                                        v-model="
-                                            form.box_art_url
-                                        "
-                                        type="url"
-                                        placeholder="https://..."
+                                    <div
+                                        v-if="selectedTwitchGame"
+                                        class="admin-twitch-selected"
                                     >
 
-                                </div>
+                                        <img
+                                            v-if="getTwitchResultImage(selectedTwitchGame)"
+                                            :src="getTwitchResultImage(selectedTwitchGame) ?? ''"
+                                            :alt="selectedTwitchGame.name"
+                                        >
+
+                                        <div class="admin-twitch-selected__info">
+                                            <span>✓ JEU SÉLECTIONNÉ</span>
+                                            <strong>{{ selectedTwitchGame.name }}</strong>
+                                            <small>
+                                                L'ID et l'image seront enregistrés automatiquement.
+                                            </small>
+                                        </div>
+
+                                        <button
+                                            type="button"
+                                            class="admin-twitch-selected__change"
+                                            @click="changeSelectedTwitchGame"
+                                        >
+                                            Changer
+                                        </button>
+
+                                    </div>
+
+
+                                    <div
+                                        v-if="twitchSearching"
+                                        class="admin-twitch-search__loading"
+                                    >
+                                        <span>🎮</span>
+                                        Recherche sur Twitch...
+                                    </div>
+
+
+                                    <div
+                                        v-else-if="twitchResults.length > 0"
+                                        class="admin-twitch-results"
+                                    >
+
+                                        <button
+                                            v-for="result in twitchResults"
+                                            :key="result.id"
+                                            type="button"
+                                            class="admin-twitch-result"
+                                            :class="{
+                                                'admin-twitch-result--selected':
+                                                    form.twitch_game_id === result.id
+                                            }"
+                                            @click="selectTwitchGame(result)"
+                                        >
+
+                                            <div class="admin-twitch-result__cover">
+
+                                                <img
+                                                    v-if="getTwitchResultImage(result)"
+                                                    :src="getTwitchResultImage(result) ?? ''"
+                                                    :alt="result.name"
+                                                >
+
+                                                <span v-else>🎮</span>
+
+                                            </div>
+
+                                            <strong>{{ result.name }}</strong>
+
+                                            <span class="admin-twitch-result__select">
+                                                {{
+                                                    form.twitch_game_id === result.id
+                                                        ? "✓ Sélectionné"
+                                                        : "Choisir"
+                                                }}
+                                            </span>
+
+                                        </button>
+
+                                    </div>
+
+
+                                    <div
+                                        v-else-if="twitchSearchPerformed && !twitchSearching"
+                                        class="admin-twitch-search__empty"
+                                    >
+                                        Aucun jeu Twitch trouvé pour cette recherche.
+                                    </div>
+
+                                </section>
 
                             </div>
 
                         </div>
 
 
-                        <div
-                            class="admin-game-form__row"
-                        >
+                        <div class="admin-game-form__row">
 
-                            <div
-                                class="admin-game-field"
-                            >
+                            <div class="admin-game-field">
 
-                                <label
-                                    for="admin-game-status"
-                                >
+                                <label for="admin-game-status">
                                     Statut
                                 </label>
 
-
                                 <select
                                     id="admin-game-status"
-                                    v-model="
-                                        form.status
-                                    "
+                                    v-model="form.status"
                                 >
-
-                                    <option
-                                        value="current"
-                                    >
-                                        🔥 En cours
-                                    </option>
-
-
-                                    <option
-                                        value="regular"
-                                    >
-                                        🔁 Régulier
-                                    </option>
-
-
-                                    <option
-                                        value="backlog"
-                                    >
-                                        📚 À faire
-                                    </option>
-
-
-                                    <option
-                                        value="paused"
-                                    >
-                                        ⏸️ En pause
-                                    </option>
-
-
-                                    <option
-                                        value="finished"
-                                    >
-                                        🏆 Terminé
-                                    </option>
-
+                                    <option value="current">🔥 En cours</option>
+                                    <option value="regular">🔁 Régulier</option>
+                                    <option value="backlog">📚 À faire</option>
+                                    <option value="paused">⏸️ En pause</option>
+                                    <option value="finished">🏆 Terminé</option>
                                 </select>
 
                             </div>
 
 
-                            <div
-                                class="admin-game-field"
-                            >
+                            <div class="admin-game-field">
 
-                                <label
-                                    for="admin-game-rating"
-                                >
+                                <label for="admin-game-rating">
                                     Note / 10
                                 </label>
 
-
                                 <input
                                     id="admin-game-rating"
-                                    v-model="
-                                        form.rating
-                                    "
+                                    v-model="form.rating"
                                     type="number"
                                     min="0"
                                     max="10"
@@ -2111,22 +2039,15 @@ onMounted(
                         </div>
 
 
-                        <div
-                            class="admin-game-field"
-                        >
+                        <div class="admin-game-field">
 
-                            <label
-                                for="admin-game-tags"
-                            >
+                            <label for="admin-game-tags">
                                 Tags
                             </label>
 
-
                             <input
                                 id="admin-game-tags"
-                                v-model="
-                                    form.tags
-                                "
+                                v-model="form.tags"
                                 type="text"
                                 placeholder="Multijoueur, Fun, Horreur..."
                             >
@@ -2134,22 +2055,15 @@ onMounted(
                         </div>
 
 
-                        <div
-                            class="admin-game-field"
-                        >
+                        <div class="admin-game-field">
 
-                            <label
-                                for="admin-game-description"
-                            >
+                            <label for="admin-game-description">
                                 Description
                             </label>
 
-
                             <textarea
                                 id="admin-game-description"
-                                v-model="
-                                    form.description
-                                "
+                                v-model="form.description"
                                 rows="5"
                                 placeholder="Description du jeu..."
                             ></textarea>
@@ -2157,22 +2071,15 @@ onMounted(
                         </div>
 
 
-                        <div
-                            class="admin-game-field"
-                        >
+                        <div class="admin-game-field">
 
-                            <label
-                                for="admin-game-youtube"
-                            >
+                            <label for="admin-game-youtube">
                                 Playlist YouTube
                             </label>
 
-
                             <input
                                 id="admin-game-youtube"
-                                v-model="
-                                    form.youtube_playlist
-                                "
+                                v-model="form.youtube_playlist"
                                 type="url"
                                 placeholder="https://youtube.com/..."
                             >
@@ -2180,61 +2087,39 @@ onMounted(
                         </div>
 
 
-                        <label
-                            class="admin-game-form__poll"
-                        >
+                        <label class="admin-game-form__poll">
 
                             <div>
-
-                                <strong>
-                                    🗳️ Disponible dans les sondages
-                                </strong>
-
-
+                                <strong>🗳️ Disponible dans les sondages</strong>
                                 <span>
-                                    Le jeu pourra être sélectionné
-                                    lorsque tu crées un sondage.
+                                    Le jeu pourra être sélectionné lorsque tu crées un sondage.
                                 </span>
-
                             </div>
 
-
                             <input
-                                v-model="
-                                    form.poll_enabled
-                                "
+                                v-model="form.poll_enabled"
                                 type="checkbox"
                             >
 
                         </label>
 
 
-                        <footer
-                            class="admin-game-form__actions"
-                        >
+                        <footer class="admin-game-form__actions">
 
                             <button
                                 type="button"
                                 class="admin-game-form__cancel"
-                                :disabled="
-                                    saving
-                                "
-                                @click="
-                                    closeForm
-                                "
+                                :disabled="saving"
+                                @click="closeForm"
                             >
                                 Annuler
                             </button>
 
-
                             <button
                                 type="submit"
                                 class="admin-game-form__save"
-                                :disabled="
-                                    !canSave
-                                "
+                                :disabled="!canSave"
                             >
-
                                 {{
                                     saving
                                         ? "Enregistrement..."
@@ -2242,7 +2127,6 @@ onMounted(
                                             ? "Enregistrer"
                                             : "Ajouter le jeu"
                                 }}
-
                             </button>
 
                         </footer>
@@ -3641,6 +3525,262 @@ onMounted(
         padding: 17px;
     }
 
+}
+
+
+/* =========================================================
+   TWITCH SEARCH — MODAL
+========================================================= */
+
+.admin-twitch-search {
+    width: 100%;
+}
+
+.admin-twitch-search__heading {
+    margin-bottom: 16px;
+}
+
+.admin-twitch-search__heading > span {
+    color: var(--cyan);
+    font-size: 0.68rem;
+    font-weight: 900;
+    letter-spacing: 0.14em;
+}
+
+.admin-twitch-search__heading h3 {
+    margin: 5px 0 6px;
+    color: #ffffff;
+    font-size: 1.15rem;
+}
+
+.admin-twitch-search__heading p {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.48);
+    font-size: 0.78rem;
+    line-height: 1.55;
+}
+
+.admin-twitch-search__bar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 10px;
+}
+
+.admin-twitch-search__bar input {
+    width: 100%;
+    min-width: 0;
+    padding: 13px 14px;
+    color: #ffffff;
+    background: rgba(5, 2, 10, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 12px;
+    outline: 0;
+    font: inherit;
+}
+
+.admin-twitch-search__bar input:focus {
+    border-color: rgba(255, 44, 168, 0.55);
+    box-shadow: 0 0 0 3px rgba(255, 44, 168, 0.07);
+}
+
+.admin-twitch-search__bar button {
+    min-height: 46px;
+    padding: 0 17px;
+    color: #ffffff;
+    background: linear-gradient(135deg, var(--purple), var(--pink));
+    border: 1px solid rgba(255, 44, 168, 0.4);
+    border-radius: 12px;
+    font: inherit;
+    font-size: 0.78rem;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.admin-twitch-search__bar button:disabled {
+    opacity: 0.55;
+    cursor: wait;
+}
+
+.admin-twitch-search__error {
+    margin: 10px 0 0;
+    padding: 10px 12px;
+    color: #ff9db4;
+    background: rgba(255, 62, 103, 0.08);
+    border: 1px solid rgba(255, 62, 103, 0.2);
+    border-radius: 10px;
+    font-size: 0.75rem;
+    font-weight: 750;
+}
+
+.admin-twitch-selected {
+    display: grid;
+    grid-template-columns: 62px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 12px;
+    margin-top: 14px;
+    padding: 12px;
+    background: linear-gradient(135deg, rgba(34, 242, 239, 0.07), rgba(141, 44, 255, 0.08));
+    border: 1px solid rgba(34, 242, 239, 0.22);
+    border-radius: 14px;
+}
+
+.admin-twitch-selected > img {
+    width: 62px;
+    height: 82px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.admin-twitch-selected__info {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.admin-twitch-selected__info > span {
+    color: var(--cyan);
+    font-size: 0.62rem;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+}
+
+.admin-twitch-selected__info strong {
+    overflow: hidden;
+    color: #ffffff;
+    font-size: 0.9rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.admin-twitch-selected__info small {
+    color: rgba(255, 255, 255, 0.42);
+    font-size: 0.68rem;
+}
+
+.admin-twitch-selected__change {
+    min-height: 38px;
+    padding: 7px 11px;
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    font: inherit;
+    font-size: 0.7rem;
+    font-weight: 850;
+    cursor: pointer;
+}
+
+.admin-twitch-search__loading,
+.admin-twitch-search__empty {
+    margin-top: 14px;
+    padding: 20px;
+    color: rgba(255, 255, 255, 0.48);
+    text-align: center;
+    background: rgba(255, 255, 255, 0.025);
+    border: 1px dashed rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    font-size: 0.76rem;
+}
+
+.admin-twitch-results {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 14px;
+    max-height: 390px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.admin-twitch-result {
+    appearance: none;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    padding: 8px;
+    color: #ffffff;
+    text-align: left;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 13px;
+    cursor: pointer;
+    transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+}
+
+.admin-twitch-result:hover {
+    transform: translateY(-2px);
+    background: rgba(141, 44, 255, 0.08);
+    border-color: rgba(255, 44, 168, 0.34);
+}
+
+.admin-twitch-result--selected {
+    border-color: rgba(34, 242, 239, 0.5);
+    box-shadow: 0 0 0 2px rgba(34, 242, 239, 0.07);
+}
+
+.admin-twitch-result__cover {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: #12091a;
+    border-radius: 9px;
+}
+
+.admin-twitch-result__cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.admin-twitch-result__cover span {
+    font-size: 2rem;
+}
+
+.admin-twitch-result > strong {
+    min-height: 2.5em;
+    display: -webkit-box;
+    overflow: hidden;
+    color: #ffffff;
+    font-size: 0.72rem;
+    line-height: 1.25;
+    
+    -webkit-box-orient: vertical;
+}
+
+.admin-twitch-result__select {
+    color: var(--cyan);
+    font-size: 0.64rem;
+    font-weight: 900;
+}
+
+@media screen and (max-width: 850px) {
+    .admin-twitch-results {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media screen and (max-width: 600px) {
+    .admin-twitch-search__bar {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-twitch-selected {
+        grid-template-columns: 54px minmax(0, 1fr);
+    }
+
+    .admin-twitch-selected__change {
+        grid-column: 1 / -1;
+        width: 100%;
+    }
+
+    .admin-twitch-results {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
 }
 
 </style>
