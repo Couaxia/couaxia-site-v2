@@ -1,7 +1,9 @@
 <script setup lang="ts">
 
 import {
-    computed
+    computed,
+    ref,
+    watch
 } from "vue";
 
 import type {
@@ -9,6 +11,7 @@ import type {
 } from "../../services/profile.service";
 
 import {
+    getProfileArtworkLikesCount,
     getProfileAvatar,
     getProfileDisplayName,
     getProfileRoleLabel
@@ -174,13 +177,11 @@ const memberSince =
             return new Intl.DateTimeFormat(
                 "fr-FR",
                 {
-
                     month:
                         "long",
 
                     year:
                         "numeric"
-
                 }
             ).format(
                 date
@@ -311,6 +312,101 @@ const roleIcon =
 
 
 /* =========================================================
+   ARTWORK LIKES
+========================================================= */
+
+const artworkLikesCount =
+    ref(
+        0
+    );
+
+
+const artworkLikesLoading =
+    ref(
+        false
+    );
+
+
+async function loadArtworkLikesCount() {
+
+    if (
+        !props.profile.id
+    ) {
+
+        artworkLikesCount.value =
+            0;
+
+
+        return;
+
+    }
+
+
+    artworkLikesLoading.value =
+        true;
+
+
+    try {
+
+        artworkLikesCount.value =
+            await getProfileArtworkLikesCount(
+                props.profile.id
+            );
+
+    }
+
+    catch (
+        error
+    ) {
+
+        console.error(
+            "Erreur récupération likes artworks du profil :",
+            error
+        );
+
+
+        artworkLikesCount.value =
+            0;
+
+    }
+
+    finally {
+
+        artworkLikesLoading.value =
+            false;
+
+    }
+
+}
+
+
+/* =========================================================
+   WATCH PROFILE
+========================================================= */
+
+/*
+ * Recharge le compteur automatiquement
+ * si ProfileCard reçoit un autre profil.
+ */
+
+watch(
+    () =>
+        props.profile.id,
+
+    () => {
+
+        void loadArtworkLikesCount();
+
+    },
+
+    {
+        immediate:
+            true
+    }
+);
+
+
+/* =========================================================
    EDIT
 ========================================================= */
 
@@ -416,8 +512,6 @@ function requestEdit() {
                     class="profile-card__identity"
                 >
 
-                    <!-- POUP -->
-
                     <span
                         class="profile-card__eyebrow"
                     >
@@ -427,8 +521,6 @@ function requestEdit() {
                     </span>
 
 
-                    <!-- DISPLAY NAME -->
-
                     <h2
                         class="profile-card__display-name"
                     >
@@ -437,8 +529,6 @@ function requestEdit() {
 
                     </h2>
 
-
-                    <!-- USERNAME -->
 
                     <span
                         class="profile-card__username"
@@ -589,6 +679,52 @@ function requestEdit() {
                         <strong>
 
                             Les POUP
+
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =============================================
+                     ARTWORK LIKES
+                ============================================== -->
+
+                <div
+                    class="profile-card__meta-item"
+                >
+
+                    <span
+                        class="profile-card__meta-icon"
+                        aria-hidden="true"
+                    >
+
+                        🎨
+
+                    </span>
+
+
+                    <div
+                        class="profile-card__meta-content"
+                    >
+
+                        <span
+                            class="profile-card__meta-label"
+                        >
+
+                            Arts likés
+
+                        </span>
+
+
+                        <strong>
+
+                            {{
+                                artworkLikesLoading
+                                    ? "..."
+                                    : artworkLikesCount
+                            }}
 
                         </strong>
 

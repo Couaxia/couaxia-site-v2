@@ -1451,7 +1451,52 @@ export function getProfileInitial(
         .toUpperCase();
 
 }
+export async function getProfileArtworkLikesCount(
+    userId: string
+): Promise<number> {
 
+    const {
+        count,
+        error
+    } =
+        await supabase
+            .from(
+                "artwork_likes"
+            )
+            .select(
+                "id",
+                {
+                    count:
+                        "exact",
+
+                    head:
+                        true
+                }
+            )
+            .eq(
+                "user_id",
+                userId
+            );
+
+
+    if (
+        error
+    ) {
+
+        console.error(
+            "Erreur récupération likes artworks :",
+            error
+        );
+
+
+        return 0;
+
+    }
+
+
+    return count ?? 0;
+
+}
 
 /* =========================================================
    PROFILE ROLE LABEL
