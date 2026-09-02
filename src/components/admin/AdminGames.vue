@@ -66,7 +66,7 @@ interface GameForm {
         string;
 
     rating:
-        string;
+        string | number;
 
     youtube_playlist:
         string;
@@ -1028,6 +1028,33 @@ function changeSelectedTwitchGame() {
 
 
 /* =========================================================
+   RATING TEXT
+========================================================= */
+
+function getRatingText():
+    string {
+
+    if (
+        form.value.rating ===
+        null
+        ||
+        form.value.rating ===
+        undefined
+    ) {
+
+        return "";
+
+    }
+
+
+    return String(
+        form.value.rating
+    ).trim();
+
+}
+
+
+/* =========================================================
    PARSE RATING
 ========================================================= */
 
@@ -1035,7 +1062,7 @@ function parseRating():
     number | null {
 
     const value =
-        form.value.rating.trim();
+        getRatingText();
 
 
     if (
@@ -1122,7 +1149,7 @@ async function saveGame() {
 
 
         if (
-            form.value.rating.trim()
+            getRatingText()
             &&
             rating === null
         ) {
@@ -3748,7 +3775,6 @@ onMounted(
     color: #ffffff;
     font-size: 0.72rem;
     line-height: 1.25;
-    
     -webkit-box-orient: vertical;
 }
 
