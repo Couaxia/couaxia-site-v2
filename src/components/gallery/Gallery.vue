@@ -1070,31 +1070,10 @@ async function loadArtworks():
         await loadArtworkLikes();
 
 
-        console.table(
-            artworks.value.map(
-                artwork => ({
-                    title:
-                        artwork.title,
-
-                    artist:
-                        artwork.artistName,
-
-                    category:
-                        artwork.category,
-
-                    tags:
-                        artwork.tags.join(
-                            ", "
-                        ),
-
-                    mediaType:
-                        artwork.mediaType,
-
-                    sensitive:
-                        artwork.sensitive
-                })
-            )
-        );
+        /*
+         * Les médias eux-mêmes sont chargés paresseusement
+         * dans Cards.vue afin de limiter le trafic Storage.
+         */
 
     }
 

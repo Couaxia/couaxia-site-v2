@@ -3870,7 +3870,7 @@ export async function uploadAdminArtworkFile(
                 {
 
                     cacheControl:
-                        "3600",
+                        "31536000",
 
                     upsert:
                         false,

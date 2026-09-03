@@ -1,6 +1,103 @@
 /* =========================================================
    TYPES
 ========================================================= */
+/*
+ * Les informations d'un jeu Twitch changent très rarement.
+ *
+ * On garde donc les jeux récupérés par ID pendant 24 h.
+ */
+const TWITCH_GAME_CACHE_TTL_MS = 24
+    *
+        60
+    *
+        60
+    *
+        1000;
+/*
+ * Les résultats de recherche sont un peu plus dynamiques.
+ *
+ * On les garde pendant 15 minutes.
+ */
+const TWITCH_GAME_SEARCH_CACHE_TTL_MS = 15
+    *
+        60
+    *
+        1000;
+/*
+ * Limite simple pour éviter qu'une grande quantité
+ * de recherches différentes fasse grossir le cache
+ * mémoire indéfiniment.
+ */
+const TWITCH_SEARCH_CACHE_MAX_ENTRIES = 250;
+const twitchGameByIdCache = new Map();
+const twitchGameSearchCache = new Map();
+/* =========================================================
+   CACHE — GET
+========================================================= */
+function getCachedValue(cache, key) {
+    const entry = cache.get(key);
+    if (!entry) {
+        return null;
+    }
+    if (Date.now()
+        >=
+            entry.expiresAt) {
+        cache.delete(key);
+        return null;
+    }
+    return entry.value;
+}
+/* =========================================================
+   CACHE — SET
+========================================================= */
+function setCachedValue(cache, key, value, ttlMs, maxEntries) {
+    /*
+     * On retire d'abord les entrées expirées.
+     */
+    const now = Date.now();
+    for (const [cachedKey, entry] of cache) {
+        if (now
+            >=
+                entry.expiresAt) {
+            cache.delete(cachedKey);
+        }
+    }
+    /*
+     * Si une limite est fournie, on retire la plus
+     * ancienne entrée restante avant d'en ajouter une.
+     */
+    if (maxEntries
+        &&
+            cache.size
+                >=
+                    maxEntries
+        &&
+            !cache.has(key)) {
+        const firstKey = cache
+            .keys()
+            .next()
+            .value;
+        if (typeof firstKey
+            ===
+                "string") {
+            cache.delete(firstKey);
+        }
+    }
+    cache.set(key, {
+        value,
+        expiresAt: now
+            +
+                ttlMs
+    });
+}
+/* =========================================================
+   CACHE — SEARCH KEY
+========================================================= */
+function getTwitchGameSearchCacheKey(query, limit) {
+    return `${query
+        .trim()
+        .toLowerCase()}::${limit}`;
+}
 /* =========================================================
    CONFIG TWITCH
 ========================================================= */
@@ -463,31 +560,70 @@ export async function getTwitchGames(gameIds) {
             0) {
         return [];
     }
-    const games = [];
     /*
-     * Twitch accepte jusqu'à 100 jeux
-     * dans cette requête.
+     * On conserve les résultats dans une Map afin de
+     * pouvoir reconstruire le tableau final dans le
+     * même ordre que les IDs demandés.
      */
-    const chunkSize = 100;
-    for (let index = 0; index < cleanIds.length; index += chunkSize) {
-        const currentIds = cleanIds.slice(index, index
-            +
-                chunkSize);
-        const url = new URL("https://api.twitch.tv/helix/games");
-        for (const gameId of currentIds) {
-            url.searchParams.append("id", gameId);
+    const gameById = new Map();
+    const missingIds = [];
+    /* =====================================================
+       MEMORY CACHE
+    ====================================================== */
+    for (const gameId of cleanIds) {
+        const cachedGame = getCachedValue(twitchGameByIdCache, gameId);
+        if (cachedGame) {
+            gameById.set(gameId, cachedGame);
+            continue;
         }
-        const response = await twitchFetch(url.toString());
-        const currentGames = (response.data
-            ??
-                [])
-            .map(formatGame)
-            .filter(game => Boolean(game.id)
-            &&
-                Boolean(game.name));
-        games.push(...currentGames);
+        missingIds.push(gameId);
     }
-    return games;
+    /* =====================================================
+       TWITCH API — ONLY MISSING IDS
+    ====================================================== */
+    if (missingIds.length
+        >
+            0) {
+        /*
+         * Twitch accepte jusqu'à 100 jeux
+         * dans cette requête.
+         */
+        const chunkSize = 100;
+        for (let index = 0; index < missingIds.length; index += chunkSize) {
+            const currentIds = missingIds.slice(index, index
+                +
+                    chunkSize);
+            const url = new URL("https://api.twitch.tv/helix/games");
+            for (const gameId of currentIds) {
+                url.searchParams.append("id", gameId);
+            }
+            const response = await twitchFetch(url.toString());
+            const currentGames = (response.data
+                ??
+                    [])
+                .map(formatGame)
+                .filter(game => Boolean(game.id)
+                &&
+                    Boolean(game.name));
+            for (const game of currentGames) {
+                /*
+                 * Cache serveur partagé entre les visiteurs
+                 * tant que l'instance Render reste active.
+                 */
+                setCachedValue(twitchGameByIdCache, game.id, game, TWITCH_GAME_CACHE_TTL_MS);
+                gameById.set(game.id, game);
+            }
+        }
+    }
+    /* =====================================================
+       RESULT — ORIGINAL REQUEST ORDER
+    ====================================================== */
+    return cleanIds
+        .map(gameId => gameById.get(gameId)
+        ??
+            null)
+        .filter((game) => game !==
+        null);
 }
 /* =========================================================
    GET ONE TWITCH GAME
@@ -542,6 +678,14 @@ export async function searchTwitchGames(query, first = 20) {
     ====================================================== */
     const limit = normalizeLimit(first, 20);
     /* =====================================================
+       MEMORY CACHE
+    ====================================================== */
+    const cacheKey = getTwitchGameSearchCacheKey(cleanQuery, limit);
+    const cachedResults = getCachedValue(twitchGameSearchCache, cacheKey);
+    if (cachedResults) {
+        return cachedResults;
+    }
+    /* =====================================================
        URL
     ====================================================== */
     const url = new URL("https://api.twitch.tv/helix/search/categories");
@@ -554,13 +698,30 @@ export async function searchTwitchGames(query, first = 20) {
     /* =====================================================
        RESULT
     ====================================================== */
-    return (response.data
+    const results = (response.data
         ??
             [])
         .map(formatGame)
         .filter(game => Boolean(game.id)
         &&
             Boolean(game.name));
+    /*
+     * Cache 15 minutes.
+     *
+     * Le cache est mémoire uniquement :
+     * un redémarrage de l'instance Render le vide,
+     * ce qui est parfaitement acceptable ici.
+     */
+    setCachedValue(twitchGameSearchCache, cacheKey, results, TWITCH_GAME_SEARCH_CACHE_TTL_MS, TWITCH_SEARCH_CACHE_MAX_ENTRIES);
+    /*
+     * Les résultats d'une recherche nous donnent également
+     * des jeux complets. On peut donc remplir en même temps
+     * le cache par ID pour les futurs appels getTwitchGames().
+     */
+    for (const game of results) {
+        setCachedValue(twitchGameByIdCache, game.id, game, TWITCH_GAME_CACHE_TTL_MS);
+    }
+    return results;
 }
 /* =========================================================
    SEARCH FIRST TWITCH GAME

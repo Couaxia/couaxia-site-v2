@@ -9,6 +9,7 @@ import {
 import {
     createAdminArtwork,
     deleteAdminArtwork,
+    deleteAdminArtworkFile,
     getAdminArtworks,
     updateAdminArtwork,
     uploadAdminArtworkFile
@@ -402,6 +403,125 @@ function normalizeTextArray(
 
 
     return [];
+
+}
+
+
+/* =========================================================
+   STORAGE PATH FROM PUBLIC URL
+========================================================= */
+
+function getArtworkStoragePath(
+    publicUrl:
+        string | null | undefined
+): string | null {
+
+    const cleanUrl =
+        (
+            publicUrl
+            ??
+            ""
+        ).trim();
+
+    if (
+        !cleanUrl
+    ) {
+
+        return null;
+
+    }
+
+    const marker =
+        "/storage/v1/object/public/artworks/";
+
+    const markerIndex =
+        cleanUrl.indexOf(
+            marker
+        );
+
+    if (
+        markerIndex
+        ===
+        -1
+    ) {
+
+        return null;
+
+    }
+
+    const encodedPath =
+        cleanUrl
+            .slice(
+                markerIndex
+                +
+                marker.length
+            )
+            .split("?")[0]
+            .split("#")[0];
+
+    if (
+        !encodedPath
+    ) {
+
+        return null;
+
+    }
+
+    try {
+
+        return decodeURIComponent(
+            encodedPath
+        );
+
+    }
+    catch {
+
+        return encodedPath;
+
+    }
+
+}
+
+
+/* =========================================================
+   SAFE STORAGE DELETE
+========================================================= */
+
+async function deleteArtworkStorageFileSafely(
+    publicUrl:
+        string | null | undefined
+): Promise<void> {
+
+    const storagePath =
+        getArtworkStoragePath(
+            publicUrl
+        );
+
+    if (
+        !storagePath
+    ) {
+
+        return;
+
+    }
+
+    try {
+
+        await deleteAdminArtworkFile(
+            storagePath
+        );
+
+    }
+    catch (
+        error
+    ) {
+
+        console.warn(
+            "Impossible de supprimer l'ancien média Supabase :",
+            error
+        );
+
+    }
 
 }
 
@@ -1203,18 +1323,33 @@ async function saveArtwork() {
 
     }
 
-
     saving.value =
         true;
-
 
     errorMessage.value =
         "";
 
-
     successMessage.value =
         "";
 
+    const previousImageUrl =
+        editing.value
+        &&
+        selectedArtwork.value
+
+            ? (
+                selectedArtwork.value.image_url
+                ??
+                ""
+            )
+
+            : "";
+
+    let newlyUploadedUrl =
+        "";
+
+    let databaseSaved =
+        false;
 
     try {
 
@@ -1222,18 +1357,16 @@ async function saveArtwork() {
             selectedFile.value
         ) {
 
-            const uploadedUrl =
+            newlyUploadedUrl =
                 await uploadAdminArtworkFile(
                     selectedFile.value,
                     "credits"
                 );
 
-
             form.value.image_url =
-                uploadedUrl;
+                newlyUploadedUrl;
 
         }
-
 
         if (
             !form.value.image_url.trim()
@@ -1245,14 +1378,8 @@ async function saveArtwork() {
 
         }
 
-
         const payload =
             createPayload();
-
-
-        /* =================================================
-           UPDATE
-        ================================================== */
 
         if (
             editing.value
@@ -1265,32 +1392,44 @@ async function saveArtwork() {
                 payload
             );
 
+            databaseSaved =
+                true;
+
+            if (
+                newlyUploadedUrl
+                &&
+                previousImageUrl
+                &&
+                previousImageUrl
+                !==
+                newlyUploadedUrl
+            ) {
+
+                await deleteArtworkStorageFileSafely(
+                    previousImageUrl
+                );
+
+            }
 
             successMessage.value =
                 "La création a bien été modifiée. 🎨";
 
         }
-
-
-        /* =================================================
-           CREATE
-        ================================================== */
-
         else {
 
             await createAdminArtwork(
                 payload
             );
 
+            databaseSaved =
+                true;
 
             successMessage.value =
                 "La création a bien été ajoutée. 🎨";
 
         }
 
-
         await loadArtworks();
-
 
         forceCloseForm();
 
@@ -1299,11 +1438,22 @@ async function saveArtwork() {
         error
     ) {
 
+        if (
+            newlyUploadedUrl
+            &&
+            !databaseSaved
+        ) {
+
+            await deleteArtworkStorageFileSafely(
+                newlyUploadedUrl
+            );
+
+        }
+
         console.error(
             "Erreur sauvegarde artwork :",
             error
         );
-
 
         errorMessage.value =
             error instanceof Error
@@ -1498,18 +1648,15 @@ async function removeArtwork(
 
     }
 
-
     const artistName =
         artwork.artist
         ||
         "cet artiste";
 
-
     const confirmed =
         window.confirm(
             `Supprimer définitivement cette création de ${artistName} ?`
         );
-
 
     if (
         !confirmed
@@ -1519,25 +1666,25 @@ async function removeArtwork(
 
     }
 
-
     deletingArtworkId.value =
         artwork.id;
-
 
     errorMessage.value =
         "";
 
-
     successMessage.value =
         "";
 
+    const imageUrl =
+        artwork.image_url
+        ??
+        "";
 
     try {
 
         await deleteAdminArtwork(
             artwork.id
         );
-
 
         artworks.value =
             artworks.value.filter(
@@ -1547,9 +1694,12 @@ async function removeArtwork(
                     artwork.id
             );
 
+        await deleteArtworkStorageFileSafely(
+            imageUrl
+        );
 
         successMessage.value =
-            "La création a été supprimée.";
+            "La création et son média ont été supprimés.";
 
     }
     catch (
@@ -1560,7 +1710,6 @@ async function removeArtwork(
             "Erreur suppression artwork :",
             error
         );
-
 
         errorMessage.value =
             error instanceof Error
@@ -2001,6 +2150,7 @@ onMounted(
                             loop
                             playsinline
                             controls
+                            preload="none"
                         ></video>
 
 
@@ -2022,6 +2172,8 @@ onMounted(
                                 ||
                                 'Artwork'
                             "
+                            loading="lazy"
+                            decoding="async"
                         >
 
 

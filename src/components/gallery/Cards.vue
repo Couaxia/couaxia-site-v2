@@ -108,6 +108,12 @@ const adultContentVisible =
     ref(false);
 
 
+const videoElement =
+    ref<HTMLVideoElement | null>(
+        null
+    );
+
+
 let mascotHoverTimer:
     number | null =
         null;
@@ -153,6 +159,56 @@ const isVideo =
 
         }
     );
+
+
+/* =========================================================
+   VIDEO PLAYBACK
+========================================================= */
+
+async function playVideoPreview() {
+
+    if (
+        !isVideo.value
+        ||
+        !videoElement.value
+    ) {
+
+        return;
+
+    }
+
+
+    try {
+
+        await videoElement.value.play();
+
+    }
+    catch {
+
+        /*
+         * Certains navigateurs peuvent refuser play().
+         * Ce n'est pas bloquant pour la galerie.
+         */
+
+    }
+
+}
+
+
+function pauseVideoPreview() {
+
+    if (
+        !videoElement.value
+    ) {
+
+        return;
+
+    }
+
+
+    videoElement.value.pause();
+
+}
 
 
 /* =========================================================
@@ -659,6 +715,10 @@ function handleArtistButtonHover() {
 
                 loading="lazy"
 
+                decoding="async"
+
+                fetchpriority="low"
+
                 draggable="false"
             >
 
@@ -670,6 +730,10 @@ function handleArtistButtonHover() {
             <video
                 v-else
 
+                ref="
+                    videoElement
+                "
+
                 :src="
                     artwork.imageUrl
                 "
@@ -679,21 +743,35 @@ function handleArtistButtonHover() {
                     credits-card__video
                 "
 
-                autoplay
-
                 loop
 
                 muted
 
                 playsinline
 
-                preload="metadata"
+                preload="none"
 
                 disablepictureinpicture
 
                 disableremoteplayback
 
                 draggable="false"
+
+                @mouseenter="
+                    playVideoPreview
+                "
+
+                @mouseleave="
+                    pauseVideoPreview
+                "
+
+                @focus="
+                    playVideoPreview
+                "
+
+                @blur="
+                    pauseVideoPreview
+                "
 
                 @contextmenu.prevent
             ></video>
@@ -712,6 +790,10 @@ function handleArtistButtonHover() {
                     src="https://qudeuzkwvwprlhqtzsct.supabase.co/storage/v1/object/public/site-asset/logo/Logo_Glow.png"
 
                     alt=""
+
+                    loading="lazy"
+
+                    decoding="async"
 
                     draggable="false"
                 >
