@@ -108,10 +108,6 @@ const adultContentVisible =
     ref(false);
 
 
-const videoElement =
-    ref<HTMLVideoElement | null>(
-        null
-    );
 
 
 let mascotHoverTimer:
@@ -155,60 +151,14 @@ const isVideo =
                 url.endsWith(".mp4")
                 ||
                 url.endsWith(".webm")
+                ||
+                url.endsWith(".mov")
+                ||
+                url.endsWith(".m4v")
             );
 
         }
     );
-
-
-/* =========================================================
-   VIDEO PLAYBACK
-========================================================= */
-
-async function playVideoPreview() {
-
-    if (
-        !isVideo.value
-        ||
-        !videoElement.value
-    ) {
-
-        return;
-
-    }
-
-
-    try {
-
-        await videoElement.value.play();
-
-    }
-    catch {
-
-        /*
-         * Certains navigateurs peuvent refuser play().
-         * Ce n'est pas bloquant pour la galerie.
-         */
-
-    }
-
-}
-
-
-function pauseVideoPreview() {
-
-    if (
-        !videoElement.value
-    ) {
-
-        return;
-
-    }
-
-
-    videoElement.value.pause();
-
-}
 
 
 /* =========================================================
@@ -702,23 +652,12 @@ function handleArtistButtonHover() {
 
             <img
                 v-if="!isVideo"
-
-                :src="
-                    artwork.imageUrl
-                "
-
-                :alt="
-                    artwork.title
-                "
-
+                :src="artwork.imageUrl"
+                :alt="artwork.title"
                 class="credits-card__image"
-
                 loading="lazy"
-
                 decoding="async"
-
                 fetchpriority="low"
-
                 draggable="false"
             >
 
@@ -729,50 +668,19 @@ function handleArtistButtonHover() {
 
             <video
                 v-else
-
-                ref="
-                    videoElement
-                "
-
-                :src="
-                    artwork.imageUrl
-                "
-
+                :src="artwork.imageUrl"
                 class="
                     credits-card__image
                     credits-card__video
                 "
-
-                loop
-
+                autoplay
                 muted
-
+                loop
                 playsinline
-
-                preload="none"
-
+                preload="metadata"
                 disablepictureinpicture
-
                 disableremoteplayback
-
                 draggable="false"
-
-                @mouseenter="
-                    playVideoPreview
-                "
-
-                @mouseleave="
-                    pauseVideoPreview
-                "
-
-                @focus="
-                    playVideoPreview
-                "
-
-                @blur="
-                    pauseVideoPreview
-                "
-
                 @contextmenu.prevent
             ></video>
 

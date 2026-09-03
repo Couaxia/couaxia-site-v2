@@ -1185,6 +1185,31 @@ function forceCloseForm() {
 
 
 /* =========================================================
+   GENERATE ART ID
+========================================================= */
+
+function generateArtworkId():
+    string {
+
+    const timestamp =
+        Date.now();
+
+
+    const random =
+        Math.random()
+            .toString(36)
+            .slice(
+                2,
+                8
+            );
+
+
+    return `art-${timestamp}-${random}`;
+
+}
+
+
+/* =========================================================
    CREATE PAYLOAD
 ========================================================= */
 
@@ -1237,7 +1262,17 @@ function createPayload():
 
         art_id:
             form.value.art_id
-                .trim(),
+                .trim()
+            ||
+            (
+                editing.value
+                    ? (
+                        selectedArtwork.value?.art_id
+                        ??
+                        generateArtworkId()
+                    )
+                    : generateArtworkId()
+            ),
 
         artist:
             form.value.artist
@@ -2695,8 +2730,13 @@ onMounted(
                                             form.art_id
                                         "
                                         type="text"
-                                        placeholder="couaxia-model-01"
+                                        placeholder="Laisse vide pour générer automatiquement"
                                     >
+
+
+                                    <small>
+                                        Facultatif — un identifiant unique sera généré automatiquement.
+                                    </small>
 
                                 </div>
 
