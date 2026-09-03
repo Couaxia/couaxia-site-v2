@@ -428,29 +428,94 @@ function nextArtwork() {
 
 function toggleLike() {
 
+    /*
+     * On mémorise l'état AVANT le clic.
+     *
+     * false → l'utilisateur ajoute aux favoris
+     * true  → l'utilisateur retire des favoris
+     */
+
+    const wasLiked =
+        props.artwork.liked;
+
+
     emit(
         "toggle-like",
         props.artwork
     );
 
 
+    /* =====================================================
+       AJOUT AUX FAVORIS
+    ===================================================== */
+
     if (
-        props.artwork.liked
+        !wasLiked
     ) {
 
+        const likeMessages = [
+
+            "Oh, tu aimes celle-là ? 👀💜",
+
+            "Hop ! Dans tes favoris ! 💜",
+
+            "Héhé, elle t'a tapé dans l'œil ? ✨",
+
+            "Excellent choix ! Je valide aussi. 🐙💜",
+
+            "Ooooh, celle-là mérite son petit cœur ! 💕",
+
+            "Je vois que quelqu'un a du goût... 👀✨",
+
+            "Et hop, directement dans tes favoris ! 💜",
+
+            "Un petit cœur pour cette création ? Adorable ! 🥰"
+
+        ];
+
+
         sendMascotMessage(
-            "Tu changes d'avis ? 👀"
+            getRandomMessage(
+                likeMessages
+            )
         );
+
+
+        return;
 
     }
 
-    else {
 
-        sendMascotMessage(
-            "Hop ! Dans tes favoris ! 💜"
-        );
+    /* =====================================================
+       RETRAIT DES FAVORIS
+    ===================================================== */
 
-    }
+    const unlikeMessages = [
+
+        "Oh... tu ne l'aimes plus ? 🥺",
+
+        "Noooon ! Son petit cœur ! 💔",
+
+        "Elle vient de perdre sa place dans tes favoris... 😭",
+
+        "Aïe... le cœur vient de disparaître. 🥺",
+
+        "Bon... je vais faire comme si je n'avais rien vu. 👀",
+
+        "Un favori en moins... mes tentacules sont tristes. 🐙🥺",
+
+        "Tu as changé d'avis ? Ça arrive ! 💜",
+
+        "Et pouf ! Plus dans les favoris. 👋"
+
+    ];
+
+
+    sendMascotMessage(
+        getRandomMessage(
+            unlikeMessages
+        )
+    );
 
 }
 
