@@ -77,6 +77,9 @@ const props =
     defineProps<{
         artwork:
             CreditArtwork;
+
+        randomSelected?:
+            boolean;
     }>();
 
 
@@ -467,32 +470,110 @@ function revealAdultContent() {
 
 function toggleLike() {
 
+    /*
+     * props.artwork.liked représente l'état AVANT le clic.
+     *
+     * false → l'utilisateur vient d'aimer
+     * true  → l'utilisateur vient de retirer son like
+     */
+
+    const wasLiked =
+        props.artwork.liked;
+
+
     emit(
         "toggle-like",
         props.artwork
     );
 
 
+    /* =====================================================
+       AJOUT AUX FAVORIS
+    ===================================================== */
+
     if (
-        props.artwork.liked
+        !wasLiked
     ) {
 
+        const likeMessages = [
+
+            "Oh, tu aimes celle-là ? 👀💜",
+
+            "Hop ! Une création de plus dans tes favoris ! 💜",
+
+            "Héhé, celle-ci t'a tapé dans l'œil ? ✨",
+
+            "Excellent choix ! Je valide aussi. 🐙💜",
+
+            "Ooooh, celle-là mérite son petit cœur ! 💕",
+
+            "Je vois que quelqu'un a du goût... 👀✨",
+
+            "Et hop, directement dans les favoris ! 💜",
+
+            "Un petit cœur pour cette création ? Adorable ! 🥰"
+
+        ];
+
+
+        const message =
+            likeMessages[
+                Math.floor(
+                    Math.random() *
+                    likeMessages.length
+                )
+            ];
+
+
         sendMascotMessage(
-            "Oh... tu ne l'aimes plus ? 🥺"
+            message
         );
 
-    }
-    else {
 
-        sendMascotMessage(
-            "Hop ! Une création de plus dans tes favoris ! 💜"
-        );
+        return;
 
     }
+
+
+    /* =====================================================
+       RETRAIT DES FAVORIS
+    ===================================================== */
+
+    const unlikeMessages = [
+
+        "Oh... tu ne l'aimes plus ? 🥺",
+
+        "Noooon ! Son petit cœur ! 💔",
+
+        "Elle vient de perdre sa place dans tes favoris... 😭",
+
+        "Aïe... le cœur vient de disparaître. 🥺",
+
+        "Bon... je vais faire comme si je n'avais rien vu. 👀",
+
+        "Un favori en moins... mes tentacules sont tristes. 🐙🥺",
+
+        "Tu as changé d'avis ? Ça arrive ! 💜",
+
+        "Et pouf ! Plus dans les favoris. 👋"
+
+    ];
+
+
+    const message =
+        unlikeMessages[
+            Math.floor(
+                Math.random() *
+                unlikeMessages.length
+            )
+        ];
+
+
+    sendMascotMessage(
+        message
+    );
 
 }
-
-
 /* =========================================================
    ARTIST BUTTON MESSAGE
 ========================================================= */
@@ -577,7 +658,10 @@ function handleArtistButtonHover() {
 
         :class="{
             'credits-card--liked':
-                artwork.liked
+                artwork.liked,
+
+            'credits-card--random-selected':
+                props.randomSelected === true
         }"
 
         @mouseenter="

@@ -1895,6 +1895,12 @@ onBeforeUnmount(
 
                 <CreditsCard
                     :artwork="artwork"
+
+                    :random-selected="
+                        highlightedArtworkId ===
+                        artwork.id
+                    "
+
                     @toggle-like="toggleLike"
                     @open="openArtwork"
                 />
