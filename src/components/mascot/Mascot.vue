@@ -8,6 +8,8 @@ import {
 } from "vue";
 
 import "../../assets/styles/components/mascot.css";
+
+
 /* =========================================================
    TYPES
 ========================================================= */
@@ -42,7 +44,7 @@ const mascotImages:
     > = {
 
         idle:
-               "https://qudeuzkwvwprlhqtzsct.supabase.co/storage/v1/object/public/site-asset/mascotte/Discord-reactive-Mute.gif",
+            "https://qudeuzkwvwprlhqtzsct.supabase.co/storage/v1/object/public/site-asset/mascotte/Discord-reactive-Mute.gif",
 
         talking:
             "https://qudeuzkwvwprlhqtzsct.supabase.co/storage/v1/object/public/site-asset/mascotte/Discord-reactive-Talk.gif"
@@ -121,6 +123,36 @@ const currentMascotImage =
 
 
 /* =========================================================
+   PRELOAD MASCOT IMAGES
+========================================================= */
+
+function preloadMascotImages() {
+
+    Object
+        .values(
+            mascotImages
+        )
+        .forEach(
+            imageUrl => {
+
+                const image =
+                    new Image();
+
+
+                image.decoding =
+                    "async";
+
+
+                image.src =
+                    imageUrl;
+
+            }
+        );
+
+}
+
+
+/* =========================================================
    RANDOM
 ========================================================= */
 
@@ -131,7 +163,8 @@ function getRandomMessage(
     string {
 
     if (
-        !messages ||
+        !messages
+        ||
         messages.length === 0
     ) {
 
@@ -142,7 +175,8 @@ function getRandomMessage(
 
     const randomIndex =
         Math.floor(
-            Math.random() *
+            Math.random()
+            *
             messages.length
         );
 
@@ -201,7 +235,8 @@ function showMessage(
 ) {
 
     if (
-        !message ||
+        !message
+        ||
         !message.trim()
     ) {
 
@@ -213,10 +248,6 @@ function showMessage(
     clearHideTimer();
 
 
-    /* =====================================================
-       MESSAGE
-    ===================================================== */
-
     currentMessage.value =
         message;
 
@@ -225,17 +256,9 @@ function showMessage(
         true;
 
 
-    /* =====================================================
-       EXPRESSION
-    ===================================================== */
-
     expression.value =
         requestedExpression;
 
-
-    /* =====================================================
-       AUTO CLOSE
-    ===================================================== */
 
     hideTimer =
         window.setTimeout(
@@ -279,7 +302,8 @@ function handleMascotMessage(
 
 
     if (
-        !detail ||
+        !detail
+        ||
         !detail.message
     ) {
 
@@ -291,11 +315,13 @@ function handleMascotMessage(
     showMessage(
         detail.message,
 
-        detail.expression ??
-            "talking",
+        detail.expression
+        ??
+        "talking",
 
-        detail.duration ??
-            6500
+        detail.duration
+        ??
+        6500
     );
 
 }
@@ -347,6 +373,16 @@ function closeMessage() {
 onMounted(
     () => {
 
+        /*
+         * Charge les deux GIF une seule fois au démarrage
+         * du composant.
+         *
+         * Les changements idle / talking réutilisent ensuite
+         * les fichiers déjà présents dans le cache navigateur.
+         */
+        preloadMascotImages();
+
+
         window.addEventListener(
             "couaxia-mascot-message",
             handleMascotMessage
@@ -386,15 +422,14 @@ onBeforeUnmount(
         ]"
     >
 
-        <!-- =================================================
-             SPEECH BUBBLE
-        ================================================== -->
-
-        <Transition name="mascot-bubble">
+        <Transition
+            name="mascot-bubble"
+        >
 
             <div
                 v-if="
-                    isVisible &&
+                    isVisible
+                    &&
                     currentMessage
                 "
                 class="mascot-widget__bubble"
@@ -402,39 +437,29 @@ onBeforeUnmount(
                 aria-live="polite"
             >
 
-                <!-- =========================================
-                     CLOSE
-                ========================================== -->
-
                 <button
                     type="button"
                     class="mascot-widget__close"
                     aria-label="Fermer le message"
-                    @click="closeMessage"
+                    @click="
+                        closeMessage
+                    "
                 >
                     ×
                 </button>
 
 
-                <!-- =========================================
-                     NAME
-                ========================================== -->
-
-                <span class="mascot-widget__name">
-
+                <span
+                    class="mascot-widget__name"
+                >
                     🐙 Couaxia
-
                 </span>
 
 
-                <!-- =========================================
-                     MESSAGE
-                ========================================== -->
-
-                <p class="mascot-widget__message">
-
+                <p
+                    class="mascot-widget__message"
+                >
                     {{ currentMessage }}
-
                 </p>
 
             </div>
@@ -442,21 +467,23 @@ onBeforeUnmount(
         </Transition>
 
 
-        <!-- =================================================
-             CHARACTER
-        ================================================== -->
-
         <button
             type="button"
             class="mascot-widget__character"
             aria-label="Faire parler Couaxia"
-            @click="speakRandomMessage"
+            @click="
+                speakRandomMessage
+            "
         >
 
             <img
-                :src="currentMascotImage"
+                :src="
+                    currentMascotImage
+                "
                 alt="Mascotte Couaxia"
                 class="mascot-widget__image"
+                decoding="async"
+                fetchpriority="low"
                 draggable="false"
             >
 
