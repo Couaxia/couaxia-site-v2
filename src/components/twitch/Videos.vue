@@ -890,10 +890,30 @@ function scrollToVideos() {
 
 function formatViews(
     value:
-        number
-) {
+        number | null | undefined
+):
+    string {
 
-    return value.toLocaleString(
+    const safeValue =
+        Number(
+            value
+            ??
+            0
+        );
+
+
+    if (
+        !Number.isFinite(
+            safeValue
+        )
+    ) {
+
+        return "0";
+
+    }
+
+
+    return safeValue.toLocaleString(
         "fr-FR"
     );
 
