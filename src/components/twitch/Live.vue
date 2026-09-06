@@ -1003,85 +1003,124 @@ onBeforeUnmount(
 
         <template v-else>
 
-            <!-- =============================================
-                 PLAYER
-            ============================================== -->
+           <!-- =================================================
+     PLAYER
+================================================== -->
 
-            <div
-                class="twitch-live__player"
+<div
+    class="twitch-live__player"
+    tabindex="0"
 
-                tabindex="0"
+    @mouseenter.stop="
+        speakAboutPlayer
+    "
 
-                @mouseenter.stop="
-                    speakAboutPlayer
+    @mouseleave.stop="
+        stopMascotHover
+    "
+
+    @focus.stop="
+        speakAboutPlayer
+    "
+
+    @blur.stop="
+        stopMascotHover
+    "
+>
+
+    <span
+        class="twitch-live__player-status"
+
+        :class="{
+            'twitch-live__player-status--online':
+                isLive
+        }"
+    >
+        {{
+            isLive
+                ? "EN DIRECT"
+                : "HORS LIGNE"
+        }}
+    </span>
+
+
+    <!-- =================================================
+         LIVE
+    ================================================== -->
+
+    <iframe
+        v-if="isLive"
+
+        class="twitch-live__iframe"
+
+        :src="
+            twitchPlayerUrl
+        "
+
+        title="
+            Live Twitch de Couaxia
+        "
+
+        allow="
+            autoplay;
+            fullscreen
+        "
+
+        allowfullscreen
+    ></iframe>
+
+
+    <!-- =================================================
+         OFFLINE
+    ================================================== -->
+
+        <div
+            v-else
+
+            class="
+                twitch-live__player-offline
+            "
+        >
+
+            <span
+                class="
+                    twitch-live__player-offline-icon
                 "
 
-                @mouseleave.stop="
-                    stopMascotHover
+                aria-hidden="true"
+            >
+                🌙
+            </span>
+
+
+            <strong>
+                Couaxia est hors ligne.
+            </strong>
+
+
+            <p>
+                Le player Twitch reviendra automatiquement
+                dès que le live commencera.
+            </p>
+
+
+            <a
+                href="
+                    https://www.twitch.tv/couaxia
                 "
 
-                @focus.stop="
-                    speakAboutPlayer
-                "
+                target="_blank"
 
-                @blur.stop="
-                    stopMascotHover
+                rel="
+                    noopener noreferrer
                 "
             >
+                Aller sur Twitch ↗
+            </a>
 
-                <span
-                    class="twitch-live__player-status"
+        </div>
 
-                    :class="{
-                        'twitch-live__player-status--online':
-                            isLive
-                    }"
-                >
-
-                    {{
-                        isLive
-                            ? "EN DIRECT"
-                            : "HORS LIGNE"
-                    }}
-
-                </span>
-
-
-                <iframe
-                    v-if="isLive"
-                    class="twitch-live__iframe"
-                    :src="twitchPlayerUrl"
-                    title="Live Twitch de Couaxia"
-                    allow="autoplay; fullscreen"
-                    allowfullscreen
-                ></iframe>
-
-
-                <div
-                    v-else
-                    class="twitch-live__player-offline"
-                >
-                    <span
-                        class="twitch-live__player-offline-icon"
-                        aria-hidden="true"
-                    >
-                        🌙
-                    </span>
-
-
-                    <strong>
-                        Le live est actuellement hors ligne
-                    </strong>
-
-
-                    <p>
-                        Le lecteur Twitch s'activera automatiquement
-                        dès que le stream sera en direct.
-                    </p>
-                </div>
-
-            </div>
-
+    </div>
 
             <!-- =============================================
                  INFORMATIONS
@@ -1272,30 +1311,48 @@ onBeforeUnmount(
 
 .twitch-live__player-offline {
     display: flex;
-    min-height: 360px;
-    padding: 32px;
-    box-sizing: border-box;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+
+    gap: 12px;
+
+    width: 100%;
+    min-height: 320px;
+
+    padding: 30px;
+
+    box-sizing: border-box;
+
     text-align: center;
 }
 
+
 .twitch-live__player-offline-icon {
     font-size: 3rem;
-    line-height: 1;
 }
+
 
 .twitch-live__player-offline strong {
-    font-size: 1.05rem;
+    font-size: 1.25rem;
 }
 
+
 .twitch-live__player-offline p {
-    max-width: 420px;
     margin: 0;
-    opacity: 0.72;
-    line-height: 1.5;
+    opacity: 0.75;
+}
+
+
+.twitch-live__player-offline a {
+    margin-top: 8px;
+
+    padding: 10px 16px;
+
+    border-radius: 12px;
+
+    text-decoration: none;
+    font-weight: 800;
 }
 
 </style>
