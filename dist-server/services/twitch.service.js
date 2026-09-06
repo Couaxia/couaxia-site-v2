@@ -228,68 +228,35 @@ function normalizeLimit(value, fallback = 20) {
 /* =========================================================
    FORMAT BOX ART
 ========================================================= */
-export function formatTwitchBoxArt(
-    value,
-    width = 285,
-    height = 380
-) {
+export function formatTwitchBoxArt(value, width = 285, height = 380) {
     if (!value) {
         return null;
     }
-
     const url = value.trim();
-
     if (!url) {
         return null;
     }
-
     return url
-        .replaceAll(
-            "%{width}",
-            String(width)
-        )
-        .replaceAll(
-            "%{height}",
-            String(height)
-        )
-        .replaceAll(
-            "{width}",
-            String(width)
-        )
-        .replaceAll(
-            "{height}",
-            String(height)
-        );
+        .replaceAll("%{width}", String(width))
+        .replaceAll("%{height}", String(height))
+        .replaceAll("{width}", String(width))
+        .replaceAll("{height}", String(height));
 }
 /* =========================================================
    FORMAT THUMBNAIL
 ========================================================= */
-function formatThumbnail(
-    value,
-    width = 1280,
-    height = 720
-) {
+function formatThumbnail(value, width, height) {
     if (!value) {
-        return null;
+        return "";
     }
-
     return value
-        .replaceAll(
-            "%{width}",
-            String(width)
-        )
-        .replaceAll(
-            "%{height}",
-            String(height)
-        )
-        .replaceAll(
-            "{width}",
-            String(width)
-        )
-        .replaceAll(
-            "{height}",
-            String(height)
-        );
+        .replace(/%\{width\}/g, String(width))
+        .replace(/%\{height\}/g, String(height))
+        .replace(/\{width\}/g, String(width))
+        .replace(/\{height\}/g, String(height))
+        // sécurité si une ancienne transformation a déjà produit %640/%360
+        .replace(new RegExp(`%${width}`, "g"), String(width))
+        .replace(new RegExp(`%${height}`, "g"), String(height));
 }
 /* =========================================================
    FORMAT GAME
