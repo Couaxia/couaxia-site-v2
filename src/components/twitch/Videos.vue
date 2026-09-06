@@ -86,6 +86,14 @@ const VIDEOS_PER_PAGE =
 
 
 /* =========================================================
+   FALLBACK THUMBNAIL
+========================================================= */
+
+const FALLBACK_THUMBNAIL_URL =
+    "https://ik.imagekit.io/couaxia/artworks/forme-3/Couaxia_flat_color.jpg?updatedAt=1788685707115";
+
+
+/* =========================================================
    STATE
 ========================================================= */
 
@@ -145,21 +153,7 @@ function markThumbnailFailed(
 }
 
 
-function canShowThumbnail(
-    video:
-        TwitchVideo
-):
-    boolean {
 
-    return Boolean(
-        video.thumbnailUrl
-    )
-    &&
-    !failedThumbnailIds.value.has(
-        video.id
-    );
-
-}
 
 
 /* =========================================================
@@ -1299,14 +1293,16 @@ onBeforeUnmount(
                     >
 
                         <img
-                            v-if="
-                                canShowThumbnail(
-                                    video
-                                )
-                            "
-
                             :src="
-                                video.thumbnailUrl ?? ''
+                                failedThumbnailIds.has(
+                                    video.id
+                                )
+                                    ? FALLBACK_THUMBNAIL_URL
+                                    : (
+                                        video.thumbnailUrl
+                                        ??
+                                        FALLBACK_THUMBNAIL_URL
+                                    )
                             "
 
                             :alt="
@@ -1325,24 +1321,6 @@ onBeforeUnmount(
                                 )
                             "
                         >
-
-
-                        <div
-                            v-else
-                            class="
-                                twitch-video-card__thumbnail
-                                twitch-video-card__thumbnail--fallback
-                            "
-                            aria-hidden="true"
-                        >
-                            <span>
-                                📺
-                            </span>
-
-                            <small>
-                                Miniature indisponible
-                            </small>
-                        </div>
 
 
                         <!-- =================================
