@@ -198,7 +198,7 @@ const socialLinks:
                 "https://www.twitch.tv/couaxia",
 
             icon:
-                "https://qudeuzkwvwprlhqtzsct.supabase.co/storage/v1/object/public/site-asset/logo/twitch-logo-transparent.png",
+                "https://ik.imagekit.io/couaxia/site-assets/logo/twitch-logo-transparent.png?updatedAt=1788690563230",
 
             messages: [
 
@@ -222,7 +222,7 @@ const socialLinks:
                 "https://www.youtube.com/@couaxia",
 
             icon:
-                "https://qudeuzkwvwprlhqtzsct.supabase.co/storage/v1/object/public/site-asset/logo/youtube-logo-png.png",
+                "https://ik.imagekit.io/couaxia/site-assets/logo/youtube-logo-png.png?updatedAt=1788690563190",
 
             messages: [
 
@@ -246,7 +246,7 @@ const socialLinks:
                 "https://www.tiktok.com/@couaxia_tv",
 
             icon:
-                "https://qudeuzkwvwprlhqtzsct.supabase.co/storage/v1/object/public/site-asset/logo/logo-tiktok-png.png",
+                "https://ik.imagekit.io/couaxia/site-assets/logo/logo-tiktok-png.png?updatedAt=1788690563200",
 
             messages: [
 
@@ -270,7 +270,7 @@ const socialLinks:
                 "https://x.com/couaxia",
 
             icon:
-                "https://qudeuzkwvwprlhqtzsct.supabase.co/storage/v1/object/public/site-asset/logo/x-logo-x.png",
+                "https://ik.imagekit.io/couaxia/site-assets/logo/x-logo-x.png?updatedAt=1788690563210",
 
             messages: [
 
@@ -294,7 +294,7 @@ const socialLinks:
                 "https://www.instagram.com/couaxia/",
 
             icon:
-                "https://qudeuzkwvwprlhqtzsct.supabase.co/storage/v1/object/public/site-asset/logo/instagram-logo.png",
+                "https://ik.imagekit.io/couaxia/site-assets/logo/instagram-logo.png?updatedAt=1788690563220",
 
             messages: [
 
@@ -318,7 +318,7 @@ const socialLinks:
                 "https://throne.com/couaxia",
 
             icon:
-                "https://qudeuzkwvwprlhqtzsct.supabase.co/storage/v1/object/public/site-asset/logo/Throne_Icon.png",
+                "https://ik.imagekit.io/couaxia/site-assets/logo/Throne_Icon.png?updatedAt=1788690563268",
 
             messages: [
 
@@ -342,7 +342,7 @@ const socialLinks:
                 "https://discord.com/invite/YeCXm8JZ7e",
 
             icon:
-                "https://qudeuzkwvwprlhqtzsct.supabase.co/storage/v1/object/public/site-asset/logo/discord-logo.png",
+                "https://ik.imagekit.io/couaxia/site-assets/logo/discord-logo.png?updatedAt=1788690563240",
 
             messages: [
 
@@ -384,7 +384,7 @@ const characterMessages = [
 ========================================================= */
 
 const characterImage =
-    "https://qudeuzkwvwprlhqtzsct.supabase.co/storage/v1/object/public/site-asset/mascotte/Aboutmeno.png";
+    "https://ik.imagekit.io/couaxia/site-assets/mascotte/AboutmenoText.png";
 
 </script>
 

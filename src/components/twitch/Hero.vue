@@ -844,7 +844,7 @@ onBeforeUnmount(
             <div class="twitch-hero__image-wrapper">
 
                 <img
-                    src="https://qudeuzkwvwprlhqtzsct.supabase.co/storage/v1/object/public/artworks/couple/Couaxia_Myo.png"
+                    src="https://ik.imagekit.io/couaxia/artworks/forme-3/commission_couaxia_pngtransparent.png?updatedAt=1788685704298"
                     alt="Couaxia et Myo"
                     class="twitch-hero__image"
                 >

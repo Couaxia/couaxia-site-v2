@@ -28,7 +28,7 @@ interface PaletteColor {
 ========================================================= */
 
 const characterImage =
-    "https://qudeuzkwvwprlhqtzsct.supabase.co/storage/v1/object/public/artworks/Couaxia/forme-3/Fullbody_transparent.png";
+    "https://ik.imagekit.io/couaxia/artworks/forme-3/commission_for_couaxia_fullbody.png?updatedAt=1788685704384";
 
 
 /* =========================================================

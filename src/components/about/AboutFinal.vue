@@ -5,7 +5,7 @@
 ========================================================= */
 
 const finalImage =
-    "https://qudeuzkwvwprlhqtzsct.supabase.co/storage/v1/object/public/artworks/Couaxia/forme-2/SPOILER_Jack_O_Lantern_Violet_-_background.png";
+    "https://ik.imagekit.io/couaxia/artworks/forme-2/Jack_O_Lantern_Violet-background.png?updatedAt=1788686093360";
 
 
 /* =========================================================

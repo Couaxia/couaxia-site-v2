@@ -230,7 +230,7 @@ const galleryItems:
                 "Kraduk originaire de Saphira, pilote et exploratrice. C’est elle qui est au cœur de cette aventure à travers l’univers.",
 
             image:
-                "https://qudeuzkwvwprlhqtzsct.supabase.co/storage/v1/object/public/site-asset/characters/couaxia.png",
+                "https://ik.imagekit.io/couaxia/site-assets/characters/couaxia.png?updatedAt=1788690230222",
 
             alt:
                 "Couaxia",
@@ -278,7 +278,7 @@ const galleryItems:
                 "La sœur de Couaxia, présente à ses côtés depuis leur départ de Saphira et durant leur voyage à bord d’Avadora.",
 
             image:
-                "https://qudeuzkwvwprlhqtzsct.supabase.co/storage/v1/object/public/site-asset/characters/hylda.png",
+                "https://ik.imagekit.io/couaxia/site-assets/characters/hylda.png?updatedAt=1788690228773",
 
             alt:
                 "Hylda",
@@ -323,7 +323,7 @@ const galleryItems:
                 "Cita fait partie de l’équipage qui quitte Saphira et accompagne Couaxia et Hylda dans leur voyage à travers l’univers.",
 
             image:
-                "https://qudeuzkwvwprlhqtzsct.supabase.co/storage/v1/object/public/site-asset/characters/Cita.png",
+                "https://ik.imagekit.io/couaxia/site-assets/characters/Cita.png?updatedAt=1788690437874",
 
             alt:
                 "Cita",
@@ -368,7 +368,7 @@ const galleryItems:
                 "Le vaisseau spatial d’exploration qui accompagne Couaxia, Hylda et Cita dans leur voyage à travers l’univers.",
 
             image:
-                "https://qudeuzkwvwprlhqtzsct.supabase.co/storage/v1/object/public/site-asset/characters/avadora.png",
+                "https://ik.imagekit.io/couaxia/site-assets/characters/avadora.png?updatedAt=1788690438106",
 
             alt:
                 "Avadora, le vaisseau spatial",
@@ -418,7 +418,7 @@ const galleryItems:
                 "Un Drasquin rencontré sur Draquin. Cette créature mêlant requin et dragon finira par devenir l’un des compagnons de Couaxia.",
 
             image:
-                "https://qudeuzkwvwprlhqtzsct.supabase.co/storage/v1/object/public/site-asset/characters/natsu.gif",
+                "https://ik.imagekit.io/couaxia/site-assets/characters/natsu.png?updatedAt=1788690228901",
 
             alt:
                 "Natsu, le Drasquin",
@@ -469,7 +469,7 @@ const galleryItems:
                 "Une mystérieuse faunette rencontrée dans un marché magique caché aux humains après l’arrivée de Couaxia sur Terre.",
 
             image:
-                "https://qudeuzkwvwprlhqtzsct.supabase.co/storage/v1/object/public/site-asset/characters/myo.png",
+                "https://ik.imagekit.io/couaxia/site-assets/characters/myo.png?updatedAt=1788690228949",
 
             alt:
                 "Myo, la faunette",

@@ -228,32 +228,68 @@ function normalizeLimit(value, fallback = 20) {
 /* =========================================================
    FORMAT BOX ART
 ========================================================= */
-export function formatTwitchBoxArt(value, width = 285, height = 380) {
+export function formatTwitchBoxArt(
+    value,
+    width = 285,
+    height = 380
+) {
     if (!value) {
         return null;
     }
+
     const url = value.trim();
+
     if (!url) {
         return null;
     }
+
     return url
-        .replaceAll("{width}", String(width))
-        .replaceAll("{height}", String(height))
-        .replaceAll("%{width}", String(width))
-        .replaceAll("%{height}", String(height));
+        .replaceAll(
+            "%{width}",
+            String(width)
+        )
+        .replaceAll(
+            "%{height}",
+            String(height)
+        )
+        .replaceAll(
+            "{width}",
+            String(width)
+        )
+        .replaceAll(
+            "{height}",
+            String(height)
+        );
 }
 /* =========================================================
    FORMAT THUMBNAIL
 ========================================================= */
-function formatThumbnail(value, width = 1280, height = 720) {
+function formatThumbnail(
+    value,
+    width = 1280,
+    height = 720
+) {
     if (!value) {
         return null;
     }
+
     return value
-        .replaceAll("{width}", String(width))
-        .replaceAll("{height}", String(height))
-        .replaceAll("%{width}", String(width))
-        .replaceAll("%{height}", String(height));
+        .replaceAll(
+            "%{width}",
+            String(width)
+        )
+        .replaceAll(
+            "%{height}",
+            String(height)
+        )
+        .replaceAll(
+            "{width}",
+            String(width)
+        )
+        .replaceAll(
+            "{height}",
+            String(height)
+        );
 }
 /* =========================================================
    FORMAT GAME

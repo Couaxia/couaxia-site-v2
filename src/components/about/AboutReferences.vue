@@ -180,7 +180,7 @@ const references:
                 "Vue complète, visage, dos, mains et principaux détails du personnage.",
 
             image:
-                "https://qudeuzkwvwprlhqtzsct.supabase.co/storage/v1/object/public/artworks/Couaxia/forme-3/Koleander_Ref_sheet1.png",
+                "https://ik.imagekit.io/couaxia/artworks/forme-3/REF_SHEET.png?updatedAt=1788685705480",
 
             alt:
                 "Reference sheet complète de Couaxia",
@@ -212,7 +212,7 @@ const references:
                 "Variante de coiffure, manches et éléments vestimentaires.",
 
             image:
-                "https://qudeuzkwvwprlhqtzsct.supabase.co/storage/v1/object/public/artworks/Couaxia/forme-3/Koleander_Ref_sheet2.png",
+                "https://ik.imagekit.io/couaxia/artworks/forme-3/Commission_for_couaxia_2nd_outfit.png?updatedAt=1788685704761",
 
             alt:
                 "Seconde tenue de Couaxia",
@@ -241,7 +241,7 @@ const references:
                 "Morphologie, marques corporelles, tentacules et tatouages.",
 
             image:
-                "https://qudeuzkwvwprlhqtzsct.supabase.co/storage/v1/object/public/artworks/Couaxia/forme-3/Koleander_Ref_sheet3.png",
+                "https://ik.imagekit.io/couaxia/artworks/forme-3/commission_for_couaxia_tattoo_ref.png?updatedAt=1788685705198",
 
             alt:
                 "Référence du corps et des tatouages de Couaxia",

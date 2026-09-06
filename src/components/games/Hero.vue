@@ -10,7 +10,7 @@ import {
 ========================================================= */
 
 const heroImage =
-    "https://qudeuzkwvwprlhqtzsct.supabase.co/storage/v1/object/public/site-asset/mascotte/YCH_Dance_V2.gif";
+    "https://ik.imagekit.io/couaxia/site-assets/mascotte/YCH_Dance.gif";
 
 
 /* =========================================================

@@ -14,7 +14,7 @@ withDefaults(
 
 
 const loaderGif =
-    "https://qudeuzkwvwprlhqtzsct.supabase.co/storage/v1/object/public/artworks/stream/IW_750.gif";
+    "https://ik.imagekit.io/couaxia/artworks/stream/IW_750.gif?updatedAt=1788687205222";
 </script>
 
 

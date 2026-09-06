@@ -244,7 +244,7 @@ const characters:
             ],
 
             image:
-                "https://qudeuzkwvwprlhqtzsct.supabase.co/storage/v1/object/public/site-asset/characters/couaxia.png",
+                "https://ik.imagekit.io/couaxia/site-assets/characters/couaxia.png?updatedAt=1788690230222",
 
             imageAlt:
                 "Couaxia",
@@ -306,7 +306,7 @@ const characters:
             ],
 
             image:
-                "https://qudeuzkwvwprlhqtzsct.supabase.co/storage/v1/object/public/site-asset/characters/hylda.png",
+                "https://ik.imagekit.io/couaxia/site-assets/characters/hylda.png?updatedAt=1788690228773",
 
             imageAlt:
                 "Hylda",
@@ -365,7 +365,7 @@ const characters:
             ],
 
             image:
-                "https://qudeuzkwvwprlhqtzsct.supabase.co/storage/v1/object/public/site-asset/characters/Cita.png",
+                "https://ik.imagekit.io/couaxia/site-assets/characters/Cita.png?updatedAt=1788690437874",
 
             imageAlt:
                 "Cita",
@@ -425,7 +425,7 @@ const characters:
             ],
 
             image:
-                "https://qudeuzkwvwprlhqtzsct.supabase.co/storage/v1/object/public/site-asset/characters/avadora.png",
+                "https://ik.imagekit.io/couaxia/site-assets/characters/avadora.png?updatedAt=1788690438106",
 
             imageAlt:
                 "Avadora, le vaisseau spatial de Couaxia",
@@ -493,7 +493,7 @@ const characters:
             ],
 
             image:
-                "https://qudeuzkwvwprlhqtzsct.supabase.co/storage/v1/object/public/site-asset/characters/natsu.gif",
+                "https://ik.imagekit.io/couaxia/site-assets/characters/natsu.png?updatedAt=1788690228901",
 
             imageAlt:
                 "Natsu",
@@ -557,7 +557,7 @@ const characters:
             ],
 
             image:
-                "https://qudeuzkwvwprlhqtzsct.supabase.co/storage/v1/object/public/site-asset/characters/myo.png",
+                "https://ik.imagekit.io/couaxia/site-assets/characters/myo.png?updatedAt=1788690228949",
 
             imageAlt:
                 "Myo",

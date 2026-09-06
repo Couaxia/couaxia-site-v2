@@ -909,7 +909,7 @@ const informations:
         >
 
             <img
-                src="https://qudeuzkwvwprlhqtzsct.supabase.co/storage/v1/object/public/artworks/Couaxia/forme-3/Anwedia.png"
+                src="https://ik.imagekit.io/couaxia/artworks/forme-3/Couaxia's_Chibi.png?updatedAt=1788685705555"
                 alt=""
                 class="about-info__banner-image"
                 aria-hidden="true"

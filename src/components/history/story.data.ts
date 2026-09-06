@@ -18,12 +18,12 @@ const d = (
 });
 
 export const storyImages = {
-  couaxia: "https://qudeuzkwvwprlhqtzsct.supabase.co/storage/v1/object/public/site-asset/characters/couaxia.png",
-  avadora: "https://qudeuzkwvwprlhqtzsct.supabase.co/storage/v1/object/public/site-asset/characters/avadora.png",
-  hylda: "https://qudeuzkwvwprlhqtzsct.supabase.co/storage/v1/object/public/site-asset/characters/hylda.png",
-  cita: "https://qudeuzkwvwprlhqtzsct.supabase.co/storage/v1/object/public/site-asset/characters/Cita.png",
-  natsu: "https://qudeuzkwvwprlhqtzsct.supabase.co/storage/v1/object/public/site-asset/characters/natsu.gif",
-  myo: "https://qudeuzkwvwprlhqtzsct.supabase.co/storage/v1/object/public/site-asset/characters/myo.png"
+  couaxia: "https://ik.imagekit.io/couaxia/site-assets/characters/couaxia.png?updatedAt=1788690230222",
+  avadora: "https://ik.imagekit.io/couaxia/site-assets/characters/avadora.png?updatedAt=1788690438106",
+  hylda: "https://ik.imagekit.io/couaxia/site-assets/characters/hylda.png?updatedAt=1788690228773",
+  cita: "https://ik.imagekit.io/couaxia/site-assets/characters/Cita.png?updatedAt=1788690437874",
+  natsu: "https://ik.imagekit.io/couaxia/site-assets/characters/natsu.png?updatedAt=1788690228901",
+  myo: "https://ik.imagekit.io/couaxia/site-assets/characters/myo.png?updatedAt=1788690228949"
 };
 
 export const chapters: StoryChapter[] = [

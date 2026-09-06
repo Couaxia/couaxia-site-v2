@@ -44,10 +44,10 @@ const mascotImages:
     > = {
 
         idle:
-            "https://qudeuzkwvwprlhqtzsct.supabase.co/storage/v1/object/public/site-asset/mascotte/Discord-reactive-Mute.gif",
+            "https://ik.imagekit.io/couaxia/site-assets/mascotte/Discord-reactive-Mute.gif?updatedAt=1788690094920",
 
         talking:
-            "https://qudeuzkwvwprlhqtzsct.supabase.co/storage/v1/object/public/site-asset/mascotte/Discord-reactive-Talk.gif"
+            "https://ik.imagekit.io/couaxia/site-assets/mascotte/Discord-reactive-Talk.gif?updatedAt=1788690094920"
 
     };
 

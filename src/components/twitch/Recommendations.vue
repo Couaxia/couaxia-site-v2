@@ -228,7 +228,8 @@ const recommendationGroups =
                 "Nysselya_vt",
                 "Meizy_11",
                 "mokaa_cafe",
-                "SaturneSmile"
+                "SaturneSmile",
+                "joueur_du_grenier"
 
             ],
 

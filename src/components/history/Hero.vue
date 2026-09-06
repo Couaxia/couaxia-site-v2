@@ -10,7 +10,7 @@ import {
 ========================================================= */
 
 const heroImage =
-    "https://qudeuzkwvwprlhqtzsct.supabase.co/storage/v1/object/public/artworks/Couaxia/forme-3/Fullbody_transparent.png";
+    "https://ik.imagekit.io/couaxia/site-assets/mascotte/rulesnoText.png?updatedAt=1788696579590";
 
 
 /* =========================================================

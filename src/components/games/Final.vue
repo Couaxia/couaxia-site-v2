@@ -5,14 +5,14 @@
 ========================================================= */
 
 const finalImage =
-    "https://qudeuzkwvwprlhqtzsct.supabase.co/storage/v1/object/public/site-asset/mascotte/YCH_Dance_V2.gif";
+    "https://ik.imagekit.io/couaxia/site-assets/mascotte/YCH_Dance_V2.gif";
 
 /* =========================================================
    TWITCH LOGO
 ========================================================= */
 
 const twitchLogo =
-    "https://qudeuzkwvwprlhqtzsct.supabase.co/storage/v1/object/public/site-asset/logo/twitch-logo-transparent.png";
+    "https://ik.imagekit.io/couaxia/site-assets/logo/twitch-logo-transparent.png?updatedAt=1788690563230";
 /* =========================================================
    MASCOT TIMER
 ========================================================= */

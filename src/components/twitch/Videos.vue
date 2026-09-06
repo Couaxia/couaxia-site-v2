@@ -34,9 +34,9 @@ interface TwitchVideo {
         string;
 
     thumbnailUrl:
-        string;
+        string | null;
 
-    views:
+    viewCount:
         number;
 
     createdAt:
@@ -111,6 +111,55 @@ const currentPage =
     ref(
         1
     );
+
+
+/* =========================================================
+   THUMBNAIL ERRORS
+========================================================= */
+
+const failedThumbnailIds =
+    ref<Set<string>>(
+        new Set()
+    );
+
+
+function markThumbnailFailed(
+    videoId:
+        string
+) {
+
+    failedThumbnailIds.value.add(
+        videoId
+    );
+
+
+    /*
+     * On remplace le Set afin de garantir
+     * la réactivité du rendu Vue.
+     */
+    failedThumbnailIds.value =
+        new Set(
+            failedThumbnailIds.value
+        );
+
+}
+
+
+function canShowThumbnail(
+    video:
+        TwitchVideo
+):
+    boolean {
+
+    return Boolean(
+        video.thumbnailUrl
+    )
+    &&
+    !failedThumbnailIds.value.has(
+        video.id
+    );
+
+}
 
 
 /* =========================================================
@@ -385,7 +434,7 @@ function speakAboutVideo(
 
     const views =
         formatViews(
-            video.views
+            video.viewCount
         );
 
 
@@ -396,7 +445,7 @@ function speakAboutVideo(
 
             `Tu veux revoir « ${video.title} » ?`,
 
-            `Cette rediffusion possède ${views} vue${video.views > 1 ? "s" : ""} !`,
+            `Cette rediffusion possède ${views} vue${video.viewCount > 1 ? "s" : ""} !`,
 
             `${video.duration} de Couaxia... tu es prêt ? 👀`,
 
@@ -509,18 +558,18 @@ function speakAboutViews(
 
     const count =
         formatViews(
-            video.views
+            video.viewCount
         );
 
 
     startMascotHover(
         [
 
-            `${count} vue${video.views > 1 ? "s" : ""} sur cette vidéo ! 👀`,
+            `${count} vue${video.viewCount > 1 ? "s" : ""} sur cette vidéo ! 👀`,
 
             `Vous êtes déjà ${count} à avoir regardé cette aventure !`,
 
-            `${count} vue${video.views > 1 ? "s" : ""}... ça commence à faire du monde !`,
+            `${count} vue${video.viewCount > 1 ? "s" : ""}... ça commence à faire du monde !`,
 
             "Merci à toutes les personnes qui regardent mes rediffusions ! 💜",
 
@@ -966,36 +1015,6 @@ function formatDate(
 
 
 /* =========================================================
-   FORMAT THUMBNAIL
-========================================================= */
-
-function formatThumbnail(
-    url:
-        string
-) {
-
-    return url
-        .replace(
-            "%{width}",
-            "640"
-        )
-        .replace(
-            "%{height}",
-            "360"
-        )
-        .replace(
-            "{width}",
-            "640"
-        )
-        .replace(
-            "{height}",
-            "360"
-        );
-
-}
-
-
-/* =========================================================
    FORMAT TYPE
 ========================================================= */
 
@@ -1280,10 +1299,14 @@ onBeforeUnmount(
                     >
 
                         <img
-                            :src="
-                                formatThumbnail(
-                                    video.thumbnailUrl
+                            v-if="
+                                canShowThumbnail(
+                                    video
                                 )
+                            "
+
+                            :src="
+                                video.thumbnailUrl ?? ''
                             "
 
                             :alt="
@@ -1295,7 +1318,31 @@ onBeforeUnmount(
                             "
 
                             loading="lazy"
+
+                            @error="
+                                markThumbnailFailed(
+                                    video.id
+                                )
+                            "
                         >
+
+
+                        <div
+                            v-else
+                            class="
+                                twitch-video-card__thumbnail
+                                twitch-video-card__thumbnail--fallback
+                            "
+                            aria-hidden="true"
+                        >
+                            <span>
+                                📺
+                            </span>
+
+                            <small>
+                                Miniature indisponible
+                            </small>
+                        </div>
 
 
                         <!-- =================================
@@ -1481,12 +1528,12 @@ onBeforeUnmount(
 
                                 {{
                                     formatViews(
-                                        video.views
+                                        video.viewCount
                                     )
                                 }}
 
                                 vue{{
-                                    video.views > 1
+                                    video.viewCount > 1
                                         ? "s"
                                         : ""
                                 }}

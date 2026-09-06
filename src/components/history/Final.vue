@@ -10,7 +10,7 @@ import {
 ========================================================= */
 
 const finalImage =
-    "https://qudeuzkwvwprlhqtzsct.supabase.co/storage/v1/object/public/site-asset/characters/couaxia.png";
+    "https://ik.imagekit.io/couaxia/artworks/forme-3/Couaxia_SKEB_Splash_Art.png?updatedAt=1788685705560";
 
 
 /* =========================================================

@@ -442,7 +442,7 @@ const accountMessages = [
                     <div class="home-hero__image-wrapper">
 
                         <img
-                            src="https://qudeuzkwvwprlhqtzsct.supabase.co/storage/v1/object/public/artworks/stream/Koleander_chibi.png"
+                            src="https://ik.imagekit.io/couaxia/artworks/stream/commission_for_couaxia.png?updatedAt=1788689324458"
                             alt="Illustration de Couaxia"
                             class="home-hero__image"
                             draggable="false"

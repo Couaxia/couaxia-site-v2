@@ -5,7 +5,7 @@
 ========================================================= */
 
 const storyImage =
-    "https://qudeuzkwvwprlhqtzsct.supabase.co/storage/v1/object/public/artworks/Couaxia/forme-2/Couaxia_pp_Melumii.png";
+    "https://ik.imagekit.io/couaxia/artworks/forme-2/Couaxia_%C3%B0_wm.png?updatedAt=1788686096058";
 
 
 /* =========================================================

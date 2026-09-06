@@ -1015,18 +1015,6 @@ export function formatTwitchBoxArt(
 
     return url
         .replaceAll(
-            "{width}",
-            String(
-                width
-            )
-        )
-        .replaceAll(
-            "{height}",
-            String(
-                height
-            )
-        )
-        .replaceAll(
             "%{width}",
             String(
                 width
@@ -1034,6 +1022,18 @@ export function formatTwitchBoxArt(
         )
         .replaceAll(
             "%{height}",
+            String(
+                height
+            )
+        )
+        .replaceAll(
+            "{width}",
+            String(
+                width
+            )
+        )
+        .replaceAll(
+            "{height}",
             String(
                 height
             )
@@ -1047,53 +1047,29 @@ export function formatTwitchBoxArt(
 ========================================================= */
 
 function formatThumbnail(
-    value:
-        string | null | undefined,
+    value: string,
+    width: number,
+    height: number
+): string {
 
-    width:
-        number =
-            1280,
-
-    height:
-        number =
-            720
-): string | null {
-
-    if (
-        !value
-    ) {
-
-        return null;
-
+    if (!value) {
+        return "";
     }
 
-
     return value
-        .replaceAll(
-            "{width}",
-            String(
-                width
-            )
+        .replace(/%\{width\}/g, String(width))
+        .replace(/%\{height\}/g, String(height))
+        .replace(/\{width\}/g, String(width))
+        .replace(/\{height\}/g, String(height))
+        // sécurité si une ancienne transformation a déjà produit %640/%360
+        .replace(
+            new RegExp(`%${width}`, "g"),
+            String(width)
         )
-        .replaceAll(
-            "{height}",
-            String(
-                height
-            )
-        )
-        .replaceAll(
-            "%{width}",
-            String(
-                width
-            )
-        )
-        .replaceAll(
-            "%{height}",
-            String(
-                height
-            )
+        .replace(
+            new RegExp(`%${height}`, "g"),
+            String(height)
         );
-
 }
 
 
