@@ -1048,12 +1048,37 @@ onBeforeUnmount(
 
 
                 <iframe
+                    v-if="isLive"
                     class="twitch-live__iframe"
                     :src="twitchPlayerUrl"
                     title="Live Twitch de Couaxia"
                     allow="autoplay; fullscreen"
                     allowfullscreen
                 ></iframe>
+
+
+                <div
+                    v-else
+                    class="twitch-live__player-offline"
+                >
+                    <span
+                        class="twitch-live__player-offline-icon"
+                        aria-hidden="true"
+                    >
+                        🌙
+                    </span>
+
+
+                    <strong>
+                        Le live est actuellement hors ligne
+                    </strong>
+
+
+                    <p>
+                        Le lecteur Twitch s'activera automatiquement
+                        dès que le stream sera en direct.
+                    </p>
+                </div>
 
             </div>
 
@@ -1239,3 +1264,38 @@ onBeforeUnmount(
     </section>
 
 </template>
+<style scoped>
+
+/* =========================================================
+   PLAYER OFFLINE
+========================================================= */
+
+.twitch-live__player-offline {
+    display: flex;
+    min-height: 360px;
+    padding: 32px;
+    box-sizing: border-box;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    text-align: center;
+}
+
+.twitch-live__player-offline-icon {
+    font-size: 3rem;
+    line-height: 1;
+}
+
+.twitch-live__player-offline strong {
+    font-size: 1.05rem;
+}
+
+.twitch-live__player-offline p {
+    max-width: 420px;
+    margin: 0;
+    opacity: 0.72;
+    line-height: 1.5;
+}
+
+</style>
