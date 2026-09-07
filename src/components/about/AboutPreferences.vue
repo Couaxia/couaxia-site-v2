@@ -38,7 +38,7 @@ interface PreferenceCard {
 
 let mascotHoverTimer:
     number | null =
-        null;
+    null;
 
 
 /* =========================================================
@@ -182,6 +182,7 @@ const preferences:
         ===================================================== */
 
         {
+
             icon:
                 "💬",
 
@@ -203,6 +204,7 @@ const preferences:
             items: [
 
                 {
+
                     text:
                         "Positive et accueillante",
 
@@ -217,10 +219,12 @@ const preferences:
                         "Bienvenue chez les Poups ! 🐙"
 
                     ]
+
                 },
 
 
                 {
+
                     text:
                         "Curieuse",
 
@@ -235,10 +239,12 @@ const preferences:
                         "La curiosité est une excellente excuse pour partir à l'aventure !"
 
                     ]
+
                 },
 
 
                 {
+
                     text:
                         "Un peu chaotique",
 
@@ -253,10 +259,12 @@ const preferences:
                         "Ce n'est pas du chaos, c'est de l'improvisation intergalactique ! 🐙"
 
                     ]
+
                 },
 
 
                 {
+
                     text:
                         "Passionnée",
 
@@ -271,28 +279,12 @@ const preferences:
                         "Une Kraduk passionnée est difficile à arrêter !"
 
                     ]
+
                 },
 
 
                 {
-                    text:
-                        "Proche de ma communauté",
 
-                    messages: [
-
-                        "Les Poups sont une grande partie de cette aventure ! 💜",
-
-                        "J'adore partager mes projets avec ma communauté.",
-
-                        "Sans vous, les streams seraient quand même beaucoup moins amusants !",
-
-                        "Les Poups font partie de l'univers de Couaxia ! 🐙"
-
-                    ]
-                },
-
-
-                {
                     text:
                         "Joyeuse et souriante",
 
@@ -307,10 +299,12 @@ const preferences:
                         "Normalement, tu devrais m'entendre rire assez souvent !"
 
                     ]
+
                 },
 
 
                 {
+
                     text:
                         "Drôle",
 
@@ -325,10 +319,12 @@ const preferences:
                         "Si personne ne rigole, je peux toujours rire toute seule !"
 
                     ]
+
                 },
 
 
                 {
+
                     text:
                         "Attachante",
 
@@ -343,299 +339,311 @@ const preferences:
                         "Je vais finir par rougir si tu continues de regarder cette ligne !"
 
                     ]
+
                 }
 
             ]
+
         },
 
 
         /* =====================================================
-           GAMES
+           STREAM
         ===================================================== */
 
         {
+
             icon:
-                "🎮",
+                "🎙️",
 
             title:
-                "Mes jeux",
+                "En stream",
 
             messages: [
 
-                "Bienvenue dans la partie dangereuse : ma bibliothèque de jeux ! 🎮",
+                "Bienvenue dans mon environnement naturel : un stream légèrement chaotique. 👀",
 
-                "Il y a beaucoup trop de jeux auxquels j'ai envie de jouer.",
+                "On ne sait pas toujours ce qui va se passer... moi non plus !",
 
-                "Impossible de me limiter à un seul genre !",
+                "Un stream Couaxia calme ? Ça existe sûrement quelque part.",
 
-                "Choisir le prochain jeu est parfois une aventure à lui tout seul. 👀"
+                "Prépare-toi, le chaos peut arriver à tout moment ! 🐙"
 
             ],
 
             items: [
 
                 {
+
                     text:
-                        "Jeux multijoueurs",
+                        "Beaucoup d’improvisation",
 
                     messages: [
 
-                        "Plus on est nombreux, plus le chaos est efficace ! 🎮",
+                        "Préparer un plan c'est bien. Ne pas le suivre, c'est encore mieux !",
 
-                        "J'adore jouer avec les Poups et mes amis !",
+                        "Je sais parfaitement où je vais... normalement. 👀",
 
-                        "Le multijoueur crée toujours des moments mémorables.",
+                        "Une bonne partie du stream se construit sur le moment.",
 
-                        "Une équipe organisée ? Chez nous ? Hmm... 👀"
+                        "L'improvisation fait souvent les meilleurs souvenirs !"
 
                     ]
+
                 },
 
 
                 {
+
                     text:
-                        "Jeux d’horreur",
+                        "De l’humour et du second degré",
 
                     messages: [
 
-                        "Je n'ai absolument pas peur... AAAAAH ! 👻",
+                        "Il vaut mieux ne pas prendre toutes mes phrases trop au sérieux. 😂",
 
-                        "Pourquoi est-ce que je continue à jouer à des jeux d'horreur ?",
+                        "L'humour est une partie importante de mes streams !",
 
-                        "Les jumpscares sont une invention humaine particulièrement cruelle.",
+                        "Oui, même les blagues nulles sont autorisées.",
 
-                        "Mes tentacules sont prêtes à fuir au premier bruit suspect ! 🐙"
+                        "Le second degré voyage très bien dans l'espace. 🐙"
 
                     ]
+
                 },
 
 
                 {
+
                     text:
-                        "Jeux narratifs",
+                        "Des découvertes et des réactions spontanées",
 
                     messages: [
 
-                        "J'adore découvrir une bonne histoire ! 📖",
+                        "Découvrir quelque chose en direct, c'est toujours plus drôle !",
 
-                        "Les jeux narratifs permettent de vraiment entrer dans un univers.",
+                        "Mes réactions ne sont absolument jamais exagérées... 👀",
 
-                        "Par contre, pas de spoilers ! 👀",
+                        "J'adore découvrir de nouveaux jeux avec les Poups.",
 
-                        "Je veux découvrir chaque rebondissement moi-même !"
+                        "La première réaction est souvent la meilleure !"
 
                     ]
+
                 },
 
 
                 {
+
                     text:
-                        "Jeux de survie",
+                        "Un peu de chaos",
 
                     messages: [
 
-                        "Objectif numéro un : survivre. Ça semble simple, non ? 👀",
+                        "Ce n'est pas un bug, c'est une fonctionnalité Couaxia. 👀",
 
-                        "Construire une base pendant que tout essaie de nous tuer... parfait !",
+                        "Un stream trop calme devient rapidement suspect.",
 
-                        "Je suis une excellente survivante ! Enfin, ça dépend des jours.",
+                        "Le chaos finit toujours par trouver son chemin.",
 
-                        "Une Kraduk devrait être avantagée dans les jeux de survie, non ?"
+                        "Mes tentacules n'ont évidemment rien à voir avec ça. 🐙"
 
                     ]
+
                 },
 
 
                 {
+
                     text:
-                        "Jeux indépendants",
+                        "Des moments chill entre deux catastrophes",
 
                     messages: [
 
-                        "Les jeux indépendants cachent tellement de pépites ! ✨",
+                        "Parfois nous savons être calmes. Parfois.",
 
-                        "J'adore découvrir des petits jeux originaux.",
+                        "Il faut bien quelques moments tranquilles entre deux catastrophes !",
 
-                        "Parfois les aventures les plus mémorables viennent de petits studios !",
+                        "Un petit moment chill fait toujours du bien.",
 
-                        "Il y a toujours de nouvelles pépites à découvrir."
+                        "Profite du calme avant que quelque chose ne casse. 👀"
 
                     ]
+
                 },
 
 
                 {
+
                     text:
-                        "Et plein d’autres !",
+                        "Des souvenirs plutôt que de la performance",
 
                     messages: [
 
-                        "Tu pensais vraiment que la liste allait s'arrêter là ? 👀",
+                        "Le but principal est surtout de passer un bon moment ensemble. 💜",
 
-                        "Multigaming veut dire BEAUCOUP de jeux ! 🎮",
+                        "Être la meilleure joueuse du monde ? On verra plus tard. 😂",
 
-                        "Ma bibliothèque Steam préfère qu'on ne parle pas du nombre exact.",
+                        "Les bons souvenirs valent beaucoup plus qu'un classement.",
 
-                        "Il reste encore énormément d'univers à découvrir !"
+                        "Une partie ratée peut quand même devenir un excellent moment !"
 
                     ]
+
                 }
 
             ]
+
         },
 
 
         /* =====================================================
-           UNIVERSE
+           COMMUNITY
         ===================================================== */
 
         {
+
             icon:
-                "💎",
+                "💜",
 
             title:
-                "Mon univers",
+                "Avec les Poups",
 
             messages: [
 
-                "Bienvenue dans mon petit univers ! 🌌",
+                "Les Poups sont une énorme partie de cette aventure ! 💜",
 
-                "Mon histoire est beaucoup plus grande que ce qu'on voit en stream.",
+                "Un stream sans les Poups serait beaucoup moins amusant.",
 
-                "Saphira, Avadora, Natsu... il y a beaucoup à découvrir !",
+                "Vous faites vraiment partie de l'univers de Couaxia ! 🐙",
 
-                "Chaque élément cache une petite partie de mon histoire. 👀"
+                "Attention, rester trop longtemps ici peut transformer quelqu'un en Poup. 👀"
 
             ],
 
             items: [
 
                 {
+
                     text:
-                        "Avadora",
+                        "Une communauté bienveillante",
 
                     messages: [
 
-                        "Avadora ! Mon fidèle vaisseau spatial ! 🚀",
+                        "Le respect reste la base ici. 💜",
 
-                        "Sans Avadora, le voyage jusqu'à la Terre aurait été légèrement compliqué.",
+                        "Tout le monde doit pouvoir passer un bon moment.",
 
-                        "Cinq années de voyage spatial... heureusement qu'Avadora était là !",
+                        "Bienveillance et respect avant tout !",
 
-                        "Mon vaisseau a déjà vu beaucoup de choses. 🌌"
+                        "Les Poups prennent soin les uns des autres."
 
                     ]
+
                 },
 
 
                 {
+
                     text:
-                        "Les tentacules",
+                        "Partager les bons comme les mauvais moments",
 
                     messages: [
 
-                        "Enfin le sujet le plus important : LES TENTACULES ! 🐙",
+                        "Même les fails deviennent de bons souvenirs ensemble !",
 
-                        "Tu avais remarqué que j'avais quelques tentacules ? 👀",
+                        "Un bug est moins terrible quand tout le monde peut en rire.",
 
-                        "Une Couaxia sans tentacules ? Impossible !",
+                        "On partage les victoires... et les catastrophes. 😂",
 
-                        "Attention, elles ont parfois leur propre personnalité."
+                        "Les meilleurs moments ne sont pas toujours ceux qui étaient prévus."
 
                     ]
+
                 },
 
 
                 {
+
                     text:
-                        "Mes compagnons : Natsu, Hylda et Cita",
+                        "Faire participer la communauté",
 
                     messages: [
 
-                        "Impossible de parler de mon aventure sans eux ! 💜",
+                        "Sondages, discussions, jeux... les Poups ont leur mot à dire !",
 
-                        "Natsu, Hylda et Cita font partie de mon histoire.",
+                        "J'aime beaucoup vous faire participer à mes projets.",
 
-                        "Mes compagnons ont déjà vécu beaucoup d'aventures avec moi !",
+                        "Certaines de vos idées sont excellentes... d'autres sont dangereuses. 👀",
 
-                        "Avec eux, même une mission simple peut devenir chaotique. 👀"
+                        "Les Poups influencent parfois beaucoup trop mes décisions ! 😂"
 
                     ]
+
                 },
 
 
                 {
+
                     text:
-                        "Mes femmes",
+                        "Créer des souvenirs ensemble",
 
                     messages: [
 
-                        "JE VOUS AIME MES FEMMES ! 💜",
+                        "C'est probablement ce que je préfère dans le streaming. 💜",
 
-                        "Évidemment qu'elles sont dans la liste !",
+                        "Un bon souvenir partagé vaut toutes les victoires.",
 
-                        "Tu pensais vraiment que j'allais les oublier ? 👀",
+                        "Les meilleurs moments viennent souvent de choses complètement imprévues.",
 
-                        "Une partie extrêmement importante de l'univers Couaxia ! 🐙"
+                        "Chaque stream ajoute quelques souvenirs à l'aventure."
 
                     ]
+
                 },
 
 
                 {
+
                     text:
-                        "Les créatures fantastiques",
+                        "Garder un espace agréable et amusant",
 
                     messages: [
 
-                        "Dragons, créatures magiques... j'adore ça ! 🐉",
+                        "Du respect, des bêtises et beaucoup de tentacules.",
 
-                        "Certaines créatures de mon univers sont plutôt impressionnantes.",
+                        "L'objectif reste de passer un bon moment ensemble !",
 
-                        "Natsu est probablement le meilleur exemple !",
+                        "Pas besoin de drama pour s'amuser. 💜",
 
-                        "Je pourrais remplir un bestiaire entier avec les créatures rencontrées !"
+                        "Un peu de chaos oui, de toxicité non !"
 
                     ]
+
                 },
 
 
                 {
+
                     text:
-                        "Les aventures spatiales",
+                        "Être proche de ma communauté",
 
                     messages: [
 
-                        "L'espace est immense... et parfait pour partir à l'aventure ! 🌌",
+                        "J'aime énormément échanger avec les Poups ! 💜",
 
-                        "Cinq années dans l'espace, ça laisse quelques souvenirs.",
+                        "Vous faites partie de l'aventure depuis le début.",
 
-                        "Il existe encore tellement de mondes à découvrir !",
+                        "Sans vous, Couaxia serait quand même beaucoup plus seule dans l'espace.",
 
-                        "Avadora est toujours prête pour une nouvelle destination. 🚀"
-
-                    ]
-                },
-
-
-                {
-                    text:
-                        "Mes aventures sur Terre",
-
-                    messages: [
-
-                        "Votre planète est vraiment étrange. 👀",
-
-                        "La Terre réserve beaucoup plus de surprises que prévu !",
-
-                        "Entre les humains et le monde magique, je n'ai pas le temps de m'ennuyer.",
-
-                        "Mon arrivée sur Terre n'était que le début d'une nouvelle aventure ! 🌍"
+                        "Ma communauté est une partie importante de mon univers."
 
                     ]
+
                 }
 
             ]
+
         }
 
     ];
@@ -657,7 +665,7 @@ const preferences:
         <header class="about-preferences__header">
 
             <p class="about-preferences__eyebrow">
-                CE QUI ME CARACTÉRISE
+                DERRIÈRE LES STREAMS
             </p>
 
 
@@ -669,7 +677,7 @@ const preferences:
                 Ma personnalité
 
                 <span>
-                    et mes préférences
+                    côté stream
                 </span>
 
             </h2>
@@ -677,9 +685,8 @@ const preferences:
 
             <p class="about-preferences__description">
 
-                Quelques petites choses qui permettent
-                de mieux comprendre ma personnalité,
-                mes goûts et l’univers de Couaxia.
+                Mon caractère, ma façon de streamer et
+                la relation que j’aime construire avec les Poups.
 
             </p>
 
