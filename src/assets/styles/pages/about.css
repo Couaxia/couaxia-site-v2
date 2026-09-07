@@ -2513,21 +2513,17 @@ html[data-theme="light"] .about-final__message { color: #4f315c; }
     font-weight: 800;
 }
 
-
 /* =========================================================
    LIGHT MODE
 ========================================================= */
 
-:global(
-    html[data-theme="light"]
-)
-.about-artists {
+html[data-theme="light"] .about-artists {
     border-color:
         rgba(
             109,
             0,
             163,
-            0.2
+            0.20
         );
 
     background:
@@ -2553,22 +2549,23 @@ html[data-theme="light"] .about-final__message { color: #4f315c; }
             109,
             0,
             163,
-            0.1
+            0.10
         );
 }
 
 
-:global(
-    html[data-theme="light"]
-)
+/* =========================================================
+   HEADER
+========================================================= */
+
+html[data-theme="light"]
 .about-artists__title {
-    color: #48135d;
+    color:
+        #48135d;
 }
 
 
-:global(
-    html[data-theme="light"]
-)
+html[data-theme="light"]
 .about-artists__intro {
     color:
         rgba(
@@ -2580,16 +2577,25 @@ html[data-theme="light"] .about-final__message { color: #4f315c; }
 }
 
 
-:global(
-    html[data-theme="light"]
-)
+html[data-theme="light"]
+.about-artists__eyebrow {
+    color:
+        #6d00a3;
+}
+
+
+/* =========================================================
+   CARDS
+========================================================= */
+
+html[data-theme="light"]
 .about-artist-card {
     border-color:
         rgba(
             109,
             0,
             163,
-            0.17
+            0.18
         );
 
     background:
@@ -2597,25 +2603,30 @@ html[data-theme="light"] .about-final__message { color: #4f315c; }
             255,
             255,
             255,
-            0.74
+            0.78
+        );
+
+    box-shadow:
+        0 10px 28px
+        rgba(
+            109,
+            0,
+            163,
+            0.10
         );
 }
 
 
-:global(
-    html[data-theme="light"]
-)
+html[data-theme="light"]
 .about-artist-card:hover,
-:global(
-    html[data-theme="light"]
-)
+html[data-theme="light"]
 .about-artist-card:focus-visible {
     border-color:
         rgba(
             109,
             0,
             163,
-            0.38
+            0.40
         );
 
     background:
@@ -2623,75 +2634,59 @@ html[data-theme="light"] .about-final__message { color: #4f315c; }
             255,
             255,
             255,
-            0.96
+            0.98
+        );
+
+    box-shadow:
+        0 18px 35px
+        rgba(
+            109,
+            0,
+            163,
+            0.16
         );
 }
 
 
-:global(
-    html[data-theme="light"]
-)
+/* =========================================================
+   ROLE
+========================================================= */
+
+html[data-theme="light"]
 .about-artist-card__role {
-    color: #6d00a3;
+    color:
+        #6d00a3;
+
+    border-color:
+        rgba(
+            242,
+            34,
+            146,
+            0.22
+        );
 
     background:
         rgba(
             242,
             34,
             146,
-            0.06
+            0.07
         );
 }
 
 
-:global(
-    html[data-theme="light"]
-)
-.about-artist-card__content h3 {
-    color: #48135d;
-}
+/* =========================================================
+   IMAGE
+========================================================= */
 
-
-:global(
-    html[data-theme="light"]
-)
-.about-artist-card__content p {
-    color:
-        rgba(
-            72,
-            19,
-            93,
-            0.72
-        );
-}
-
-
-:global(
-    html[data-theme="light"]
-)
-.about-artist-card__link {
-    color: #6d00a3;
-
-    background:
+html[data-theme="light"]
+.about-artist-card__avatar {
+    border-color:
         rgba(
             109,
             0,
             163,
-            0.06
-        );
-}
-
-
-:global(
-    html[data-theme="light"]
-)
-.about-artist-card__coming-soon {
-    color:
-        rgba(
-            72,
-            19,
-            93,
-            0.52
+            0.30
         );
 
     background:
@@ -2701,8 +2696,131 @@ html[data-theme="light"] .about-final__message { color: #4f315c; }
             163,
             0.05
         );
+
+    box-shadow:
+        0 0 28px
+        rgba(
+            109,
+            0,
+            163,
+            0.10
+        );
 }
 
+
+html[data-theme="light"]
+.about-artist-card:hover
+.about-artist-card__avatar,
+html[data-theme="light"]
+.about-artist-card:focus-visible
+.about-artist-card__avatar {
+    border-color:
+        rgba(
+            34,
+            180,
+            180,
+            0.55
+        );
+}
+
+
+/* =========================================================
+   TEXT
+========================================================= */
+
+html[data-theme="light"]
+.about-artist-card__content h3 {
+    color:
+        #48135d;
+}
+
+
+html[data-theme="light"]
+.about-artist-card__content p {
+    color:
+        rgba(
+            72,
+            19,
+            93,
+            0.76
+        );
+}
+
+
+/* =========================================================
+   LINKS
+========================================================= */
+
+html[data-theme="light"]
+.about-artist-card__link {
+    color:
+        #6d00a3;
+
+    border-color:
+        rgba(
+            109,
+            0,
+            163,
+            0.22
+        );
+
+    background:
+        rgba(
+            109,
+            0,
+            163,
+            0.06
+        );
+}
+
+
+html[data-theme="light"]
+.about-artist-card__link:hover,
+html[data-theme="light"]
+.about-artist-card__link:focus-visible {
+    color:
+        #48135d;
+
+    border-color:
+        rgba(
+            34,
+            180,
+            180,
+            0.55
+        );
+
+    background:
+        rgba(
+            34,
+            242,
+            239,
+            0.10
+        );
+}
+
+
+/* =========================================================
+   COMING SOON
+========================================================= */
+
+html[data-theme="light"]
+.about-artist-card__coming-soon {
+    color:
+        rgba(
+            72,
+            19,
+            93,
+            0.55
+        );
+
+    background:
+        rgba(
+            109,
+            0,
+            163,
+            0.06
+        );
+}
 
 /* =========================================================
    TABLET
