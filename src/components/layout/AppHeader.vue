@@ -978,29 +978,16 @@ onBeforeUnmount(
                 >
 
                     <video
-
-                        class="app-header__logo-video"
-
+                        class="nav-logo"
                         autoplay
-
                         muted
-
                         loop
-
                         playsinline
-
-                        aria-label="Couaxia"
-
                     >
-
                         <source
-
-                            src="https://ik.imagekit.io/couaxia/artworks/stream/Transparents.webm/ik-video.mp4?updatedAt=1788687432562"
-
+                            src="../../../public/video/Transparents.webm"
                             type="video/webm"
-
-                        >
-
+                        />
                     </video>
 
                 </span>
@@ -4813,6 +4800,17 @@ onBeforeUnmount(
 
     }
 
+}
+
+.nav-logo {
+    width: 140px;
+    height: 90px;
+
+    object-fit: contain;
+
+    background: transparent;
+
+    border: none;
 }
 
 </style>

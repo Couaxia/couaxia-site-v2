@@ -10,7 +10,7 @@ import {
 ========================================================= */
 
 const heroImage =
-    "https://ik.imagekit.io/couaxia/site-assets/mascotte/ArtcreditsnoText.png?updatedAt=1788696579822";
+    "https://ik.imagekit.io/couaxia/site-assets/mascotte/AboutmenoText.png?updatedAt=1788696579754";
 
 
 /* =========================================================

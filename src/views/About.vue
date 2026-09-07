@@ -5,6 +5,7 @@ import AboutInfo from "../components/about/AboutInfo.vue";
 import AboutTastes from "../components/about/AboutTastes.vue";
 import AboutStory from "../components/about/AboutStory.vue";
 import AboutReferences from "../components/about/AboutReferences.vue";
+import AboutArtists from "../components/about/AboutArtists.vue";
 import AboutPalette from "../components/about/AboutPalette.vue";
 import AboutJourney from "../components/about/AboutJourney.vue";
 import AboutPreferences from "../components/about/AboutPreferences.vue";
@@ -55,7 +56,12 @@ import "../assets/styles/pages/about.css";
 
             <AboutReferences />
 
+            <!-- ==========================================
+                 LES ARTISTES DERRIÈRE COUAXIA
+            =========================================== -->
 
+            <AboutArtists />
+            
         <!-- ==========================================
              PALETTE
         =========================================== -->

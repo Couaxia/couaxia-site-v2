@@ -1930,12 +1930,898 @@ html[data-theme="light"] .about-final__message { color: #4f315c; }
     .about-hero__character-wrapper { min-height: 300px; }
 }
 
+
 /* =========================================================
-   NOTE ABOUT REDUCED MOTION
+   ABOUT ARTISTS
 ========================================================= */
 
-/*
-   Do not disable animation here if you want the floating images
-   to remain animated even when the operating system requests
-   reduced motion. Your global.css already controls reduced motion.
-*/
+.about-artists {
+    position: relative;
+
+    margin-top: 70px;
+    padding: 35px;
+
+    border: 1px solid
+        rgba(
+            109,
+            0,
+            163,
+            0.42
+        );
+
+    border-radius: 28px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(
+                24,
+                7,
+                39,
+                0.96
+            ),
+            rgba(
+                43,
+                9,
+                62,
+                0.94
+            )
+        );
+
+    box-shadow:
+        0 18px 45px
+        rgba(
+            0,
+            0,
+            0,
+            0.22
+        );
+
+    overflow: hidden;
+}
+
+
+/* =========================================================
+   DECORATIVE GLOW
+========================================================= */
+
+.about-artists::before,
+.about-artists::after {
+    content: "";
+
+    position: absolute;
+
+    width: 220px;
+    height: 220px;
+
+    border-radius: 50%;
+
+    filter: blur(
+        70px
+    );
+
+    pointer-events: none;
+
+    opacity: 0.35;
+}
+
+
+.about-artists::before {
+    top: -90px;
+    left: -80px;
+
+    background:
+        rgba(
+            34,
+            242,
+            239,
+            0.38
+        );
+}
+
+
+.about-artists::after {
+    right: -80px;
+    bottom: -100px;
+
+    background:
+        rgba(
+            242,
+            34,
+            146,
+            0.42
+        );
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.about-artists__header {
+    position: relative;
+    z-index: 1;
+
+    max-width: 760px;
+    margin: 0 auto 35px;
+
+    text-align: center;
+}
+
+
+.about-artists__eyebrow {
+    display: inline-block;
+
+    margin-bottom: 10px;
+
+    color: #22f2ef;
+
+    font-size: 0.72rem;
+    font-weight: 900;
+
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+
+.about-artists__title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 10px;
+
+    margin: 0;
+
+    color: #ffffff;
+
+    font-size:
+        clamp(
+            1.7rem,
+            4vw,
+            2.45rem
+        );
+
+    line-height: 1.15;
+}
+
+
+.about-artists__intro {
+    margin:
+        16px
+        auto
+        0;
+
+    color:
+        rgba(
+            255,
+            255,
+            255,
+            0.76
+        );
+
+    font-size: 0.98rem;
+    line-height: 1.7;
+}
+
+
+/* =========================================================
+   GRID
+========================================================= */
+
+.about-artists__grid {
+    position: relative;
+    z-index: 1;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            3,
+            minmax(
+                0,
+                1fr
+            )
+        );
+
+    gap: 22px;
+}
+
+
+/* =========================================================
+   ARTIST CARD
+========================================================= */
+
+.about-artist-card {
+    position: relative;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    min-width: 0;
+
+    padding: 24px;
+
+    border: 1px solid
+        rgba(
+            202,
+            81,
+            255,
+            0.28
+        );
+
+    border-radius: 22px;
+
+    background:
+        rgba(
+            18,
+            5,
+            31,
+            0.78
+        );
+
+    box-shadow:
+        0 10px 28px
+        rgba(
+            0,
+            0,
+            0,
+            0.18
+        );
+
+    text-align: center;
+
+    transition:
+        transform 0.25s ease,
+        border-color 0.25s ease,
+        box-shadow 0.25s ease,
+        background 0.25s ease;
+}
+
+
+.about-artist-card:hover,
+.about-artist-card:focus-visible {
+    transform:
+        translateY(
+            -6px
+        );
+
+    border-color:
+        rgba(
+            34,
+            242,
+            239,
+            0.55
+        );
+
+    background:
+        rgba(
+            28,
+            8,
+            46,
+            0.94
+        );
+
+    box-shadow:
+        0 18px 35px
+        rgba(
+            109,
+            0,
+            163,
+            0.24
+        );
+
+    outline: none;
+}
+
+
+/* =========================================================
+   ROLE
+========================================================= */
+
+.about-artist-card__role {
+    display: inline-flex;
+    align-items: center;
+
+    gap: 7px;
+
+    margin-bottom: 18px;
+    padding: 7px 11px;
+
+    border: 1px solid
+        rgba(
+            242,
+            34,
+            146,
+            0.28
+        );
+
+    border-radius: 999px;
+
+    color: #ffffff;
+
+    background:
+        rgba(
+            242,
+            34,
+            146,
+            0.08
+        );
+
+    font-size: 0.72rem;
+    font-weight: 900;
+
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+
+.about-artist-card__role-icon {
+    font-size: 1rem;
+}
+
+
+/* =========================================================
+   AVATAR
+========================================================= */
+
+.about-artist-card__avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+
+    margin-bottom: 18px;
+
+    border: 2px solid
+        rgba(202, 81, 255, 0.48);
+
+    border-radius: 16px;
+
+    background:
+        rgba(109, 0, 163, 0.12);
+
+    box-shadow:
+        0 0 28px
+        rgba(109, 0, 163, 0.2);
+
+    overflow: hidden;
+
+    transition:
+        transform 0.25s ease,
+        border-color 0.25s ease,
+        box-shadow 0.25s ease;
+}
+
+
+
+.about-artist-card:hover
+.about-artist-card__avatar,
+.about-artist-card:focus-visible
+.about-artist-card__avatar {
+    transform:
+        scale(
+            1.04
+        );
+
+    border-color:
+        rgba(
+            34,
+            242,
+            239,
+            0.72
+        );
+
+    box-shadow:
+        0 0 35px
+        rgba(
+            34,
+            242,
+            239,
+            0.18
+        );
+}
+
+
+.about-artist-card__avatar img {
+    display: block;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+    object-position: center;
+}
+
+.about-artist-card__avatar-fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+    height: 100%;
+
+    font-size: 2.8rem;
+}
+
+
+/* =========================================================
+   CONTENT
+========================================================= */
+
+.about-artist-card__content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    flex: 1;
+
+    width: 100%;
+}
+
+
+.about-artist-card__content h3 {
+    margin:
+        0
+        0
+        10px;
+
+    color: #ffffff;
+
+    font-size: 1.25rem;
+}
+
+
+.about-artist-card__content p {
+    margin: 0;
+
+    color:
+        rgba(
+            255,
+            255,
+            255,
+            0.7
+        );
+
+    font-size: 0.88rem;
+    line-height: 1.65;
+}
+
+
+/* =========================================================
+   LINKS
+========================================================= */
+
+.about-artist-card__links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+
+    gap: 8px;
+
+    width: 100%;
+
+    margin-top: 20px;
+}
+
+
+.about-artist-card__link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 6px;
+
+    min-height: 36px;
+
+    padding:
+        8px
+        12px;
+
+    border: 1px solid
+        rgba(
+            202,
+            81,
+            255,
+            0.34
+        );
+
+    border-radius: 11px;
+
+    color: #ffffff;
+
+    background:
+        rgba(
+            109,
+            0,
+            163,
+            0.18
+        );
+
+    text-decoration: none;
+
+    font-size: 0.74rem;
+    font-weight: 900;
+
+    transition:
+        transform 0.2s ease,
+        border-color 0.2s ease,
+        background 0.2s ease;
+}
+
+
+.about-artist-card__link:hover,
+.about-artist-card__link:focus-visible {
+    transform:
+        translateY(
+            -2px
+        );
+
+    border-color:
+        rgba(
+            34,
+            242,
+            239,
+            0.65
+        );
+
+    background:
+        rgba(
+            34,
+            242,
+            239,
+            0.1
+        );
+
+    outline: none;
+}
+
+
+/* =========================================================
+   COMING SOON
+========================================================= */
+
+.about-artist-card__coming-soon {
+    margin-top: 20px;
+    padding:
+        7px
+        11px;
+
+    border-radius: 999px;
+
+    color:
+        rgba(
+            255,
+            255,
+            255,
+            0.48
+        );
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            0.05
+        );
+
+    font-size: 0.7rem;
+    font-weight: 800;
+}
+
+
+/* =========================================================
+   LIGHT MODE
+========================================================= */
+
+:global(
+    html[data-theme="light"]
+)
+.about-artists {
+    border-color:
+        rgba(
+            109,
+            0,
+            163,
+            0.2
+        );
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(
+                255,
+                248,
+                255,
+                0.98
+            ),
+            rgba(
+                247,
+                233,
+                255,
+                0.98
+            )
+        );
+
+    box-shadow:
+        0 18px 45px
+        rgba(
+            109,
+            0,
+            163,
+            0.1
+        );
+}
+
+
+:global(
+    html[data-theme="light"]
+)
+.about-artists__title {
+    color: #48135d;
+}
+
+
+:global(
+    html[data-theme="light"]
+)
+.about-artists__intro {
+    color:
+        rgba(
+            72,
+            19,
+            93,
+            0.72
+        );
+}
+
+
+:global(
+    html[data-theme="light"]
+)
+.about-artist-card {
+    border-color:
+        rgba(
+            109,
+            0,
+            163,
+            0.17
+        );
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            0.74
+        );
+}
+
+
+:global(
+    html[data-theme="light"]
+)
+.about-artist-card:hover,
+:global(
+    html[data-theme="light"]
+)
+.about-artist-card:focus-visible {
+    border-color:
+        rgba(
+            109,
+            0,
+            163,
+            0.38
+        );
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            0.96
+        );
+}
+
+
+:global(
+    html[data-theme="light"]
+)
+.about-artist-card__role {
+    color: #6d00a3;
+
+    background:
+        rgba(
+            242,
+            34,
+            146,
+            0.06
+        );
+}
+
+
+:global(
+    html[data-theme="light"]
+)
+.about-artist-card__content h3 {
+    color: #48135d;
+}
+
+
+:global(
+    html[data-theme="light"]
+)
+.about-artist-card__content p {
+    color:
+        rgba(
+            72,
+            19,
+            93,
+            0.72
+        );
+}
+
+
+:global(
+    html[data-theme="light"]
+)
+.about-artist-card__link {
+    color: #6d00a3;
+
+    background:
+        rgba(
+            109,
+            0,
+            163,
+            0.06
+        );
+}
+
+
+:global(
+    html[data-theme="light"]
+)
+.about-artist-card__coming-soon {
+    color:
+        rgba(
+            72,
+            19,
+            93,
+            0.52
+        );
+
+    background:
+        rgba(
+            109,
+            0,
+            163,
+            0.05
+        );
+}
+
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (
+    max-width:
+        980px
+) {
+
+    .about-artists__grid {
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(
+                    0,
+                    1fr
+                )
+            );
+    }
+
+
+    .about-artist-card:last-child {
+        grid-column:
+            1 / -1;
+
+        width:
+            min(
+                100%,
+                460px
+            );
+
+        justify-self:
+            center;
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (
+    max-width:
+        650px
+) {
+
+    .about-artists {
+        margin-top: 45px;
+
+        padding:
+            26px
+            16px;
+
+        border-radius: 22px;
+    }
+
+
+    .about-artists__header {
+        margin-bottom: 26px;
+    }
+
+
+    .about-artists__grid {
+        grid-template-columns:
+            1fr;
+
+        gap: 16px;
+    }
+
+
+    .about-artist-card {
+        padding: 20px;
+    }
+
+
+    .about-artist-card:last-child {
+        grid-column:
+            auto;
+
+        width:
+            auto;
+    }
+
+
+    .about-artist-card__avatar {
+        width: 110px;
+        height: 110px;
+    }
+
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (
+    prefers-reduced-motion:
+        reduce
+) {
+
+    .about-artist-card,
+    .about-artist-card__avatar,
+    .about-artist-card__link {
+        transition: none;
+    }
+
+
+    .about-artist-card:hover,
+    .about-artist-card:focus-visible,
+    .about-artist-card:hover
+    .about-artist-card__avatar,
+    .about-artist-card:focus-visible
+    .about-artist-card__avatar,
+    .about-artist-card__link:hover,
+    .about-artist-card__link:focus-visible {
+        transform: none;
+    }
+
+}
