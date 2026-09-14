@@ -167,12 +167,72 @@ router.get(
         try {
 
             const rawLogins =
-                req.query.logins;
+                req.query.login;
+
+
+            /* =================================================
+               NORMALIZE QUERY
+            ================================================== */
+
+            let logins:
+                string[] =
+                [];
 
 
             if (
-                typeof rawLogins !==
+                typeof rawLogins ===
                 "string"
+            ) {
+
+                logins =
+                    [
+                        rawLogins
+                    ];
+
+            }
+
+            else if (
+                Array.isArray(
+                    rawLogins
+                )
+            ) {
+
+                logins =
+                    rawLogins
+                        .filter(
+                            (
+                                login
+                            ):
+                                login is string =>
+                                    typeof login ===
+                                    "string"
+                        );
+
+            }
+
+
+            /* =================================================
+               CLEAN LOGINS
+            ================================================== */
+
+            logins =
+                logins
+                    .map(
+                        login =>
+                            login.trim()
+                    )
+                    .filter(
+                        Boolean
+                    );
+
+
+            /* =================================================
+               EMPTY
+            ================================================== */
+
+            if (
+                logins.length ===
+                0
             ) {
 
                 res.json({
@@ -191,25 +251,19 @@ router.get(
             }
 
 
-            const logins =
-                rawLogins
-                    .split(
-                        ","
-                    )
-                    .map(
-                        login =>
-                            login.trim()
-                    )
-                    .filter(
-                        Boolean
-                    );
-
+            /* =================================================
+               TWITCH
+            ================================================== */
 
             const data =
                 await getTwitchRecommendations(
                     logins
                 );
 
+
+            /* =================================================
+               RESPONSE
+            ================================================== */
 
             res.json({
 
@@ -221,6 +275,7 @@ router.get(
             });
 
         }
+
         catch (
             error
         ) {
