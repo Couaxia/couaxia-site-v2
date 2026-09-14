@@ -58,40 +58,168 @@ router.get("/followers", async (_req, res) => {
 /* =========================================================
    GET /api/twitch/recommendations
 ========================================================= */
-router.get("/recommendations", async (req, res) => {
-    try {
-        const rawLogins = req.query.logins;
-        if (typeof rawLogins !==
-            "string") {
-            res.json({
-                success: true,
-                data: []
-            });
-            return;
-        }
-        const logins = rawLogins
-            .split(",")
-            .map(login => login.trim())
-            .filter(Boolean);
-        const data = await getTwitchRecommendations(logins);
-        res.json({
-            success: true,
-            data
-        });
-    }
-    catch (error) {
-        console.error("Twitch recommendations route error:", error);
+
+router.get(
+    "/recommendations",
+
+    async (
+        req,
         res
-            .status(500)
-            .json({
-            success: false,
-            message: "Impossible de récupérer les recommandations Twitch.",
-            error: error instanceof Error
-                ? error.message
-                : "Erreur Twitch inconnue"
-        });
+    ) => {
+
+        try {
+
+            const rawLogins =
+                req.query.login;
+
+
+            /* =================================================
+               NORMALIZE QUERY
+            ================================================== */
+
+            let logins =
+                [];
+
+
+            if (
+                typeof rawLogins ===
+                "string"
+            ) {
+
+                logins =
+                    [
+                        rawLogins
+                    ];
+
+            }
+
+            else if (
+                Array.isArray(
+                    rawLogins
+                )
+            ) {
+
+                logins =
+                    rawLogins
+                        .filter(
+                            login =>
+                                typeof login ===
+                                "string"
+                        );
+
+            }
+
+
+            /* =================================================
+               CLEAN LOGINS
+            ================================================== */
+
+            logins =
+                logins
+                    .map(
+                        login =>
+                            login.trim()
+                    )
+                    .filter(
+                        Boolean
+                    );
+
+
+            console.log(
+                "Twitch recommendations logins:",
+                logins
+            );
+
+
+            /* =================================================
+               EMPTY
+            ================================================== */
+
+            if (
+                logins.length ===
+                0
+            ) {
+
+                res.json({
+
+                    success:
+                        true,
+
+                    data:
+                        []
+
+                });
+
+
+                return;
+
+            }
+
+
+            /* =================================================
+               TWITCH
+            ================================================== */
+
+            const data =
+                await getTwitchRecommendations(
+                    logins
+                );
+
+
+            console.log(
+                "Twitch recommendations result:",
+                data.length
+            );
+
+
+            /* =================================================
+               RESPONSE
+            ================================================== */
+
+            res.json({
+
+                success:
+                    true,
+
+                data
+
+            });
+
+        }
+
+        catch (
+            error
+        ) {
+
+            console.error(
+                "Twitch recommendations route error:",
+                error
+            );
+
+
+            res
+                .status(
+                    500
+                )
+                .json({
+
+                    success:
+                        false,
+
+                    message:
+                        "Impossible de récupérer les recommandations Twitch.",
+
+                    error:
+                        error instanceof Error
+                            ? error.message
+                            : "Erreur Twitch inconnue"
+
+                });
+
+        }
+
     }
-});
+);
 /* =========================================================
    GET /api/twitch/clips
 ========================================================= */
