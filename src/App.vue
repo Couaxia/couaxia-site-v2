@@ -32,7 +32,8 @@ import ScrollPage
 import Mascot
     from "./components/mascot/Mascot.vue";
 
-
+import CustomCursor
+    from "./components/ui/CustomCursor.vue";
 /* =========================================================
    CONTENT PROTECTION
 ========================================================= */
@@ -79,7 +80,7 @@ onBeforeUnmount(
 
     <AppHeader />
 
-
+    <CustomCursor />
     <!-- =====================================================
          CURRENT PAGE
     ====================================================== -->
@@ -99,5 +100,7 @@ onBeforeUnmount(
     ====================================================== -->
 
     <ScrollPage />
+
+    
 
 </template>

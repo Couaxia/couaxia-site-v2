@@ -10,6 +10,8 @@ import AboutPalette from "../components/about/AboutPalette.vue";
 import AboutJourney from "../components/about/AboutJourney.vue";
 import AboutPreferences from "../components/about/AboutPreferences.vue";
 import AboutFinal from "../components/about/AboutFinal.vue";
+import CouaxiaForms
+    from "../components/about/CouaxiaForms.vue";
 
 import "../assets/styles/pages/about.css";
 
@@ -55,6 +57,8 @@ import "../assets/styles/pages/about.css";
         =========================================== -->
 
             <AboutReferences />
+
+            <CouaxiaForms />
 
             <!-- ==========================================
                  LES ARTISTES DERRIÈRE COUAXIA
