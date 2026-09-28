@@ -1,10 +1,13 @@
 /* =========================================================
    COUAXIA — EXPRESS SERVER
 ========================================================= */
+import "dotenv/config";
 import express from "express";
+import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
 import twitchRoutes from "./routes/twitch.routes.js";
+import cardsAdminRoutes from "./routes/cards-admin.routes.js";
 /* =========================================================
    APP
 ========================================================= */
@@ -37,8 +40,6 @@ const HOST = "0.0.0.0";
  */
 const distPath = path.resolve(process.cwd(), "dist");
 const indexPath = path.join(distPath, "index.html");
-import cors from "cors";
-import "dotenv/config";
 /* =========================================================
    TRUST PROXY — RENDER
 ========================================================= */
@@ -89,24 +90,19 @@ app.get("/health", (_req, res) => {
 /* =========================================================
    API — TWITCH
 ========================================================= */
+app.use("/api/twitch", twitchRoutes);
+/* =========================================================
+   API — ADMIN CARDS
+========================================================= */
 /*
  * IMPORTANT :
  *
- * Cette route doit être déclarée AVANT
- * express.static() et AVANT index.html.
+ * Cette route doit rester AVANT le fallback /api.
  */
-app.use("/api/twitch", twitchRoutes);
+app.use("/api/admin/cards", cardsAdminRoutes);
 /* =========================================================
    API FALLBACK
 ========================================================= */
-/*
- * Toute route /api inconnue doit retourner du JSON.
- *
- * Cela évite exactement le problème :
- *
- * "Le serveur a renvoyé une page HTML au lieu
- * de données Twitch."
- */
 app.use("/api", (req, res) => {
     res
         .status(404)
@@ -119,30 +115,11 @@ app.use("/api", (req, res) => {
 /* =========================================================
    STATIC VUE BUILD
 ========================================================= */
-/*
- * Seulement APRÈS les APIs.
- */
 app.use(express.static(distPath));
 /* =========================================================
    SPA FALLBACK
 ========================================================= */
-/*
- * Vue Router doit pouvoir afficher :
- *
- * /
- * /jeux
- * /profil
- * /admin
- * etc.
- *
- * Ce middleware est volontairement placé
- * APRÈS /api.
- */
 app.use((req, res, next) => {
-    /*
-     * Protection supplémentaire :
-     * une API ne doit JAMAIS recevoir index.html.
-     */
     if (req.path.startsWith("/api/")) {
         res
             .status(404)
@@ -153,10 +130,6 @@ app.use((req, res, next) => {
         });
         return;
     }
-    /*
-     * Pour les GET du frontend Vue,
-     * on renvoie index.html.
-     */
     if (req.method ===
         "GET") {
         res.sendFile(indexPath, error => {
@@ -182,8 +155,10 @@ app.use((error, _req, res, _next) => {
         success: false,
         message: "Une erreur interne est survenue.",
         error: error instanceof Error
-            ? error.message
-            : "Erreur inconnue"
+            ?
+                error.message
+            :
+                "Erreur inconnue"
     });
 });
 /* =========================================================
@@ -194,5 +169,6 @@ app.listen(PORT, HOST, () => {
     console.log("🐙 Serveur Couaxia démarré");
     console.log(`🌐 http://${HOST}:${PORT}`);
     console.log(`🎮 Twitch games : http://localhost:${PORT}/api/twitch/games?search=Dead%20By%20Daylight`);
+    console.log(`🃏 Admin cards : http://localhost:${PORT}/api/admin/cards`);
     console.log("====================================");
 });

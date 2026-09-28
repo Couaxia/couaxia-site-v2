@@ -6,9 +6,11 @@ import {
     ref
 } from "vue";
 
+
 import {
     useRouter
 } from "vue-router";
+
 
 import "../assets/styles/pages/admin.css";
 
@@ -20,6 +22,7 @@ import "../assets/styles/pages/admin.css";
 import {
     getCurrentAdmin
 } from "../services/admin.service";
+
 
 import type {
     AdminProfile
@@ -33,26 +36,38 @@ import type {
 import AdminSidebar from
     "../components/admin/AdminSidebar.vue";
 
+
 import AdminDashboard from
     "../components/admin/AdminDashboard.vue";
+
 
 import AdminPolls from
     "../components/admin/AdminPolls.vue";
 
+
 import AdminGames from
     "../components/admin/AdminGames.vue";
+
 
 import AdminSuggestions from
     "../components/admin/AdminSuggestions.vue";
 
+
 import AdminUsers from
     "../components/admin/AdminUsers.vue";
+
 
 import AdminArtworks from
     "../components/admin/AdminArtworks.vue";
 
+
+import AdminCards from
+    "../components/admin/AdminCards.vue";
+
+
 import AdminAnnouncements from
     "../components/admin/AdminAnnouncements.vue";
+
 
 import AdminMessages from
     "../components/admin/AdminMessages.vue";
@@ -69,6 +84,7 @@ type AdminTab =
     | "suggestions"
     | "users"
     | "artworks"
+    | "cards"
     | "announcements"
     | "messages";
 
@@ -219,6 +235,20 @@ const tabs:
 
         {
             id:
+                "cards",
+
+            label:
+                "Cartes",
+
+            icon:
+                "🃏",
+
+            description:
+                "Crée et gère les cartes de collection Couaxia."
+        },
+
+        {
+            id:
                 "announcements",
 
             label:
@@ -349,7 +379,9 @@ const adminInitial =
 
 
             return name
-                .charAt(0)
+                .charAt(
+                    0
+                )
                 .toUpperCase();
 
         }
@@ -398,7 +430,9 @@ async function loadAdmin() {
 
         errorMessage.value =
             error instanceof Error
+
                 ? error.message
+
                 : "Impossible de charger l'espace administration.";
 
     }
@@ -425,17 +459,14 @@ function changeTab(
         tab;
 
 
-    /*
-     * On remonte en haut de la page
-     * lorsqu'on change de section.
-     */
-
     window.scrollTo({
+
         top:
             0,
 
         behavior:
             "smooth"
+
     });
 
 }
@@ -448,8 +479,10 @@ function changeTab(
 async function backToSite() {
 
     await router.push({
+
         name:
             "home"
+
     });
 
 }
@@ -462,8 +495,10 @@ async function backToSite() {
 async function goToProfile() {
 
     await router.push({
+
         name:
             "profile"
+
     });
 
 }
@@ -608,22 +643,27 @@ onMounted(
         >
 
             <!-- =============================================
-                 SIDEBAR COMPONENT
+                 SIDEBAR
             ============================================== -->
 
             <AdminSidebar
+
                 :active-tab="
                     activeTab
                 "
+
                 @change-tab="
                     changeTab
                 "
+
                 @go-profile="
                     goToProfile
                 "
+
                 @go-home="
                     backToSite
                 "
+
             />
 
 
@@ -643,10 +683,6 @@ onMounted(
                     class="admin-topbar"
                 >
 
-                    <!-- =====================================
-                         CURRENT PAGE
-                    ====================================== -->
-
                     <div
                         class="admin-topbar__title"
                     >
@@ -654,11 +690,13 @@ onMounted(
                         <span
                             class="admin-topbar__eyebrow"
                         >
+
                             {{
                                 currentTab.icon
                             }}
 
                             ADMINISTRATION
+
                         </span>
 
 
@@ -697,8 +735,6 @@ onMounted(
                         "
                     >
 
-                        <!-- AVATAR -->
-
                         <div
                             class="
                                 admin-topbar__avatar
@@ -730,8 +766,6 @@ onMounted(
                         </div>
 
 
-                        <!-- USER -->
-
                         <div
                             class="
                                 admin-topbar__profile-text
@@ -751,8 +785,6 @@ onMounted(
 
                         </div>
 
-
-                        <!-- ROLE -->
 
                         <span
                             class="
@@ -805,9 +837,7 @@ onMounted(
                     class="admin-content"
                 >
 
-                    <!-- =====================================
-                         DASHBOARD
-                    ====================================== -->
+                    <!-- DASHBOARD -->
 
                     <AdminDashboard
                         v-if="
@@ -818,9 +848,7 @@ onMounted(
                     />
 
 
-                    <!-- =====================================
-                         POLLS
-                    ====================================== -->
+                    <!-- POLLS -->
 
                     <AdminPolls
                         v-else-if="
@@ -831,9 +859,7 @@ onMounted(
                     />
 
 
-                    <!-- =====================================
-                         GAMES
-                    ====================================== -->
+                    <!-- GAMES -->
 
                     <AdminGames
                         v-else-if="
@@ -844,9 +870,7 @@ onMounted(
                     />
 
 
-                    <!-- =====================================
-                         SUGGESTIONS
-                    ====================================== -->
+                    <!-- SUGGESTIONS -->
 
                     <AdminSuggestions
                         v-else-if="
@@ -857,9 +881,7 @@ onMounted(
                     />
 
 
-                    <!-- =====================================
-                         USERS
-                    ====================================== -->
+                    <!-- USERS -->
 
                     <AdminUsers
                         v-else-if="
@@ -870,9 +892,7 @@ onMounted(
                     />
 
 
-                    <!-- =====================================
-                         ARTWORKS
-                    ====================================== -->
+                    <!-- ARTWORKS -->
 
                     <AdminArtworks
                         v-else-if="
@@ -883,9 +903,18 @@ onMounted(
                     />
 
 
-                    <!-- =====================================
-                         ANNOUNCEMENTS
-                    ====================================== -->
+                    <!-- CARDS -->
+
+                    <AdminCards
+                        v-else-if="
+                            activeTab
+                            ===
+                            'cards'
+                        "
+                    />
+
+
+                    <!-- ANNOUNCEMENTS -->
 
                     <AdminAnnouncements
                         v-else-if="
@@ -896,9 +925,7 @@ onMounted(
                     />
 
 
-                    <!-- =====================================
-                         MESSAGES
-                    ====================================== -->
+                    <!-- MESSAGES -->
 
                     <AdminMessages
                         v-else-if="
@@ -909,9 +936,7 @@ onMounted(
                     />
 
 
-                    <!-- =====================================
-                         FALLBACK
-                    ====================================== -->
+                    <!-- FALLBACK -->
 
                     <section
                         v-else

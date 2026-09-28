@@ -58,168 +58,69 @@ router.get("/followers", async (_req, res) => {
 /* =========================================================
    GET /api/twitch/recommendations
 ========================================================= */
-
-router.get(
-    "/recommendations",
-
-    async (
-        req,
-        res
-    ) => {
-
-        try {
-
-            const rawLogins =
-                req.query.login;
-
-
-            /* =================================================
-               NORMALIZE QUERY
-            ================================================== */
-
-            let logins =
-                [];
-
-
-            if (
-                typeof rawLogins ===
-                "string"
-            ) {
-
-                logins =
-                    [
-                        rawLogins
-                    ];
-
-            }
-
-            else if (
-                Array.isArray(
-                    rawLogins
-                )
-            ) {
-
-                logins =
-                    rawLogins
-                        .filter(
-                            login =>
-                                typeof login ===
-                                "string"
-                        );
-
-            }
-
-
-            /* =================================================
-               CLEAN LOGINS
-            ================================================== */
-
+router.get("/recommendations", async (req, res) => {
+    try {
+        const rawLogins = req.query.login;
+        /* =================================================
+           NORMALIZE QUERY
+        ================================================== */
+        let logins = [];
+        if (typeof rawLogins ===
+            "string") {
             logins =
-                logins
-                    .map(
-                        login =>
-                            login.trim()
-                    )
-                    .filter(
-                        Boolean
-                    );
-
-
-            console.log(
-                "Twitch recommendations logins:",
-                logins
-            );
-
-
-            /* =================================================
-               EMPTY
-            ================================================== */
-
-            if (
-                logins.length ===
-                0
-            ) {
-
-                res.json({
-
-                    success:
-                        true,
-
-                    data:
-                        []
-
-                });
-
-
-                return;
-
-            }
-
-
-            /* =================================================
-               TWITCH
-            ================================================== */
-
-            const data =
-                await getTwitchRecommendations(
-                    logins
-                );
-
-
-            console.log(
-                "Twitch recommendations result:",
-                data.length
-            );
-
-
-            /* =================================================
-               RESPONSE
-            ================================================== */
-
+                [
+                    rawLogins
+                ];
+        }
+        else if (Array.isArray(rawLogins)) {
+            logins =
+                rawLogins
+                    .filter((login) => typeof login ===
+                    "string");
+        }
+        /* =================================================
+           CLEAN LOGINS
+        ================================================== */
+        logins =
+            logins
+                .map(login => login.trim())
+                .filter(Boolean);
+        /* =================================================
+           EMPTY
+        ================================================== */
+        if (logins.length ===
+            0) {
             res.json({
-
-                success:
-                    true,
-
-                data
-
+                success: true,
+                data: []
             });
-
+            return;
         }
-
-        catch (
-            error
-        ) {
-
-            console.error(
-                "Twitch recommendations route error:",
-                error
-            );
-
-
-            res
-                .status(
-                    500
-                )
-                .json({
-
-                    success:
-                        false,
-
-                    message:
-                        "Impossible de récupérer les recommandations Twitch.",
-
-                    error:
-                        error instanceof Error
-                            ? error.message
-                            : "Erreur Twitch inconnue"
-
-                });
-
-        }
-
+        /* =================================================
+           TWITCH
+        ================================================== */
+        const data = await getTwitchRecommendations(logins);
+        /* =================================================
+           RESPONSE
+        ================================================== */
+        res.json({
+            success: true,
+            data
+        });
     }
-);
+    catch (error) {
+        console.error("Twitch recommendations route error:", error);
+        res
+            .status(500)
+            .json({
+            success: false,
+            message: "Impossible de récupérer les recommandations Twitch.",
+            error: error instanceof Error
+                ? error.message
+                : "Erreur Twitch inconnue"
+        });
+    }
+});
 /* =========================================================
    GET /api/twitch/clips
 ========================================================= */

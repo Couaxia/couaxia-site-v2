@@ -2,7 +2,12 @@
    COUAXIA — EXPRESS SERVER
 ========================================================= */
 
+import "dotenv/config";
+
+
 import express from "express";
+
+import cors from "cors";
 
 import path from "path";
 
@@ -13,6 +18,10 @@ import {
 
 import twitchRoutes
     from "./routes/twitch.routes.js";
+
+
+import cardsAdminRoutes
+    from "./routes/cards-admin.routes.js";
 
 
 /* =========================================================
@@ -83,8 +92,8 @@ const indexPath =
         distPath,
         "index.html"
     );
-import cors from "cors";
-import "dotenv/config";
+
+
 /* =========================================================
    TRUST PROXY — RENDER
 ========================================================= */
@@ -94,36 +103,55 @@ app.set(
     1
 );
 
+
 /* =========================================================
    CORS
 ========================================================= */
 
 app.use(
     cors({
+
         origin: [
+
             "https://couaxia-hmbf.onrender.com",
+
             "https://couaxia-api.onrender.com",
+
             "http://localhost:5173"
+
         ],
 
         methods: [
+
             "GET",
+
             "POST",
+
             "PUT",
+
             "PATCH",
+
             "DELETE",
+
             "OPTIONS"
+
         ],
 
         allowedHeaders: [
+
             "Content-Type",
+
             "Authorization"
+
         ],
 
         credentials:
             true
+
     })
 );
+
+
 /* =========================================================
    BODY
 ========================================================= */
@@ -184,13 +212,6 @@ app.get(
    API — TWITCH
 ========================================================= */
 
-/*
- * IMPORTANT :
- *
- * Cette route doit être déclarée AVANT
- * express.static() et AVANT index.html.
- */
-
 app.use(
     "/api/twitch",
     twitchRoutes
@@ -198,17 +219,24 @@ app.use(
 
 
 /* =========================================================
-   API FALLBACK
+   API — ADMIN CARDS
 ========================================================= */
 
 /*
- * Toute route /api inconnue doit retourner du JSON.
+ * IMPORTANT :
  *
- * Cela évite exactement le problème :
- *
- * "Le serveur a renvoyé une page HTML au lieu
- * de données Twitch."
+ * Cette route doit rester AVANT le fallback /api.
  */
+
+app.use(
+    "/api/admin/cards",
+    cardsAdminRoutes
+);
+
+
+/* =========================================================
+   API FALLBACK
+========================================================= */
 
 app.use(
     "/api",
@@ -243,10 +271,6 @@ app.use(
    STATIC VUE BUILD
 ========================================================= */
 
-/*
- * Seulement APRÈS les APIs.
- */
-
 app.use(
     express.static(
         distPath
@@ -258,30 +282,12 @@ app.use(
    SPA FALLBACK
 ========================================================= */
 
-/*
- * Vue Router doit pouvoir afficher :
- *
- * /
- * /jeux
- * /profil
- * /admin
- * etc.
- *
- * Ce middleware est volontairement placé
- * APRÈS /api.
- */
-
 app.use(
     (
         req,
         res,
         next
     ) => {
-
-        /*
-         * Protection supplémentaire :
-         * une API ne doit JAMAIS recevoir index.html.
-         */
 
         if (
             req.path.startsWith(
@@ -311,11 +317,6 @@ app.use(
 
         }
 
-
-        /*
-         * Pour les GET du frontend Vue,
-         * on renvoie index.html.
-         */
 
         if (
             req.method ===
@@ -399,8 +400,10 @@ app.use(
 
                 error:
                     error instanceof Error
-                        ? error.message
-                        : "Erreur inconnue"
+                        ?
+                        error.message
+                        :
+                        "Erreur inconnue"
 
             });
 
@@ -435,6 +438,11 @@ app.listen(
 
         console.log(
             `🎮 Twitch games : http://localhost:${PORT}/api/twitch/games?search=Dead%20By%20Daylight`
+        );
+
+
+        console.log(
+            `🃏 Admin cards : http://localhost:${PORT}/api/admin/cards`
         );
 
 
