@@ -1216,25 +1216,16 @@ onBeforeUnmount(
 
 <template>
 
-    <div
-        class="custom-cursor"
-
-        :class="{
-            'custom-cursor--visible':
-                isVisible,
-
-            'custom-cursor--hover':
-                isHovering,
-
-            'custom-cursor--click':
-                isClicking,
-
-            'custom-cursor--text':
-                isText
-        }"
-
-        aria-hidden="true"
-    >
+     <div
+            class="custom-cursor"
+            :class="{
+                'custom-cursor--visible': isVisible,
+                'custom-cursor--hover': isHovering,
+                'custom-cursor--click': isClicking,
+                'custom-cursor--text': isText
+            }"
+            aria-hidden="true"
+        >
 
         <!-- =================================================
              SVG

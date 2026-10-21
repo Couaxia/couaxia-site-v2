@@ -1596,70 +1596,47 @@ onBeforeUnmount(
 
         ================================================== -->
 
+        <!-- =========================================
+            BOUTON NOTIFICATIONS
+        ========================================= -->
+
         <button
-
             type="button"
-
             class="announcement-bell__button"
-
             :class="{
-
-                'has-notifications':
-
-                    notificationCount > 0
-
+                'has-notifications': notificationCount > 0
             }"
-
             aria-label="Afficher les notifications"
-
             :aria-expanded="isOpen"
-
-            @click="
-
-                toggleNotifications
-
-            "
-
+            @click="toggleNotifications"
         >
-
+            <!-- IMAGE FIXE OU GIF ANIMÉ -->
             <span
-
                 class="announcement-bell__icon"
-
                 aria-hidden="true"
-
             >
-
-                🔔
-
+                <img
+                    :src="
+                        notificationCount > 0
+                            ? 'src/assets/styles/notifications/dinkdonk.gif'
+                            : 'src/assets/styles/notifications/dinkdonk.png'
+                    "
+                    alt=""
+                    class="announcement-bell__image"
+                />
             </span>
 
-
-
+            <!-- COMPTEUR DE NOTIFICATIONS -->
             <span
-
-                v-if="
-
-                    notificationCount > 0
-
-                "
-
+                v-if="notificationCount > 0"
                 class="announcement-bell__count"
-
             >
-
                 {{
-
                     notificationCount > 99
-
                         ? "99+"
-
                         : notificationCount
-
                 }}
-
             </span>
-
         </button>
 
 
@@ -2914,9 +2891,7 @@ onBeforeUnmount(
 
         330px;
 
-    z-index:
-
-        2147483647;
+     z-index: 2147483646;
 
     width:
 
@@ -4194,4 +4169,38 @@ onBeforeUnmount(
 
 }
 
+/* =========================================
+   ICÔNE NOTIFICATIONS RONDE
+========================================= */
+
+.announcement-bell__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 50px;
+    height: 50px;
+
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+/* IMAGE FIXE OU GIF */
+.announcement-bell__image {
+    display: block;
+
+    width: 100%;
+    height: 100%;
+
+    border-radius: 50%;
+    object-fit: cover;
+
+    pointer-events: none;
+}
+
+/* Supprimer l'ancienne animation */
+.announcement-bell__button.has-notifications
+.announcement-bell__icon {
+    animation: none;
+}
 </style>
