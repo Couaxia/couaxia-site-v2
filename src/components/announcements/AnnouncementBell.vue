@@ -1618,8 +1618,8 @@ onBeforeUnmount(
                 <img
                     :src="
                         notificationCount > 0
-                            ? 'src/assets/styles/notifications/dinkdonk.gif'
-                            : 'src/assets/styles/notifications/dinkdonk.png'
+                             ? '/images/dinkdonk.gif'
+                             : '/images/dinkdonk.png'
                     "
                     alt=""
                     class="announcement-bell__image"
