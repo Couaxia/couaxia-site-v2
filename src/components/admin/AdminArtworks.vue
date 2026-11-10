@@ -20,6 +20,10 @@ import type {
     ArtworkPayload
 } from "../../services/admin.service";
 
+import ArtistCreditsEditor from "../common/ArtistCreditsEditor.vue";
+import { getArtworkCredits, saveArtworkCredits } from "../../services/artistCredits.service";
+import type { ArtistCredit } from "../../types/artist-credit.types";
+
 
 /* =========================================================
    TYPES
@@ -159,6 +163,73 @@ const successMessage =
         ""
     );
 
+
+/* =========================================================
+   MULTIPLE ARTIST CREDITS
+========================================================= */
+
+// Crédits de toutes les illustrations pour les cartes d'administration.
+const artworkCreditsById = ref<Record<string, ArtistCredit[]>>({});
+let artworkCreditsLoadVersion = 0;
+
+function creditsForAdminArtwork(artwork: AdminArtwork): ArtistCredit[] {
+    const saved = artworkCreditsById.value[artwork.id];
+    if (saved !== undefined) return saved;
+    return artwork.artist ? [{
+        artistName: artwork.artist,
+        contribution: artwork.artist_role ?? "",
+        links: artwork.artist_url ? [{ label: "Profil", url: artwork.artist_url }] : [],
+        sortOrder: 0
+    }] : [];
+}
+
+async function loadAllArtworkCredits(items: AdminArtwork[]) {
+    const version = ++artworkCreditsLoadVersion;
+    const ids = items.map(item => item.id);
+    // Plusieurs requêtes en parallèle, mais avec une limite pour ménager l'API.
+    let nextIndex = 0;
+    const worker = async () => {
+        while (nextIndex < ids.length && version === artworkCreditsLoadVersion) {
+            const id = ids[nextIndex++];
+            if (!id) continue;
+            try {
+                const credits = await getArtworkCredits(id);
+                if (version !== artworkCreditsLoadVersion) return;
+                artworkCreditsById.value = { ...artworkCreditsById.value, [id]: credits };
+            } catch (error) {
+                console.warn(`Crédits indisponibles pour ${id}`, error);
+                // En cas d'échec, l'ancien champ artiste reste affiché.
+            }
+        }
+    };
+    await Promise.all(Array.from({ length: Math.min(5, ids.length) }, () => worker()));
+}
+
+const artistCredits = ref<ArtistCredit[]>([]);
+const loadingCredits = ref(false);
+const creditsLoaded = ref(true);
+let creditsRequestId = 0;
+
+async function loadCreditsForArtwork(artworkId: string) {
+    const requestId = ++creditsRequestId;
+    loadingCredits.value = true;
+    creditsLoaded.value = false;
+
+    try {
+        const credits = await getArtworkCredits(artworkId);
+        if (requestId !== creditsRequestId) return;
+        artistCredits.value = credits;
+        artworkCreditsById.value = { ...artworkCreditsById.value, [artworkId]: credits };
+        creditsLoaded.value = true;
+    } catch (error) {
+        if (requestId !== creditsRequestId) return;
+        errorMessage.value = error instanceof Error
+            ? `Impossible de charger les crédits : ${error.message}`
+            : "Impossible de charger les crédits artistiques.";
+    } finally {
+        if (requestId === creditsRequestId) loadingCredits.value = false;
+    }
+}
 
 /* =========================================================
    UPLOAD FILE
@@ -797,13 +868,8 @@ const canSave =
             }
 
 
-            if (
-                !form.value.artist
-                    .trim()
-            ) {
-
+            if (loadingCredits.value || !creditsLoaded.value) {
                 return false;
-
             }
 
 
@@ -907,6 +973,8 @@ async function loadArtworks() {
         artworks.value =
             await getAdminArtworks();
 
+        void loadAllArtworkCredits(artworks.value);
+
     }
     catch (
         error
@@ -939,6 +1007,11 @@ async function loadArtworks() {
 ========================================================= */
 
 function openCreate() {
+
+    ++creditsRequestId;
+    artistCredits.value = [];
+    loadingCredits.value = false;
+    creditsLoaded.value = true;
 
     selectedArtwork.value =
         null;
@@ -981,6 +1054,9 @@ function openEdit(
     artwork:
         AdminArtwork
 ) {
+
+    artistCredits.value = [];
+    void loadCreditsForArtwork(artwork.id);
 
     selectedArtwork.value =
         artwork;
@@ -1119,6 +1195,11 @@ function openEdit(
 
 function closeForm() {
 
+    ++creditsRequestId;
+    artistCredits.value = [];
+    loadingCredits.value = false;
+    creditsLoaded.value = true;
+
     if (
         saving.value
     ) {
@@ -1158,6 +1239,11 @@ function closeForm() {
 ========================================================= */
 
 function forceCloseForm() {
+
+    ++creditsRequestId;
+    artistCredits.value = [];
+    loadingCredits.value = false;
+    creditsLoaded.value = true;
 
     formOpen.value =
         false;
@@ -1275,14 +1361,12 @@ function createPayload():
             ),
 
         artist:
-            form.value.artist
-                .trim(),
+            artistCredits.value[0]?.artistName.trim()
+            || "",
 
         artist_role:
-            form.value.artist_role
-                .trim()
-            ||
-            null,
+            artistCredits.value[0]?.contribution.trim()
+            || null,
 
         description:
             form.value.description
@@ -1309,10 +1393,8 @@ function createPayload():
             imageMessages,
 
         artist_url:
-            form.value.artist_url
-                .trim()
-            ||
-            null,
+            artistCredits.value[0]?.links.find(link => link.url.trim())?.url.trim()
+            || null,
 
         button_text:
             form.value.button_text
@@ -1387,6 +1469,10 @@ async function saveArtwork() {
         false;
 
     try {
+        if (!creditsLoaded.value) {
+            throw new Error("Les crédits n'ont pas été chargés. Réessaie avant d'enregistrer.");
+        }
+
 
         if (
             selectedFile.value
@@ -1430,6 +1516,8 @@ async function saveArtwork() {
             databaseSaved =
                 true;
 
+            await saveArtworkCredits(selectedArtwork.value.id, artistCredits.value);
+
             if (
                 newlyUploadedUrl
                 &&
@@ -1452,12 +1540,14 @@ async function saveArtwork() {
         }
         else {
 
-            await createAdminArtwork(
+            const createdArtwork = await createAdminArtwork(
                 payload
             );
 
             databaseSaved =
                 true;
+
+            await saveArtworkCredits(createdArtwork.id, artistCredits.value);
 
             successMessage.value =
                 "La création a bien été ajoutée. 🎨";
@@ -2282,26 +2372,20 @@ onMounted(
 
                             <div>
 
-                                <span>
-
-                                    {{
-                                        artwork.artist_role
-                                        ||
-                                        "Artiste"
-                                    }}
-
-                                </span>
-
-
-                                <h3>
-
-                                    {{
-                                        artwork.artist
-                                        ||
-                                        "Artiste inconnu"
-                                    }}
-
-                                </h3>
+                                <div
+                                    v-if="creditsForAdminArtwork(artwork).length"
+                                    class="admin-artwork-card__artists"
+                                >
+                                    <div
+                                        v-for="(credit, creditIndex) in creditsForAdminArtwork(artwork)"
+                                        :key="credit.id || creditIndex"
+                                        class="admin-artwork-card__artist-entry"
+                                    >
+                                        <span>{{ credit.contribution || "Artiste" }}</span>
+                                        <h3>{{ credit.artistName }}</h3>
+                                    </div>
+                                </div>
+                                <h3 v-else>Artiste non renseigné</h3>
 
                             </div>
 
@@ -2637,9 +2721,9 @@ onMounted(
                                 <strong>
 
                                     {{
-                                        form.artist
+                                        artistCredits[0]?.artistName
                                         ||
-                                        "Artiste"
+                                        "Artiste non renseigné"
                                     }}
 
                                 </strong>
@@ -2660,86 +2744,24 @@ onMounted(
                                 class="admin-artwork-form__fields"
                             >
 
-                                <div
-                                    class="admin-form__row"
-                                >
-
-                                    <div
-                                        class="admin-field"
-                                    >
-
-                                        <label
-                                            for="artwork-artist"
-                                        >
-                                            Artiste *
-                                        </label>
-
-
-                                        <input
-                                            id="artwork-artist"
-                                            v-model="
-                                                form.artist
-                                            "
-                                            type="text"
-                                            required
-                                            placeholder="Nom de l'artiste"
-                                        >
-
-                                    </div>
-
-
-                                    <div
-                                        class="admin-field"
-                                    >
-
-                                        <label
-                                            for="artwork-role"
-                                        >
-                                            Rôle
-                                        </label>
-
-
-                                        <input
-                                            id="artwork-role"
-                                            v-model="
-                                                form.artist_role
-                                            "
-                                            type="text"
-                                            placeholder="Illustratrice, Rigger..."
-                                        >
-
-                                    </div>
-
+                                <div class="admin-credits-editor">
+                                    <p v-if="loadingCredits" class="admin-credits-editor__notice">
+                                        Chargement des crédits artistiques...
+                                    </p>
+                                    <template v-else-if="creditsLoaded">
+                                        <ArtistCreditsEditor v-model="artistCredits" :disabled="saving" />
+                                    </template>
+                                    <p v-else class="admin-credits-editor__notice">
+                                        Impossible de charger les crédits. Ferme et rouvre cette illustration.
+                                    </p>
                                 </div>
 
-
-                                <div
-                                    class="admin-field"
-                                >
-
-                                    <label
-                                        for="artwork-id"
-                                    >
-                                        ID de l'art
-                                    </label>
-
-
-                                    <input
-                                        id="artwork-id"
-                                        v-model="
-                                            form.art_id
-                                        "
-                                        type="text"
-                                        placeholder="Laisse vide pour générer automatiquement"
-                                    >
-
-
-                                    <small>
-                                        Facultatif — un identifiant unique sera généré automatiquement.
-                                    </small>
-
+                                <div class="admin-field">
+                                    <label for="artwork-id">ID de l'art</label>
+                                    <input id="artwork-id" v-model="form.art_id" type="text"
+                                        placeholder="Laisse vide pour générer automatiquement">
+                                    <small>Facultatif — un identifiant unique sera généré automatiquement.</small>
                                 </div>
-
 
                                 <div
                                     class="admin-field"
@@ -2935,29 +2957,6 @@ onMounted(
                         <div
                             class="admin-form__row"
                         >
-
-                            <div
-                                class="admin-field"
-                            >
-
-                                <label
-                                    for="artwork-artist-url"
-                                >
-                                    Lien artiste
-                                </label>
-
-
-                                <input
-                                    id="artwork-artist-url"
-                                    v-model="
-                                        form.artist_url
-                                    "
-                                    type="url"
-                                    placeholder="https://..."
-                                >
-
-                            </div>
-
 
                             <div
                                 class="admin-field"

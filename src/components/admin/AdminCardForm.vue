@@ -26,6 +26,14 @@ import type {
 } from "../../services/cardAdmin.service";
 
 
+import ArtistCreditsEditor from "../common/ArtistCreditsEditor.vue";
+import type { ArtistCredit } from "../../types/artist-credit.types";
+import {
+    getCardArtistCredits,
+    saveCardArtistCredits
+} from "../../services/artistCredits.service";
+
+
 /* =========================================================
    PROPS / EMITS
 ========================================================= */
@@ -412,6 +420,51 @@ const backDragging =
         false
     );
 
+
+/* =========================================================
+   ARTIST CREDITS
+========================================================= */
+
+const artistCredits = ref<ArtistCredit[]>([]);
+const loadingCredits = ref(false);
+const creditsLoaded = ref(true);
+
+// Si la carte a été créée mais que les crédits ont échoué,
+// une nouvelle tentative modifie la carte au lieu d'en créer une seconde.
+const pendingSavedCard = ref<Card | null>(null);
+
+async function loadCreditsForCard(cardId: string) {
+    loadingCredits.value = true;
+    creditsLoaded.value = false;
+
+    try {
+        artistCredits.value = await getCardArtistCredits(cardId);
+        creditsLoaded.value = true;
+    } catch (error) {
+        errorMessage.value = error instanceof Error
+            ? `Impossible de charger les crédits : ${error.message}`
+            : "Impossible de charger les crédits artistiques.";
+    } finally {
+        loadingCredits.value = false;
+    }
+}
+
+function normalizedCredits(): ArtistCredit[] {
+    return artistCredits.value
+        .filter(credit => credit.artistName.trim())
+        .map((credit, index) => ({
+            ...credit,
+            artistName: credit.artistName.trim(),
+            contribution: credit.contribution.trim(),
+            links: credit.links
+                .filter(link => link.url.trim())
+                .map(link => ({
+                    label: link.label.trim(),
+                    url: link.url.trim()
+                })),
+            sortOrder: index
+        }));
+}
 
 /* =========================================================
    COMPUTED
@@ -1115,6 +1168,10 @@ async function submitForm() {
 
     }
 
+    if (!creditsLoaded.value || loadingCredits.value) {
+        errorMessage.value = "Les crédits ne sont pas encore chargés. Réessaie après leur chargement.";
+        return;
+    }
 
     errorMessage.value =
         "";
@@ -1190,6 +1247,9 @@ async function submitForm() {
         }
 
 
+        const creditsToSave = normalizedCredits();
+        const firstArtist = creditsToSave[0];
+
         const payload:
             CardAdminInput = {
 
@@ -1224,16 +1284,10 @@ async function submitForm() {
                     null,
 
                 artist:
-                    form.value.artist
-                        .trim()
-                    ||
-                    null,
+                    firstArtist?.artistName ?? null,
 
                 artistUrl:
-                    form.value.artistUrl
-                        .trim()
-                    ||
-                    null,
+                    firstArtist?.links[0]?.url ?? null,
 
                 weight:
                     Number(
@@ -1275,15 +1329,11 @@ async function submitForm() {
             Card;
 
 
-        if (
-            props.card
-        ) {
+        const existingCard = props.card ?? pendingSavedCard.value;
 
-            savedCard =
-                await updateCard(
-                    props.card.id,
-                    payload
-                );
+        if (existingCard) {
+
+            savedCard = await updateCard(existingCard.id, payload);
 
         }
         else {
@@ -1295,6 +1345,11 @@ async function submitForm() {
 
         }
 
+
+        pendingSavedCard.value = savedCard;
+
+        // Ne fermer le formulaire qu'une fois les crédits enregistrés.
+        await saveCardArtistCredits(savedCard.id, creditsToSave);
 
         emit(
             "saved",
@@ -1362,6 +1417,7 @@ onMounted(
         ) {
 
             loadExistingCard();
+            await loadCreditsForCard(props.card.id);
 
         }
         else {
@@ -1731,49 +1787,28 @@ onBeforeUnmount(
 
 
                 <!-- =====================================
-                     ARTIST
+                     MULTIPLE ARTIST CREDITS
                 ====================================== -->
 
                 <section class="card-form__section">
+                    <h3>🎨 Crédits artistiques (facultatif)</h3>
+                    <p class="card-form__section-description">
+                        Ajoute autant d'artistes et de liens que nécessaire.
+                    </p>
 
-                    <h3>
-                        🎨 Artiste
-                    </h3>
+                    <p v-if="loadingCredits" class="card-form__hint">
+                        Chargement des crédits existants...
+                    </p>
 
+                    <ArtistCreditsEditor
+                        v-else-if="creditsLoaded"
+                        v-model="artistCredits"
+                        :disabled="saving"
+                    />
 
-                    <div class="card-form__grid">
-
-                        <label class="card-form__field">
-
-                            <span>
-                                Artiste
-                            </span>
-
-                            <input
-                                v-model="form.artist"
-                                type="text"
-                                placeholder="@artiste"
-                            >
-
-                        </label>
-
-
-                        <label class="card-form__field">
-
-                            <span>
-                                Lien de l'artiste
-                            </span>
-
-                            <input
-                                v-model="form.artistUrl"
-                                type="url"
-                                placeholder="https://..."
-                            >
-
-                        </label>
-
-                    </div>
-
+                    <p v-else class="card-form__message card-form__message--error">
+                        Impossible de charger les crédits. Ferme puis rouvre la carte pour réessayer.
+                    </p>
                 </section>
 
 
@@ -2074,9 +2109,9 @@ onBeforeUnmount(
 
 
                         <small
-                            v-if="form.artist"
+                            v-if="artistCredits.some(credit => credit.artistName.trim())"
                         >
-                            🎨 {{ form.artist }}
+                            🎨 {{ artistCredits.filter(credit => credit.artistName.trim()).map(credit => credit.artistName.trim()).join(" · ") }}
                         </small>
 
                     </div>
@@ -2128,6 +2163,10 @@ onBeforeUnmount(
                     saving
                     ||
                     loadingNumber
+                    ||
+                    loadingCredits
+                    ||
+                    !creditsLoaded
                 "
             >
                 {{

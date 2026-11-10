@@ -23,6 +23,8 @@ import {
     supabase
 } from "../../lib/supabase";
 
+import type { ArtistCredit } from "../../types/artist-credit.types";
+
 
 /* =========================================================
    TYPES
@@ -42,6 +44,8 @@ type CreditsFilterValue =
 
 interface GalleryArtwork
     extends CreditArtwork {
+
+    artistCredits: ArtistCredit[];
 
     tags:
         string[];
@@ -428,6 +432,8 @@ function mapCreditToArtwork(
 
         imageUrl:
             credit.image_url,
+
+        artistCredits: [],
 
         artistName:
             credit.artist
@@ -1029,6 +1035,75 @@ function subscribeToAuth() {
 
 }
 
+/* =========================================================
+   LOAD PUBLIC ARTIST CREDITS
+========================================================= */
+
+async function loadPublicArtistCredits(): Promise<void> {
+
+    if (artworks.value.length === 0) {
+        return;
+    }
+
+    const artworkIds = artworks.value.map(
+        artwork => String(artwork.id)
+    );
+
+    const { data, error } = await supabase
+        .from("artwork_credits")
+        .select(
+            "id,artwork_id,artist_name,contribution,links,sort_order"
+        )
+        .in("artwork_id", artworkIds)
+        .order("sort_order", { ascending: true });
+
+    if (error) {
+        console.error(
+            "Erreur chargement crédits artistiques :",
+            error
+        );
+        return;
+    }
+
+    const creditsByArtwork = new Map<
+        string,
+        CreditArtwork["artistCredits"]
+    >();
+
+    for (const row of data ?? []) {
+
+        const artworkId = String(row.artwork_id);
+
+        const existingCredits =
+            creditsByArtwork.get(artworkId) ?? [];
+
+        existingCredits.push({
+            id: row.id,
+            artistName: row.artist_name,
+            contribution: row.contribution ?? "",
+            links: Array.isArray(row.links)
+                ? row.links
+                : [],
+            sortOrder: row.sort_order ?? 0
+        });
+
+        creditsByArtwork.set(
+            artworkId,
+            existingCredits
+        );
+    }
+
+    for (const artwork of artworks.value) {
+
+        const credits = creditsByArtwork.get(
+            String(artwork.id)
+        );
+
+        if (credits && credits.length > 0) {
+            artwork.artistCredits = credits;
+        }
+    }
+}
 
 /* =========================================================
    LOAD ARTWORKS
@@ -1062,6 +1137,9 @@ async function loadArtworks():
                             artwork.imageUrl
                         )
                 );
+
+
+        await loadPublicArtistCredits();
 
 
         await loadCurrentUser();

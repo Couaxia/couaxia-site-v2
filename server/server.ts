@@ -4,7 +4,6 @@
 
 import "dotenv/config";
 
-
 import express from "express";
 
 import cors from "cors";
@@ -22,6 +21,14 @@ import twitchRoutes
 
 import cardsAdminRoutes
     from "./routes/cards-admin.routes.js";
+
+
+/* =========================================================
+   NEW — ARTIST CREDITS ROUTES
+========================================================= */
+
+import artistCreditsRoutes
+    from "./routes/artist-credits.routes.js";
 
 
 /* =========================================================
@@ -235,6 +242,22 @@ app.use(
 
 
 /* =========================================================
+   NEW — API ADMIN ARTIST CREDITS
+
+   GET /api/admin/artist-credits/artwork/:id
+   PUT /api/admin/artist-credits/artwork/:id
+
+   GET /api/admin/artist-credits/card/:id
+   PUT /api/admin/artist-credits/card/:id
+========================================================= */
+
+app.use(
+    "/api/admin/artist-credits",
+    artistCreditsRoutes
+);
+
+
+/* =========================================================
    API FALLBACK
 ========================================================= */
 
@@ -399,11 +422,7 @@ app.use(
                     "Une erreur interne est survenue.",
 
                 error:
-                    error instanceof Error
-                        ?
-                        error.message
-                        :
-                        "Erreur inconnue"
+                    "Une erreur interne est survenue."
 
             });
 
@@ -443,6 +462,15 @@ app.listen(
 
         console.log(
             `🃏 Admin cards : http://localhost:${PORT}/api/admin/cards`
+        );
+
+
+        /* =============================================
+           NEW — ARTIST CREDITS
+        ============================================= */
+
+        console.log(
+            `🎨 Artist credits : http://localhost:${PORT}/api/admin/artist-credits`
         );
 
 
