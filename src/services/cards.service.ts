@@ -16,6 +16,7 @@ import type {
     CardCategory,
     CardCollection,
     CardCollectionStats,
+    CardOrientation,
     CardPack,
     CardRarity,
     CardRarityConfig,
@@ -26,115 +27,84 @@ import type {
 /* =========================================================
    DATABASE TYPES
 
-   Les noms ici correspondent directement
-   aux colonnes PostgreSQL / Supabase.
+   Les noms correspondent aux colonnes
+   PostgreSQL / Supabase.
 ========================================================= */
 
 interface DatabaseCard {
-
     id: string;
-
     number: number;
-
     name: string;
-
     description: string | null;
 
     rarity: CardRarity;
-
     category: CardCategory;
 
-    image_url: string;
+    // Orientation verticale ou horizontale
+    orientation: CardOrientation;
 
+    image_url: string;
     back_image_url: string | null;
 
     artist: string | null;
-
     artist_url: string | null;
 
     weight: number;
 
     status:
-        "draft"
+        | "draft"
         | "active"
         | "disabled";
 
     limited: boolean;
 
     available_from: string | null;
-
     available_until: string | null;
 
     reveal_sound_url: string | null;
-
     reveal_animation: string | null;
 
     created_at: string;
-
     updated_at: string;
 }
 
 
 interface DatabaseCardRarity {
-
     id: CardRarity;
-
     name: string;
-
     weight: number;
-
     color: string;
-
     secondary_color: string | null;
-
     reveal_sound_url: string | null;
-
     reveal_animation: string | null;
 }
 
 
 interface DatabaseCardPack {
-
     id: string;
-
     name: string;
-
     description: string | null;
-
     image_url: string | null;
-
     cards_per_pack: number;
-
     active: boolean;
-
     limited: boolean;
-
     available_from: string | null;
-
     available_until: string | null;
-
     created_at: string;
-
     updated_at: string;
 }
 
 
 interface DatabaseUserCard {
-
     id: string;
-
     user_id: string;
-
     card_id: string;
-
     quantity: number;
-
     first_obtained_at: string;
-
     last_obtained_at: string;
 
     cards:
-        DatabaseCard
+        | DatabaseCard
         | DatabaseCard[]
         | null;
 }
@@ -151,9 +121,9 @@ interface DatabaseUserCard {
        imageUrl
        createdAt
 
-   On fait la conversion ici pour que le reste
-   du site n'ait jamais besoin de connaître
-   les noms SQL.
+   L'orientation reste identique :
+       portrait
+       landscape
 ========================================================= */
 
 function mapCard(
@@ -161,66 +131,73 @@ function mapCard(
 ): Card {
 
     return {
+        id: card.id,
 
-        id:
-            card.id,
+        number: card.number,
 
-        number:
-            card.number,
+        name: card.name,
 
-        name:
-            card.name,
+        description: card.description,
 
-        description:
-            card.description,
+        rarity: card.rarity,
 
-        rarity:
-            card.rarity,
+        category: card.category,
 
-        category:
-            card.category,
+        /* =========================================
+           ORIENTATION
+        ========================================= */
 
-        imageUrl:
-            card.image_url,
+        orientation:
+            card.orientation === "landscape"
+                ? "landscape"
+                : "portrait",
 
-        backImageUrl:
-            card.back_image_url,
+        /* =========================================
+           IMAGES
+        ========================================= */
 
-        artist:
-            card.artist,
+        imageUrl: card.image_url,
 
-        artistUrl:
-            card.artist_url,
+        backImageUrl: card.back_image_url,
 
-        weight:
-            card.weight,
+        /* =========================================
+           ARTISTE
+        ========================================= */
 
-        status:
-            card.status,
+        artist: card.artist,
 
-        limited:
-            card.limited,
+        artistUrl: card.artist_url,
 
-        availableFrom:
-            card.available_from,
+        /* =========================================
+           PARAMÈTRES
+        ========================================= */
 
-        availableUntil:
-            card.available_until,
+        weight: card.weight,
 
-        revealSoundUrl:
-            card.reveal_sound_url,
+        status: card.status,
 
-        revealAnimation:
-            card.reveal_animation,
+        limited: card.limited,
 
-        createdAt:
-            card.created_at,
+        availableFrom: card.available_from,
 
-        updatedAt:
-            card.updated_at
+        availableUntil: card.available_until,
 
+        /* =========================================
+           ANIMATIONS
+        ========================================= */
+
+        revealSoundUrl: card.reveal_sound_url,
+
+        revealAnimation: card.reveal_animation,
+
+        /* =========================================
+           DATES
+        ========================================= */
+
+        createdAt: card.created_at,
+
+        updatedAt: card.updated_at
     };
-
 }
 
 
@@ -233,30 +210,20 @@ function mapRarity(
 ): CardRarityConfig {
 
     return {
+        id: rarity.id,
 
-        id:
-            rarity.id,
+        name: rarity.name,
 
-        name:
-            rarity.name,
+        weight: rarity.weight,
 
-        weight:
-            rarity.weight,
+        color: rarity.color,
 
-        color:
-            rarity.color,
+        secondaryColor: rarity.secondary_color,
 
-        secondaryColor:
-            rarity.secondary_color,
+        revealSoundUrl: rarity.reveal_sound_url,
 
-        revealSoundUrl:
-            rarity.reveal_sound_url,
-
-        revealAnimation:
-            rarity.reveal_animation
-
+        revealAnimation: rarity.reveal_animation
     };
-
 }
 
 
@@ -269,42 +236,28 @@ function mapPack(
 ): CardPack {
 
     return {
+        id: pack.id,
 
-        id:
-            pack.id,
+        name: pack.name,
 
-        name:
-            pack.name,
+        description: pack.description,
 
-        description:
-            pack.description,
+        imageUrl: pack.image_url,
 
-        imageUrl:
-            pack.image_url,
+        cardsPerPack: pack.cards_per_pack,
 
-        cardsPerPack:
-            pack.cards_per_pack,
+        active: pack.active,
 
-        active:
-            pack.active,
+        limited: pack.limited,
 
-        limited:
-            pack.limited,
+        availableFrom: pack.available_from,
 
-        availableFrom:
-            pack.available_from,
+        availableUntil: pack.available_until,
 
-        availableUntil:
-            pack.available_until,
+        createdAt: pack.created_at,
 
-        createdAt:
-            pack.created_at,
-
-        updatedAt:
-            pack.updated_at
-
+        updatedAt: pack.updated_at
     };
-
 }
 
 
@@ -324,23 +277,17 @@ export async function getCards():
     const {
         data,
         error
-    } =
-        await supabase
-            .from("cards")
-            .select("*")
-            .order(
-                "number",
-                {
-                    ascending:
-                        true
-                }
-            );
+    } = await supabase
+        .from("cards")
+        .select("*")
+        .order(
+            "number",
+            {
+                ascending: true
+            }
+        );
 
-
-    if (
-        error
-    ) {
-
+    if (error) {
         console.error(
             "[Cards] Impossible de récupérer les cartes :",
             error
@@ -349,21 +296,13 @@ export async function getCards():
         throw new Error(
             "Impossible de récupérer les cartes."
         );
-
     }
 
+    const cards = (
+        data ?? []
+    ) as DatabaseCard[];
 
-    const cards =
-        (
-            data ??
-            []
-        ) as DatabaseCard[];
-
-
-    return cards.map(
-        mapCard
-    );
-
+    return cards.map(mapCard);
 }
 
 
@@ -373,27 +312,21 @@ export async function getCards():
 
 export async function getCardById(
     cardId: string
-):
-    Promise<Card | null> {
+): Promise<Card | null> {
 
     const {
         data,
         error
-    } =
-        await supabase
-            .from("cards")
-            .select("*")
-            .eq(
-                "id",
-                cardId
-            )
-            .maybeSingle();
+    } = await supabase
+        .from("cards")
+        .select("*")
+        .eq(
+            "id",
+            cardId
+        )
+        .maybeSingle();
 
-
-    if (
-        error
-    ) {
-
+    if (error) {
         console.error(
             "[Cards] Impossible de récupérer la carte :",
             error
@@ -402,23 +335,15 @@ export async function getCardById(
         throw new Error(
             "Impossible de récupérer la carte."
         );
-
     }
 
-
-    if (
-        !data
-    ) {
-
+    if (!data) {
         return null;
-
     }
-
 
     return mapCard(
         data as DatabaseCard
     );
-
 }
 
 
@@ -431,27 +356,21 @@ export async function getCardById(
 
 export async function getCardByNumber(
     cardNumber: number
-):
-    Promise<Card | null> {
+): Promise<Card | null> {
 
     const {
         data,
         error
-    } =
-        await supabase
-            .from("cards")
-            .select("*")
-            .eq(
-                "number",
-                cardNumber
-            )
-            .maybeSingle();
+    } = await supabase
+        .from("cards")
+        .select("*")
+        .eq(
+            "number",
+            cardNumber
+        )
+        .maybeSingle();
 
-
-    if (
-        error
-    ) {
-
+    if (error) {
         console.error(
             "[Cards] Impossible de récupérer la carte :",
             error
@@ -460,23 +379,15 @@ export async function getCardByNumber(
         throw new Error(
             "Impossible de récupérer la carte."
         );
-
     }
 
-
-    if (
-        !data
-    ) {
-
+    if (!data) {
         return null;
-
     }
-
 
     return mapCard(
         data as DatabaseCard
     );
-
 }
 
 
@@ -486,33 +397,26 @@ export async function getCardByNumber(
 
 export async function getCardsByRarity(
     rarity: CardRarity
-):
-    Promise<Card[]> {
+): Promise<Card[]> {
 
     const {
         data,
         error
-    } =
-        await supabase
-            .from("cards")
-            .select("*")
-            .eq(
-                "rarity",
-                rarity
-            )
-            .order(
-                "number",
-                {
-                    ascending:
-                        true
-                }
-            );
+    } = await supabase
+        .from("cards")
+        .select("*")
+        .eq(
+            "rarity",
+            rarity
+        )
+        .order(
+            "number",
+            {
+                ascending: true
+            }
+        );
 
-
-    if (
-        error
-    ) {
-
+    if (error) {
         console.error(
             "[Cards] Impossible de filtrer les cartes :",
             error
@@ -521,55 +425,48 @@ export async function getCardsByRarity(
         throw new Error(
             "Impossible de récupérer les cartes."
         );
-
     }
 
-
     return (
-        (
-            data ??
-            []
-        ) as DatabaseCard[]
-    ).map(
-        mapCard
-    );
-
+        (data ?? []) as DatabaseCard[]
+    ).map(mapCard);
 }
 
 
 /* =========================================================
    GET CARDS BY CATEGORY
+
+   Catégories :
+   - couaxia
+   - natsu
+   - character
+   - lore
+   - event
+   - special
 ========================================================= */
 
 export async function getCardsByCategory(
     category: CardCategory
-):
-    Promise<Card[]> {
+): Promise<Card[]> {
 
     const {
         data,
         error
-    } =
-        await supabase
-            .from("cards")
-            .select("*")
-            .eq(
-                "category",
-                category
-            )
-            .order(
-                "number",
-                {
-                    ascending:
-                        true
-                }
-            );
+    } = await supabase
+        .from("cards")
+        .select("*")
+        .eq(
+            "category",
+            category
+        )
+        .order(
+            "number",
+            {
+                ascending: true
+            }
+        );
 
-
-    if (
-        error
-    ) {
-
+    if (error) {
         console.error(
             "[Cards] Impossible de filtrer les cartes :",
             error
@@ -578,19 +475,11 @@ export async function getCardsByCategory(
         throw new Error(
             "Impossible de récupérer les cartes."
         );
-
     }
 
-
     return (
-        (
-            data ??
-            []
-        ) as DatabaseCard[]
-    ).map(
-        mapCard
-    );
-
+        (data ?? []) as DatabaseCard[]
+    ).map(mapCard);
 }
 
 
@@ -604,23 +493,17 @@ export async function getCardRarities():
     const {
         data,
         error
-    } =
-        await supabase
-            .from("card_rarities")
-            .select("*")
-            .order(
-                "weight",
-                {
-                    ascending:
-                        false
-                }
-            );
+    } = await supabase
+        .from("card_rarities")
+        .select("*")
+        .order(
+            "weight",
+            {
+                ascending: false
+            }
+        );
 
-
-    if (
-        error
-    ) {
-
+    if (error) {
         console.error(
             "[Cards] Impossible de récupérer les raretés :",
             error
@@ -629,19 +512,11 @@ export async function getCardRarities():
         throw new Error(
             "Impossible de récupérer les raretés."
         );
-
     }
 
-
     return (
-        (
-            data ??
-            []
-        ) as DatabaseCardRarity[]
-    ).map(
-        mapRarity
-    );
-
+        (data ?? []) as DatabaseCardRarity[]
+    ).map(mapRarity);
 }
 
 
@@ -655,23 +530,17 @@ export async function getCardPacks():
     const {
         data,
         error
-    } =
-        await supabase
-            .from("card_packs")
-            .select("*")
-            .order(
-                "created_at",
-                {
-                    ascending:
-                        true
-                }
-            );
+    } = await supabase
+        .from("card_packs")
+        .select("*")
+        .order(
+            "created_at",
+            {
+                ascending: true
+            }
+        );
 
-
-    if (
-        error
-    ) {
-
+    if (error) {
         console.error(
             "[Cards] Impossible de récupérer les packs :",
             error
@@ -680,19 +549,11 @@ export async function getCardPacks():
         throw new Error(
             "Impossible de récupérer les packs."
         );
-
     }
 
-
     return (
-        (
-            data ??
-            []
-        ) as DatabaseCardPack[]
-    ).map(
-        mapPack
-    );
-
+        (data ?? []) as DatabaseCardPack[]
+    ).map(mapPack);
 }
 
 
@@ -702,27 +563,21 @@ export async function getCardPacks():
 
 export async function getCardPackById(
     packId: string
-):
-    Promise<CardPack | null> {
+): Promise<CardPack | null> {
 
     const {
         data,
         error
-    } =
-        await supabase
-            .from("card_packs")
-            .select("*")
-            .eq(
-                "id",
-                packId
-            )
-            .maybeSingle();
+    } = await supabase
+        .from("card_packs")
+        .select("*")
+        .eq(
+            "id",
+            packId
+        )
+        .maybeSingle();
 
-
-    if (
-        error
-    ) {
-
+    if (error) {
         console.error(
             "[Cards] Impossible de récupérer le pack :",
             error
@@ -731,23 +586,15 @@ export async function getCardPackById(
         throw new Error(
             "Impossible de récupérer le pack."
         );
-
     }
 
-
-    if (
-        !data
-    ) {
-
+    if (!data) {
         return null;
-
     }
-
 
     return mapPack(
         data as DatabaseCardPack
     );
-
 }
 
 
@@ -761,29 +608,18 @@ async function getCurrentUserId():
     const {
         data,
         error
-    } =
-        await supabase.auth.getUser();
+    } = await supabase.auth.getUser();
 
-
-    if (
-        error
-    ) {
-
+    if (error) {
         console.error(
             "[Cards] Impossible de récupérer l'utilisateur :",
             error
         );
 
         return null;
-
     }
 
-
-    return (
-        data.user?.id ??
-        null
-    );
-
+    return data.user?.id ?? null;
 }
 
 
@@ -797,59 +633,46 @@ export async function getMyCardCollection():
     const userId =
         await getCurrentUserId();
 
-
-    if (
-        !userId
-    ) {
-
+    if (!userId) {
         return null;
-
     }
 
-
     /*
-        Supabase récupère ici user_cards
-        ainsi que la carte correspondante.
+       Supabase récupère ici user_cards
+       ainsi que la carte correspondante.
 
-        La relation est possible grâce à :
-
-        user_cards.card_id -> cards.id
+       Relation :
+       user_cards.card_id -> cards.id
     */
 
     const {
         data,
         error
-    } =
-        await supabase
-            .from("user_cards")
-            .select(`
-                id,
-                user_id,
-                card_id,
-                quantity,
-                first_obtained_at,
-                last_obtained_at,
-                cards (
-                    *
-                )
-            `)
-            .eq(
-                "user_id",
-                userId
+    } = await supabase
+        .from("user_cards")
+        .select(`
+            id,
+            user_id,
+            card_id,
+            quantity,
+            first_obtained_at,
+            last_obtained_at,
+            cards (
+                *
             )
-            .order(
-                "first_obtained_at",
-                {
-                    ascending:
-                        true
-                }
-            );
+        `)
+        .eq(
+            "user_id",
+            userId
+        )
+        .order(
+            "first_obtained_at",
+            {
+                ascending: true
+            }
+        );
 
-
-    if (
-        error
-    ) {
-
+    if (error) {
         console.error(
             "[Cards] Impossible de récupérer la collection :",
             error
@@ -858,84 +681,51 @@ export async function getMyCardCollection():
         throw new Error(
             "Impossible de récupérer ta collection."
         );
-
     }
 
-
-    const rows =
-        (
-            data ??
-            []
-        ) as unknown as DatabaseUserCard[];
-
+    const rows = (
+        data ?? []
+    ) as unknown as DatabaseUserCard[];
 
     const userCards:
-        UserCardWithDetails[] =
-        [];
+        UserCardWithDetails[] = [];
 
-
-    for (
-        const row of rows
-    ) {
+    for (const row of rows) {
 
         /*
-            Selon la génération de types Supabase,
-            une relation peut être renvoyée
-            comme objet ou tableau.
+           Une relation Supabase peut être
+           renvoyée comme objet ou tableau.
 
-            On normalise donc le résultat.
+           On normalise le résultat.
         */
 
         const databaseCard =
-            Array.isArray(
-                row.cards
-            )
-                ?
-                row.cards[0]
-                :
-                row.cards;
+            Array.isArray(row.cards)
+                ? row.cards[0]
+                : row.cards;
 
-
-        if (
-            !databaseCard
-        ) {
-
+        if (!databaseCard) {
             continue;
-
         }
 
+        userCards.push({
+            id: row.id,
 
-        userCards.push(
-            {
+            userId: row.user_id,
 
-                id:
-                    row.id,
+            cardId: row.card_id,
 
-                userId:
-                    row.user_id,
+            quantity: row.quantity,
 
-                cardId:
-                    row.card_id,
+            firstObtainedAt:
+                row.first_obtained_at,
 
-                quantity:
-                    row.quantity,
+            lastObtainedAt:
+                row.last_obtained_at,
 
-                firstObtainedAt:
-                    row.first_obtained_at,
-
-                lastObtainedAt:
-                    row.last_obtained_at,
-
-                card:
-                    mapCard(
-                        databaseCard
-                    )
-
-            }
-        );
-
+            card: mapCard(databaseCard)
+        });
     }
-
 
     /* =====================================================
        COLLECTION STATISTICS
@@ -947,77 +737,48 @@ export async function getMyCardCollection():
                 total,
                 userCard
             ) =>
-                total +
-                userCard.quantity,
+                total + userCard.quantity,
             0
         );
 
-
     /*
-        getCards() respecte RLS.
+       getCards() respecte RLS.
 
-        Donc totalCards correspond aux cartes
-        actuellement visibles/disponibles.
+       totalCards correspond aux cartes
+       actuellement visibles/disponibles.
     */
 
     const availableCards =
         await getCards();
 
-
     const totalCards =
         availableCards.length;
-
 
     const uniqueCards =
         userCards.length;
 
-
     const completion =
-        totalCards >
-        0
-            ?
-            Number(
+        totalCards > 0
+            ? Number(
                 (
-                    (
-                        uniqueCards /
-                        totalCards
-                    )
-                    *
-                    100
-                ).toFixed(
-                    1
-                )
+                    (uniqueCards / totalCards) * 100
+                ).toFixed(1)
             )
-            :
-            0;
-
+            : 0;
 
     const stats:
-        CardCollectionStats =
-        {
-
+        CardCollectionStats = {
             uniqueCards,
-
             totalCards,
-
             totalCopies,
-
             completion
-
         };
 
-
     return {
-
         userId,
-
-        cards:
-            userCards,
-
+        cards: userCards,
         stats
-
     };
-
 }
 
 
@@ -1027,58 +788,41 @@ export async function getMyCardCollection():
 
 export async function userOwnsCard(
     cardId: string
-):
-    Promise<boolean> {
+): Promise<boolean> {
 
     const userId =
         await getCurrentUserId();
 
-
-    if (
-        !userId
-    ) {
-
+    if (!userId) {
         return false;
-
     }
-
 
     const {
         data,
         error
-    } =
-        await supabase
-            .from("user_cards")
-            .select("id")
-            .eq(
-                "user_id",
-                userId
-            )
-            .eq(
-                "card_id",
-                cardId
-            )
-            .maybeSingle();
+    } = await supabase
+        .from("user_cards")
+        .select("id")
+        .eq(
+            "user_id",
+            userId
+        )
+        .eq(
+            "card_id",
+            cardId
+        )
+        .maybeSingle();
 
-
-    if (
-        error
-    ) {
-
+    if (error) {
         console.error(
             "[Cards] Vérification impossible :",
             error
         );
 
         return false;
-
     }
 
-
-    return Boolean(
-        data
-    );
-
+    return Boolean(data);
 }
 
 
@@ -1088,57 +832,39 @@ export async function userOwnsCard(
 
 export async function getMyCardQuantity(
     cardId: string
-):
-    Promise<number> {
+): Promise<number> {
 
     const userId =
         await getCurrentUserId();
 
-
-    if (
-        !userId
-    ) {
-
+    if (!userId) {
         return 0;
-
     }
-
 
     const {
         data,
         error
-    } =
-        await supabase
-            .from("user_cards")
-            .select("quantity")
-            .eq(
-                "user_id",
-                userId
-            )
-            .eq(
-                "card_id",
-                cardId
-            )
-            .maybeSingle();
+    } = await supabase
+        .from("user_cards")
+        .select("quantity")
+        .eq(
+            "user_id",
+            userId
+        )
+        .eq(
+            "card_id",
+            cardId
+        )
+        .maybeSingle();
 
-
-    if (
-        error
-    ) {
-
+    if (error) {
         console.error(
             "[Cards] Quantité impossible à récupérer :",
             error
         );
 
         return 0;
-
     }
 
-
-    return (
-        data?.quantity ??
-        0
-    );
-
+    return data?.quantity ?? 0;
 }

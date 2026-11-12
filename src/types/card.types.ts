@@ -22,12 +22,11 @@ export type CardRarity =
 
 export type CardCategory =
     | "couaxia"
-    | "natsu"
     | "character"
     | "lore"
     | "event"
-    | "special";
-
+    | "special"
+    | "terrain";
 
 /* =========================================================
    CARD STATUS
@@ -38,6 +37,9 @@ export type CardStatus =
     | "active"
     | "disabled";
 
+
+
+export type CardOrientation = "portrait" | "landscape";
 
 /* =========================================================
    CARD
@@ -201,6 +203,8 @@ export interface Card {
 
     updatedAt:
         string;
+
+    orientation: CardOrientation;    
 }
 
 

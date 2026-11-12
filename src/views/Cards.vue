@@ -113,14 +113,6 @@ const categories:
 
         {
             id:
-                "natsu",
-
-            name:
-                "Natsu"
-        },
-
-        {
-            id:
                 "character",
 
             name:

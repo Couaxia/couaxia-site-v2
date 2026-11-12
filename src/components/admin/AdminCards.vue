@@ -578,6 +578,10 @@ onMounted(loadCards);
                 v-for="card in filteredCards"
                 :key="card.id"
                 class="admin-card"
+                :class="{
+                    'admin-card--landscape':
+                        card.orientation === 'landscape'
+                }"
             >
 
                 <!-- IMAGE -->
@@ -1545,4 +1549,50 @@ onMounted(loadCards);
     color: #17111f;
 }
 
+
+/* =========================================
+   CARTES HORIZONTALES
+========================================= */
+
+.admin-card--landscape .admin-card__image {
+    aspect-ratio: 5 / 4;
+}
+
+.admin-card--landscape .admin-card__image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* =========================================
+   EFFET TERRAIN SPÉCIAL
+========================================= */
+
+.admin-card--landscape .admin-card__image {
+    position: relative;
+    overflow: hidden;
+
+    border: 3px solid #c084fc;
+
+    box-shadow:
+        0 0 12px rgba(192, 132, 252, 0.35),
+        inset 0 0 15px rgba(192, 132, 252, 0.15);
+}
+
+.admin-card--landscape .admin-card__image::after {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+
+    pointer-events: none;
+
+    background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.18),
+        transparent 35%,
+        transparent 65%,
+        rgba(192, 132, 252, 0.18)
+    );
+}
 </style>

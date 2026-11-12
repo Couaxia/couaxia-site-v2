@@ -5,23 +5,16 @@
 import type {
     Card,
     CardCategory,
+    CardOrientation,
     CardRarity,
     CardStatus
 } from "../types/card.types";
 
-import {
-    supabase
-} from "../lib/supabase";
+import { supabase } from "../lib/supabase";
 
 
 /* =========================================================
    API URL
-
-   En local :
-   VITE_API_URL=http://localhost:3000
-
-   En production :
-   VITE_API_URL=https://couaxia-hmbf.onrender.com
 ========================================================= */
 
 const API_URL =
@@ -34,55 +27,40 @@ const API_URL =
 ========================================================= */
 
 export interface CardAdminInput {
+    number: number;
 
-    number:
-        number;
+    name: string;
 
-    name:
-        string;
+    description: string | null;
 
-    description:
-        string | null;
+    rarity: CardRarity;
 
-    rarity:
-        CardRarity;
+    category: CardCategory;
 
-    category:
-        CardCategory;
+    // Nouveau : format vertical ou horizontal
+    orientation: CardOrientation;
 
-    imageUrl:
-        string;
+    imageUrl: string;
 
-    backImageUrl:
-        string | null;
+    backImageUrl: string | null;
 
-    artist:
-        string | null;
+    artist: string | null;
 
-    artistUrl:
-        string | null;
+    artistUrl: string | null;
 
-    weight:
-        number;
+    weight: number;
 
-    status:
-        CardStatus;
+    status: CardStatus;
 
-    limited:
-        boolean;
+    limited: boolean;
 
-    availableFrom:
-        string | null;
+    availableFrom: string | null;
 
-    availableUntil:
-        string | null;
+    availableUntil: string | null;
 
-    revealSoundUrl:
-        string | null;
+    revealSoundUrl: string | null;
 
-    revealAnimation:
-        string | null;
-
+    revealAnimation: string | null;
 }
 
 
@@ -91,25 +69,17 @@ export interface CardAdminInput {
 ========================================================= */
 
 export interface CardImageUploadResult {
+    fileId: string;
 
-    fileId:
-        string;
+    name: string;
 
-    name:
-        string;
+    url: string;
 
-    url:
-        string;
+    filePath: string;
 
-    filePath:
-        string;
+    thumbnailUrl: string | null;
 
-    thumbnailUrl:
-        string | null;
-
-    size:
-        number;
-
+    size: number;
 }
 
 
@@ -118,16 +88,11 @@ export interface CardImageUploadResult {
 ========================================================= */
 
 interface ApiResponse<T> {
+    success: boolean;
 
-    success:
-        boolean;
+    data?: T;
 
-    data?:
-        T;
-
-    error?:
-        string;
-
+    error?: string;
 }
 
 
@@ -135,34 +100,17 @@ interface ApiResponse<T> {
    API ERROR
 ========================================================= */
 
-function getErrorMessage(
-    value: unknown
-): string {
-
+function getErrorMessage(value: unknown): string {
     if (
-        typeof value === "object"
-        &&
-        value !== null
-        &&
-        "error" in value
-        &&
-        typeof (
-            value as {
-                error?: unknown;
-            }
-        ).error === "string"
+        typeof value === "object" &&
+        value !== null &&
+        "error" in value &&
+        typeof (value as { error?: unknown }).error === "string"
     ) {
-
-        return (
-            value as {
-                error: string;
-            }
-        ).error;
-
+        return (value as { error: string }).error;
     }
 
     return "Une erreur est survenue.";
-
 }
 
 
@@ -170,35 +118,19 @@ function getErrorMessage(
    GET SESSION
 ========================================================= */
 
-async function getAccessToken():
-    Promise<string> {
-
+async function getAccessToken(): Promise<string> {
     const {
-        data: {
-            session
-        },
+        data: { session },
         error
-    } =
-        await supabase
-            .auth
-            .getSession();
+    } = await supabase.auth.getSession();
 
-
-    if (
-        error
-        ||
-        !session
-    ) {
-
+    if (error || !session) {
         throw new Error(
             "Tu dois être connectée pour accéder à l'administration."
         );
-
     }
 
-
     return session.access_token;
-
 }
 
 
@@ -208,117 +140,56 @@ async function getAccessToken():
 
 async function adminFetch<T>(
     path: string,
-    options:
-        RequestInit = {}
+    options: RequestInit = {}
 ): Promise<T> {
+    const accessToken = await getAccessToken();
 
-    const accessToken =
-        await getAccessToken();
+    const headers = new Headers(options.headers);
 
-
-    const headers =
-        new Headers(
-            options.headers
-        );
-
-
-    /*
-     * Toutes les routes utilisées ici envoient actuellement
-     * du JSON.
-     */
-    if (
-        options.body
-        &&
-        !headers.has(
-            "Content-Type"
-        )
-    ) {
-
-        headers.set(
-            "Content-Type",
-            "application/json"
-        );
-
+    if (options.body && !headers.has("Content-Type")) {
+        headers.set("Content-Type", "application/json");
     }
-
 
     headers.set(
         "Authorization",
         `Bearer ${accessToken}`
     );
 
+    const response = await fetch(
+        `${API_URL}${path}`,
+        {
+            ...options,
+            headers
+        }
+    );
 
-    const response =
-        await fetch(
-            `${API_URL}${path}`,
-            {
-                ...options,
-                headers
-            }
-        );
-
-
-    let body:
-        unknown = null;
-
+    let body: unknown = null;
 
     try {
-
-        body =
-            await response.json();
-
-    }
-    catch {
-
-        body =
-            null;
-
+        body = await response.json();
+    } catch {
+        body = null;
     }
 
+    if (!response.ok) {
+        throw new Error(getErrorMessage(body));
+    }
 
-    if (
-        !response.ok
-    ) {
+    const result = body as ApiResponse<T>;
 
+    if (!result.success) {
         throw new Error(
-            getErrorMessage(
-                body
-            )
+            result.error ?? "Une erreur est survenue."
         );
-
     }
 
-
-    const result =
-        body as ApiResponse<T>;
-
-
-    if (
-        !result.success
-    ) {
-
-        throw new Error(
-            result.error
-            ??
-            "Une erreur est survenue."
-        );
-
-    }
-
-
-    if (
-        result.data === undefined
-    ) {
-
+    if (result.data === undefined) {
         throw new Error(
             "Réponse invalide du serveur."
         );
-
     }
 
-
     return result.data;
-
 }
 
 
@@ -326,94 +197,40 @@ async function adminFetch<T>(
    FILE -> BASE64
 ========================================================= */
 
-function fileToBase64(
-    file: File
-): Promise<string> {
+function fileToBase64(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
 
-    return new Promise(
-        (
-            resolve,
-            reject
-        ) => {
+        reader.onload = () => {
+            if (typeof reader.result !== "string") {
+                reject(
+                    new Error("Impossible de lire l'image.")
+                );
+                return;
+            }
 
-            const reader =
-                new FileReader();
+            const base64 = reader.result.split(",")[1];
 
+            if (!base64) {
+                reject(
+                    new Error(
+                        "Le fichier n'a pas pu être converti."
+                    )
+                );
+                return;
+            }
 
-            reader.onload =
-                () => {
+            resolve(base64);
+        };
 
-                    if (
-                        typeof reader.result
-                        !==
-                        "string"
-                    ) {
-
-                        reject(
-                            new Error(
-                                "Impossible de lire l'image."
-                            )
-                        );
-
-                        return;
-
-                    }
-
-
-                    /*
-                     * FileReader retourne :
-                     *
-                     * data:image/png;base64,AAAA...
-                     *
-                     * Le serveur a uniquement besoin de la partie
-                     * située après la virgule.
-                     */
-                    const base64 =
-                        reader.result
-                            .split(",")[1];
-
-
-                    if (
-                        !base64
-                    ) {
-
-                        reject(
-                            new Error(
-                                "Le fichier n'a pas pu être converti."
-                            )
-                        );
-
-                        return;
-
-                    }
-
-
-                    resolve(
-                        base64
-                    );
-
-                };
-
-
-            reader.onerror =
-                () => {
-
-                    reject(
-                        new Error(
-                            "Impossible de lire le fichier."
-                        )
-                    );
-
-                };
-
-
-            reader.readAsDataURL(
-                file
+        reader.onerror = () => {
+            reject(
+                new Error("Impossible de lire le fichier.")
             );
+        };
 
-        }
-    );
-
+        reader.readAsDataURL(file);
+    });
 }
 
 
@@ -421,51 +238,27 @@ function fileToBase64(
    VALIDATE CARD IMAGE
 ========================================================= */
 
-function validateCardImage(
-    file: File
-): void {
-
+function validateCardImage(file: File): void {
     const allowedTypes = [
-
         "image/png",
         "image/jpeg",
         "image/webp",
         "image/gif"
-
     ];
 
-
-    if (
-        !allowedTypes.includes(
-            file.type
-        )
-    ) {
-
+    if (!allowedTypes.includes(file.type)) {
         throw new Error(
             "Format non autorisé. Utilise PNG, JPG, WEBP ou GIF."
         );
-
     }
 
+    const maxSize = 10 * 1024 * 1024;
 
-    const maxSize =
-        10
-        *
-        1024
-        *
-        1024;
-
-
-    if (
-        file.size > maxSize
-    ) {
-
+    if (file.size > maxSize) {
         throw new Error(
             "L'image ne peut pas dépasser 10 Mo."
         );
-
     }
-
 }
 
 
@@ -475,50 +268,25 @@ function validateCardImage(
 
 export async function uploadCardImage(
     file: File,
-    type:
-        "artwork" | "back" = "artwork"
-):
-    Promise<CardImageUploadResult> {
+    type: "artwork" | "back" = "artwork"
+): Promise<CardImageUploadResult> {
+    validateCardImage(file);
 
-    validateCardImage(
-        file
-    );
-
-
-    const base64 =
-        await fileToBase64(
-            file
-        );
-
+    const base64 = await fileToBase64(file);
 
     return adminFetch<CardImageUploadResult>(
         "/api/admin/cards/upload",
         {
+            method: "POST",
 
-            method:
-                "POST",
-
-            body:
-                JSON.stringify(
-                    {
-
-                        file:
-                            base64,
-
-                        fileName:
-                            file.name,
-
-                        mimeType:
-                            file.type,
-
-                        type
-
-                    }
-                )
-
+            body: JSON.stringify({
+                file: base64,
+                fileName: file.name,
+                mimeType: file.type,
+                type
+            })
         }
     );
-
 }
 
 
@@ -526,13 +294,10 @@ export async function uploadCardImage(
    GET ADMIN CARDS
 ========================================================= */
 
-export async function getAdminCards():
-    Promise<Card[]> {
-
+export async function getAdminCards(): Promise<Card[]> {
     return adminFetch<Card[]>(
         "/api/admin/cards"
     );
-
 }
 
 
@@ -540,19 +305,12 @@ export async function getAdminCards():
    GET NEXT CARD NUMBER
 ========================================================= */
 
-export async function getNextCardNumber():
-    Promise<number> {
-
-    const result =
-        await adminFetch<{
-            number: number;
-        }>(
-            "/api/admin/cards/next-number"
-        );
-
+export async function getNextCardNumber(): Promise<number> {
+    const result = await adminFetch<{
+        number: number;
+    }>("/api/admin/cards/next-number");
 
     return result.number;
-
 }
 
 
@@ -562,15 +320,10 @@ export async function getNextCardNumber():
 
 export async function getAdminCard(
     cardId: string
-):
-    Promise<Card> {
-
+): Promise<Card> {
     return adminFetch<Card>(
-        `/api/admin/cards/${encodeURIComponent(
-            cardId
-        )}`
+        `/api/admin/cards/${encodeURIComponent(cardId)}`
     );
-
 }
 
 
@@ -580,24 +333,14 @@ export async function getAdminCard(
 
 export async function createCard(
     input: CardAdminInput
-):
-    Promise<Card> {
-
+): Promise<Card> {
     return adminFetch<Card>(
         "/api/admin/cards",
         {
-
-            method:
-                "POST",
-
-            body:
-                JSON.stringify(
-                    input
-                )
-
+            method: "POST",
+            body: JSON.stringify(input)
         }
     );
-
 }
 
 
@@ -608,26 +351,14 @@ export async function createCard(
 export async function updateCard(
     cardId: string,
     input: CardAdminInput
-):
-    Promise<Card> {
-
+): Promise<Card> {
     return adminFetch<Card>(
-        `/api/admin/cards/${encodeURIComponent(
-            cardId
-        )}`,
+        `/api/admin/cards/${encodeURIComponent(cardId)}`,
         {
-
-            method:
-                "PUT",
-
-            body:
-                JSON.stringify(
-                    input
-                )
-
+            method: "PUT",
+            body: JSON.stringify(input)
         }
     );
-
 }
 
 
@@ -638,28 +369,16 @@ export async function updateCard(
 export async function updateCardStatus(
     cardId: string,
     status: CardStatus
-):
-    Promise<Card> {
-
+): Promise<Card> {
     return adminFetch<Card>(
-        `/api/admin/cards/${encodeURIComponent(
-            cardId
-        )}/status`,
+        `/api/admin/cards/${encodeURIComponent(cardId)}/status`,
         {
-
-            method:
-                "PATCH",
-
-            body:
-                JSON.stringify(
-                    {
-                        status
-                    }
-                )
-
+            method: "PATCH",
+            body: JSON.stringify({
+                status
+            })
         }
     );
-
 }
 
 
@@ -669,21 +388,11 @@ export async function updateCardStatus(
 
 export async function deleteCard(
     cardId: string
-):
-    Promise<{
-        id: string;
-    }> {
-
-    return adminFetch<{
-        id: string;
-    }>(
-        `/api/admin/cards/${encodeURIComponent(
-            cardId
-        )}`,
+): Promise<{ id: string }> {
+    return adminFetch<{ id: string }>(
+        `/api/admin/cards/${encodeURIComponent(cardId)}`,
         {
-            method:
-                "DELETE"
+            method: "DELETE"
         }
     );
-
 }
