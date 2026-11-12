@@ -973,10 +973,10 @@ onBeforeUnmount(
         ================================================== -->
 
         <AppLoader
-            v-if="loading"
-            text="Chargement des clips..."
+                    v-if="loading"
+                    text="Chargement des clips..."
+                    size="large"
         />
-
 
         <!-- =================================================
              ERROR

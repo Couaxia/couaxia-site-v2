@@ -39,6 +39,8 @@ import type {
   Profile
 } from "../services/profile.service";
 
+import AppLoader
+    from "../../src/components/ui/AppLoader.vue";
 
 /* =========================================================
    STATE
@@ -1430,29 +1432,11 @@ onBeforeUnmount(
            LOADING
       ==================================================== -->
 
-      <div
-        v-if="loading"
-        class="profile-state"
-      >
-
-        <span
-          class="profile-state__icon"
-          aria-hidden="true"
-        >
-          🐙
-        </span>
-
-
-        <strong>
-          Chargement de ton profil...
-        </strong>
-
-
-        <p>
-          Une petite seconde.
-        </p>
-
-      </div>
+      <AppLoader
+          v-if="loading"
+          text="Chargement de ton profil..."
+          size="large"
+      />
 
 
       <!-- ===================================================

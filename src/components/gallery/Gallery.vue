@@ -25,6 +25,7 @@ import {
 
 import type { ArtistCredit } from "../../types/artist-credit.types";
 
+import AppLoader from "../ui/AppLoader.vue";
 
 /* =========================================================
    TYPES
@@ -1854,23 +1855,11 @@ onBeforeUnmount(
              LOADING
         ================================================== -->
 
-        <div
+        <AppLoader
             v-if="loading"
-            class="credits-gallery__loading"
-            role="status"
-        >
-
-            <span aria-hidden="true">
-                🐙
-            </span>
-
-
-            <p>
-                Chargement des illustrations...
-            </p>
-
-        </div>
-
+            text="Chargement des illustrations..."
+            size="large"
+        />
 
         <!-- =================================================
              ERROR

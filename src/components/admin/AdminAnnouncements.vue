@@ -20,7 +20,7 @@ import type {
     AnnouncementType
 } from "../../services/admin.service";
 
-
+import AppLoader from "../ui/AppLoader.vue";
 /* =========================================================
    STATE
 ========================================================= */
@@ -1144,14 +1144,15 @@ onMounted(
 
         </div>
 
-
-        <div
+         <!-- =================================================
+             LOADING
+        ================================================== -->
+        
+        <AppLoader
             v-if="loading"
-            class="admin-announcements__empty"
-        >
-            Chargement des annonces...
-        </div>
-
+            text="Chargement des annonces..."
+            size="large"
+        />
 
         <div
             v-else-if="

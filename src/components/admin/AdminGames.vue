@@ -26,7 +26,7 @@ import type {
     TwitchGame
 } from "../../services/twitch-games.service";
 
-
+import AppLoader from "../ui/AppLoader.vue";
 /* =========================================================
    TYPES
 ========================================================= */
@@ -1615,21 +1615,11 @@ onMounted(
              LOADING
         ================================================== -->
 
-        <div
+        <AppLoader
             v-if="loading"
-            class="admin-loading"
-        >
-
-            <span>
-                🎮
-            </span>
-
-            <strong>
-                Chargement des jeux...
-            </strong>
-
-        </div>
-
+            text="Chargement des jeux..."
+            size="large"
+        />
 
         <!-- =================================================
              CONTENT
@@ -2021,14 +2011,15 @@ onMounted(
                                     </div>
 
 
-                                    <div
-                                        v-if="twitchSearching"
-                                        class="admin-twitch-search__loading"
-                                    >
-                                        <span>🎮</span>
-                                        Recherche sur Twitch...
-                                    </div>
+                                    <!-- =========================================
+                                        CHARGEMENT RECHERCHE TWITCH
+                                    ========================================== -->
 
+                                    <AppLoader
+                                        v-if="twitchSearching"
+                                        text="Recherche des jeux sur Twitch..."
+                                        size="small"
+                                    />
 
                                     <div
                                         v-else-if="twitchResults.length > 0"

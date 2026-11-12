@@ -13,6 +13,7 @@ import {
     type Game
 } from "../../services/games.service";
 
+import AppLoader from "../ui/AppLoader.vue";
 
 /* =========================================================
    DATA
@@ -606,26 +607,12 @@ onBeforeUnmount(
              LOADING
         ================================================== -->
 
-        <div
+        <AppLoader
             v-if="loading"
-            class="games-currently__state"
-        >
-
-            <span
-                class="games-currently__state-icon"
-                aria-hidden="true"
-            >
-                🎮
-            </span>
-
-
-            <p>
-                Recherche des aventures en cours...
-            </p>
-
-        </div>
-
-
+            text="Recherche des aventures en cours..."
+            size="large"
+        />
+        
         <!-- =================================================
              ERROR
         ================================================== -->

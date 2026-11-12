@@ -2,10 +2,10 @@
 
 import {
     computed,
+    nextTick,
     onMounted,
     ref
 } from "vue";
-
 
 import {
     useRouter
@@ -13,7 +13,9 @@ import {
 
 
 import "../assets/styles/pages/admin.css";
+import AppLoader from "../components/ui/AppLoader.vue";
 
+const loadingTab = ref(false);
 
 /* =========================================================
    SERVICES
@@ -450,25 +452,27 @@ async function loadAdmin() {
    CHANGE TAB
 ========================================================= */
 
-function changeTab(
-    tab:
-        AdminTab
-) {
+async function changeTab(tab: AdminTab) {
+    if (activeTab.value === tab || loadingTab.value) {
+        return;
+    }
 
-    activeTab.value =
-        tab;
+    loadingTab.value = true;
 
+    try {
+        await nextTick();
 
-    window.scrollTo({
+        activeTab.value = tab;
 
-        top:
-            0,
+        await nextTick();
 
-        behavior:
-            "smooth"
-
-    });
-
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+    } finally {
+        loadingTab.value = false;
+    }
 }
 
 
@@ -536,30 +540,12 @@ onMounted(
              LOADING
         ================================================== -->
 
-        <section
+        <AppLoader
             v-if="loading"
-            class="admin-state"
-        >
-
-            <span
-                class="admin-state__icon"
-                aria-hidden="true"
-            >
-                🐙
-            </span>
-
-
-            <strong>
-                Chargement de l'administration...
-            </strong>
-
-
-            <p>
-                Vérification de tes accès.
-            </p>
-
-        </section>
-
+            text="Chargement de l'administration..."
+            size="large"
+            overlay
+        />
 
         <!-- =================================================
              ACCESS DENIED
@@ -833,143 +819,92 @@ onMounted(
                      CONTENT
                 ========================================== -->
 
-                <div
-                    class="admin-content"
-                >
+                <div class="admin-content">
+
+                    <!-- LOADER DES RUBRIQUES -->
+
+                    <AppLoader
+                        v-if="loadingTab"
+                        text="Chargement de la rubrique..."
+                        size="large"
+                    />
 
                     <!-- DASHBOARD -->
 
                     <AdminDashboard
-                        v-if="
-                            activeTab
-                            ===
-                            'dashboard'
-                        "
+                        v-else-if="activeTab === 'dashboard'"
                     />
 
-
-                    <!-- POLLS -->
+                    <!-- SONDAGES -->
 
                     <AdminPolls
-                        v-else-if="
-                            activeTab
-                            ===
-                            'polls'
-                        "
+                        v-else-if="activeTab === 'polls'"
                     />
 
-
-                    <!-- GAMES -->
+                    <!-- JEUX -->
 
                     <AdminGames
-                        v-else-if="
-                            activeTab
-                            ===
-                            'games'
-                        "
+                        v-else-if="activeTab === 'games'"
                     />
-
 
                     <!-- SUGGESTIONS -->
 
                     <AdminSuggestions
-                        v-else-if="
-                            activeTab
-                            ===
-                            'suggestions'
-                        "
+                        v-else-if="activeTab === 'suggestions'"
                     />
 
-
-                    <!-- USERS -->
+                    <!-- UTILISATEURS -->
 
                     <AdminUsers
-                        v-else-if="
-                            activeTab
-                            ===
-                            'users'
-                        "
+                        v-else-if="activeTab === 'users'"
                     />
 
-
-                    <!-- ARTWORKS -->
+                    <!-- ARTS & CRÉDITS -->
 
                     <AdminArtworks
-                        v-else-if="
-                            activeTab
-                            ===
-                            'artworks'
-                        "
+                        v-else-if="activeTab === 'artworks'"
                     />
 
-
-                    <!-- CARDS -->
+                    <!-- CARTES -->
 
                     <AdminCards
-                        v-else-if="
-                            activeTab
-                            ===
-                            'cards'
-                        "
+                        v-else-if="activeTab === 'cards'"
                     />
 
-
-                    <!-- ANNOUNCEMENTS -->
+                    <!-- ANNONCES -->
 
                     <AdminAnnouncements
-                        v-else-if="
-                            activeTab
-                            ===
-                            'announcements'
-                        "
+                        v-else-if="activeTab === 'announcements'"
                     />
-
 
                     <!-- MESSAGES -->
 
                     <AdminMessages
-                        v-else-if="
-                            activeTab
-                            ===
-                            'messages'
-                        "
+                        v-else-if="activeTab === 'messages'"
                     />
 
-
-                    <!-- FALLBACK -->
+                    <!-- SECTION INCONNUE -->
 
                     <section
                         v-else
                         class="admin-empty"
                     >
 
-                        <span>
-                            🐙
-                        </span>
-
+                        <span>🐙</span>
 
                         <strong>
                             Section inconnue
                         </strong>
-
 
                         <p>
                             Cette section de l'administration
                             n'existe pas.
                         </p>
 
-
                         <button
                             type="button"
-                            class="
-                                admin-button
-                                admin-button--primary
-                            "
-                            @click="
-                                changeTab(
-                                    'dashboard'
-                                )
-                            "
+                            class="admin-button admin-button--primary"
+                            @click="changeTab('dashboard')"
                         >
                             Retour au dashboard
                         </button>

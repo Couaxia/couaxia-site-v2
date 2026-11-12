@@ -24,7 +24,8 @@ import type {
   PollVote
 } from "../services/poll.service";
 
-
+import AppLoader
+    from "../../src/components/ui/AppLoader.vue";
 /* =========================================================
    STATE
 ========================================================= */
@@ -394,28 +395,11 @@ onMounted(
 
       <!-- LOADING -->
 
-      <div
-        v-if="loading"
-        class="poll-state"
-      >
-
-        <span
-          class="poll-state__icon"
-          aria-hidden="true"
-        >
-          🐙
-        </span>
-
-        <strong>
-          Chargement du sondage...
-        </strong>
-
-        <p>
-          Une petite seconde.
-        </p>
-
-      </div>
-
+      <AppLoader
+          v-if="loading"
+          text="Chargement du sondage..."
+          size="large"
+      />
 
       <!-- ERROR -->
 
