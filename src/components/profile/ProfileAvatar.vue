@@ -12,7 +12,6 @@ import {
   getProfileAvatar,
   getProfileDisplayName,
   selectOfficialAvatar,
-  uploadMyAvatar
 } from "../../services/profile.service";
 
 import type {
@@ -337,19 +336,12 @@ async function uploadSelectedAvatar() {
 
   try {
 
-    const newAvatarUrl =
-      await uploadMyAvatar(
-        selectedAvatarFile.value
-      );
 
 
     clearCustomAvatarSelection();
 
 
-    emit(
-      "avatarUpdated",
-      newAvatarUrl
-    );
+
 
 
     successMessage.value =
