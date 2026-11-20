@@ -23,11 +23,15 @@ const CARD_RARITIES = [
 ];
 const CARD_CATEGORIES = [
     "couaxia",
-    "natsu",
+    "terrain",
     "character",
     "lore",
     "event",
     "special"
+];
+const CARD_ORIENTATIONS = [
+    "portrait",
+    "landscape"
 ];
 const CARD_STATUSES = [
     "draft",
@@ -91,6 +95,7 @@ function mapCard(card) {
         description: card.description,
         rarity: card.rarity,
         category: card.category,
+        orientation: card.orientation === "landscape" ? "landscape" : "portrait",
         imageUrl: card.image_url,
         backImageUrl: card.back_image_url,
         artist: card.artist,
@@ -118,6 +123,9 @@ function isCardCategory(value) {
     return (typeof value === "string"
         &&
             CARD_CATEGORIES.includes(value));
+}
+function isCardOrientation(value) {
+    return typeof value === "string" && CARD_ORIENTATIONS.includes(value);
 }
 function isCardStatus(value) {
     return (typeof value === "string"
@@ -163,6 +171,12 @@ function buildCreatePayload(payload) {
     if (!isCardCategory(payload.category)) {
         throw new Error("La catégorie de la carte est invalide.");
     }
+    const orientation = payload.orientation === undefined
+        ? "portrait"
+        : payload.orientation;
+    if (!isCardOrientation(orientation)) {
+        throw new Error("L’orientation de la carte est invalide.");
+    }
     const imageUrl = cleanRequiredString(payload.imageUrl);
     if (!imageUrl) {
         throw new Error("L'image de la carte est obligatoire.");
@@ -193,6 +207,7 @@ function buildCreatePayload(payload) {
         description: cleanNullableString(payload.description),
         rarity: payload.rarity,
         category: payload.category,
+        orientation,
         image_url: imageUrl,
         back_image_url: cleanNullableString(payload.backImageUrl),
         artist: cleanNullableString(payload.artist),
@@ -240,6 +255,12 @@ function buildUpdatePayload(payload) {
         }
         update.category =
             payload.category;
+    }
+    if (payload.orientation !== undefined) {
+        if (!isCardOrientation(payload.orientation)) {
+            throw new Error("L’orientation de la carte est invalide.");
+        }
+        update.orientation = payload.orientation;
     }
     if (payload.imageUrl !== undefined) {
         const imageUrl = cleanRequiredString(payload.imageUrl);
@@ -317,7 +338,6 @@ function sendValidationError(res, error) {
 }
 /* =========================================================
    IMAGEKIT UPLOAD
-
    POST /api/admin/cards/upload
 ========================================================= */
 router.post("/upload", async (req, res, next) => {
@@ -420,7 +440,6 @@ router.post("/upload", async (req, res, next) => {
 });
 /* =========================================================
    NEXT NUMBER
-
    GET /api/admin/cards/next-number
 ========================================================= */
 router.get("/next-number", async (_req, res, next) => {

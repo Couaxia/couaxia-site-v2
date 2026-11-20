@@ -501,6 +501,14 @@ const form =
 
     );
 
+/* Orientation proposée uniquement quand l’utilisateur change la catégorie.
+   Le chargement d’une carte existante conserve son orientation. */
+function onCategoryChange() {
+    form.value.orientation = form.value.category === "terrain"
+        ? "landscape"
+        : "portrait";
+}
+
 const saving =
 
     ref(
@@ -2299,6 +2307,7 @@ onBeforeUnmount(
                             <select
 
                                 v-model="form.category"
+                                @change="onCategoryChange"
 
                                 required
 
@@ -2401,7 +2410,7 @@ onBeforeUnmount(
                         </label>
                         <div class="card-form__field">
                             <span>Type de carte</span>
-                            <small>Choisis « Événement » dans Catégorie pour une carte Event ; « Lore » ou « Spéciale » pour une carte Terrain.</small>
+                            <small>Choisis « Terrain » pour une carte Terrain au format horizontal 5:4 par défaut. La catégorie « Événement » utilise le cadre Event. Tu peux toujours modifier l’orientation.</small>
                         </div>
                     </div>
                     <p class="card-form__section-description">Le cadre spécial est dessiné en CSS : aucune image de cadre à fournir. L'orientation est enregistrée avec la carte.</p>
@@ -2957,7 +2966,11 @@ onBeforeUnmount(
                 <div
 
                     class="preview-card"
-                    :class="{ 'preview-card--landscape': form.orientation === 'landscape', 'preview-card--terrain': form.orientation === 'landscape' && form.category !== 'event', 'preview-card--event': form.category === 'event' }"
+                    :class="{
+                        'preview-card--landscape': form.orientation === 'landscape',
+                        'preview-card--terrain': form.category === 'terrain' && form.orientation === 'landscape',
+                        'preview-card--event': form.category === 'event'
+                    }"
 
                     :data-rarity="form.rarity"
 
@@ -4376,7 +4389,6 @@ onBeforeUnmount(
     }
 }
 
-
 /* =========================================================
    CARTES HORIZONTALES : TERRAIN & ÉVÉNEMENT
 ========================================================= */
@@ -4409,6 +4421,37 @@ onBeforeUnmount(
 .preview-card--event .preview-card__body { background: linear-gradient(135deg, rgba(255, 74, 163, .14), rgba(117, 49, 209, .14)); }
 @media (prefers-reduced-motion: no-preference) {
     .preview-card--terrain:hover { filter: drop-shadow(0 0 12px rgba(241, 147, 255, .45)); }
+}
+
+
+/* =========================================================
+   FORMULAIRE RESPONSIVE — APERÇU TOUJOURS VISIBLE
+========================================================= */
+.card-form { width: 100%; max-width: 100%; min-width: 0; box-sizing: border-box; overflow-x: clip; }
+.card-form__layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 340px);
+    gap: clamp(16px, 2vw, 28px);
+    align-items: start;
+    min-width: 0;
+    max-width: 100%;
+}
+.card-form__content, .card-form__preview, .card-form__section, .card-form__grid { min-width: 0; max-width: 100%; }
+.card-form__preview { width: 100%; box-sizing: border-box; }
+.preview-card { width: 100%; max-width: 100%; min-width: 0; box-sizing: border-box; }
+.preview-card--landscape .preview-card__image { aspect-ratio: 5 / 4; }
+.preview-card__body { min-width: 0; overflow-wrap: anywhere; }
+.card-form__field, .card-form__field input, .card-form__field select, .card-form__field textarea { min-width: 0; max-width: 100%; box-sizing: border-box; }
+.card-crop-editor { min-width: 0; max-width: 100%; }
+.card-crop-editor__canvas { max-width: 100%; }
+@media (max-width: 1120px) {
+    .card-form__layout { grid-template-columns: minmax(0, 1fr); }
+    .card-form__preview { position: static; width: min(100%, 420px); max-width: 100%; margin: 0 auto; }
+}
+@media (max-width: 620px) {
+    .card-form { padding: 14px; }
+    .card-form__grid { grid-template-columns: minmax(0, 1fr); }
+    .card-crop-editor { grid-template-columns: minmax(0, 1fr); }
 }
 
 </style>
