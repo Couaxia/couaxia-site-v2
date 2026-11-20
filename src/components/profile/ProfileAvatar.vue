@@ -980,7 +980,606 @@ onMounted(
 
           </div>
 
+        </div>a<script setup lang="ts">
+
+import {
+  computed,
+  onMounted,
+  ref
+} from "vue";
+
+import {
+  deleteMyAvatar,
+  getOfficialAvatars,
+  getProfileAvatar,
+  getProfileDisplayName,
+  selectOfficialAvatar,
+} from "../../services/profile.service";
+
+import type {
+  OfficialAvatar,
+  Profile
+} from "../../services/profile.service";
+
+
+/* =========================================================
+   PROPS
+========================================================= */
+
+const props =
+  defineProps<{
+    profile:
+      Profile;
+  }>();
+
+
+/* =========================================================
+   EMITS
+========================================================= */
+
+const emit =
+  defineEmits<{
+    avatarUpdated:
+      [avatarUrl: string | null];
+  }>();
+
+
+/* =========================================================
+   STATE
+========================================================= */
+
+const officialAvatars =
+  ref<OfficialAvatar[]>(
+    []
+  );
+
+const loadingOfficialAvatars =
+  ref(false);
+
+const uploadingAvatar =
+  ref(false);
+
+const deletingAvatar =
+  ref(false);
+
+const errorMessage =
+  ref("");
+
+const successMessage =
+  ref("");
+
+
+/* =========================================================
+   COMPUTED
+========================================================= */
+
+const currentAvatarUrl =
+  computed(() =>
+    getProfileAvatar(
+      props.profile
+    )
+  );
+
+
+const displayName =
+  computed(() =>
+    getProfileDisplayName(
+      props.profile
+    )
+  );
+
+
+const hasCurrentAvatar =
+  computed(() =>
+    Boolean(
+      currentAvatarUrl.value
+    )
+  );
+
+
+/* =========================================================
+   LOAD OFFICIAL AVATARS
+========================================================= */
+
+async function loadOfficialAvatars() {
+
+  loadingOfficialAvatars.value =
+    true;
+
+  errorMessage.value =
+    "";
+
+
+  try {
+
+    officialAvatars.value =
+      await getOfficialAvatars();
+
+
+  } catch (error) {
+
+    console.error(
+      "Erreur chargement avatars officiels :",
+      error
+    );
+
+
+    errorMessage.value =
+
+      error instanceof Error
+
+        ? error.message
+
+        : "Impossible de charger les avatars officiels.";
+
+  } finally {
+
+    loadingOfficialAvatars.value =
+      false;
+
+  }
+
+}
+
+
+/* =========================================================
+   SELECT OFFICIAL AVATAR
+========================================================= */
+
+async function chooseOfficialAvatar(
+  avatar:
+    OfficialAvatar
+) {
+
+  if (
+    uploadingAvatar.value
+    ||
+    deletingAvatar.value
+  ) {
+    return;
+  }
+
+
+  uploadingAvatar.value =
+    true;
+
+  errorMessage.value =
+    "";
+
+  successMessage.value =
+    "";
+
+
+  try {
+
+    const updatedProfile =
+      await selectOfficialAvatar(
+        avatar.url
+      );
+
+
+
+    emit(
+      "avatarUpdated",
+      updatedProfile.avatar_url
+    );
+
+
+    successMessage.value =
+      "Avatar officiel sélectionné. 💜";
+
+
+  } catch (error) {
+
+    console.error(
+      "Erreur sélection avatar officiel :",
+      error
+    );
+
+
+    errorMessage.value =
+
+      error instanceof Error
+
+        ? error.message
+
+        : "Impossible de sélectionner cet avatar.";
+
+  } finally {
+
+    uploadingAvatar.value =
+      false;
+
+  }
+
+}
+
+
+/* =========================================================
+   DELETE CURRENT AVATAR
+========================================================= */
+
+async function removeCurrentAvatar() {
+
+  if (
+    deletingAvatar.value
+    ||
+    uploadingAvatar.value
+  ) {
+    return;
+  }
+
+
+  deletingAvatar.value =
+    true;
+
+  errorMessage.value =
+    "";
+
+  successMessage.value =
+    "";
+
+
+  try {
+
+    await deleteMyAvatar();
+
+
+
+    emit(
+      "avatarUpdated",
+      null
+    );
+
+
+    successMessage.value =
+      "Ton avatar a été retiré.";
+
+
+  } catch (error) {
+
+    console.error(
+      "Erreur suppression avatar :",
+      error
+    );
+
+
+    errorMessage.value =
+
+      error instanceof Error
+
+        ? error.message
+
+        : "Impossible de supprimer ton avatar.";
+
+  } finally {
+
+    deletingAvatar.value =
+      false;
+
+  }
+
+}
+
+
+/* =========================================================
+   MOUNT
+========================================================= */
+
+onMounted(
+  loadOfficialAvatars
+);
+
+</script>
+
+
+<template>
+
+  <section
+    class="profile-avatar-panel"
+  >
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <header
+      class="profile-avatar-panel__header"
+    >
+
+      <span
+        class="profile-avatar-panel__eyebrow"
+      >
+        🎨 AVATAR POUP
+      </span>
+
+
+      <h2>
+        Personnalise ton avatar
+      </h2>
+
+
+      <p>
+        Choisis une illustration officielle
+        parmi les avatars proposés.
+      </p>
+
+    </header>
+
+
+    <!-- =====================================================
+         MESSAGES
+    ====================================================== -->
+
+    <div
+      v-if="successMessage"
+      class="
+        profile-message
+        profile-message--success
+      "
+    >
+
+      <span
+        aria-hidden="true"
+      >
+        ✓
+      </span>
+
+
+      <span>
+        {{ successMessage }}
+      </span>
+
+    </div>
+
+
+    <div
+      v-if="errorMessage"
+      class="
+        profile-message
+        profile-message--error
+      "
+    >
+
+      <span
+        aria-hidden="true"
+      >
+        ⚠️
+      </span>
+
+
+      <span>
+        {{ errorMessage }}
+      </span>
+
+    </div>
+
+
+    <!-- =====================================================
+         CURRENT AVATAR
+    ====================================================== -->
+
+    <div
+      class="profile-avatar-current"
+    >
+
+      <div
+        class="profile-avatar-current__preview"
+      >
+
+        <img
+          v-if="currentAvatarUrl"
+          :src="currentAvatarUrl"
+          :alt="displayName"
+        >
+
+
+        <div
+          v-else
+          class="
+            profile-avatar-current__fallback
+          "
+          aria-hidden="true"
+        >
+          🐙
         </div>
+
+      </div>
+
+
+      <div
+        class="profile-avatar-current__content"
+      >
+
+        <span>
+          Avatar actuel
+        </span>
+
+
+        <strong>
+          {{
+            hasCurrentAvatar
+              ? displayName
+              : "Aucun avatar sélectionné"
+          }}
+        </strong>
+
+
+        <button
+          v-if="hasCurrentAvatar"
+          type="button"
+          class="
+            profile-button
+            profile-button--secondary
+          "
+          :disabled="
+            deletingAvatar
+            ||
+            uploadingAvatar
+          "
+          @click="
+            removeCurrentAvatar
+          "
+        >
+          {{
+            deletingAvatar
+              ? "Suppression..."
+              : "Retirer l'avatar"
+          }}
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         OFFICIAL AVATARS
+    ====================================================== -->
+
+    <div
+      class="profile-avatar-section"
+    >
+
+      <div
+        class="
+          profile-avatar-section__header
+        "
+      >
+
+        <div>
+
+          <span
+            class="
+              profile-avatar-section__eyebrow
+            "
+          >
+            ✨ COLLECTION
+          </span>
+
+
+          <h3>
+            Avatars officiels
+          </h3>
+
+        </div>
+
+
+        <span
+          class="
+            profile-avatar-section__count
+          "
+        >
+          {{ officialAvatars.length }}
+        </span>
+
+      </div>
+
+
+      <p
+        class="
+          profile-avatar-section__description
+        "
+      >
+        Ces avatars sont disponibles
+        pour tous les POUP.
+      </p>
+
+
+      <!-- LOADING -->
+
+      <div
+        v-if="loadingOfficialAvatars"
+        class="profile-avatar-loading"
+      >
+        Chargement des avatars...
+      </div>
+
+
+      <!-- GRID -->
+
+      <div
+        v-else-if="
+          officialAvatars.length
+        "
+        class="profile-avatar-grid"
+      >
+
+        <button
+          v-for="
+            avatar
+            in
+            officialAvatars
+          "
+          :key="
+            avatar.path
+          "
+          type="button"
+          class="profile-avatar-option"
+          :class="{
+            'profile-avatar-option--selected':
+              currentAvatarUrl
+              ===
+              avatar.url
+          }"
+          :disabled="
+            uploadingAvatar
+            ||
+            deletingAvatar
+          "
+          :aria-label="
+            `Choisir ${avatar.name}`
+          "
+          @click="
+            chooseOfficialAvatar(
+              avatar
+            )
+          "
+        >
+
+          <img
+            :src="
+              avatar.url
+            "
+            :alt="
+              avatar.name
+            "
+          >
+
+
+          <span
+            v-if="
+              currentAvatarUrl
+              ===
+              avatar.url
+            "
+            class="
+              profile-avatar-option__check
+            "
+            aria-hidden="true"
+          >
+            ✓
+          </span>
+
+        </button>
+
+      </div>
+
+
+      <!-- EMPTY -->
+
+      <div
+        v-else
+        class="profile-avatar-empty"
+      >
+        Aucun avatar officiel disponible.
+      </div>
+
+    </div>
+
+  </section>
+
+</template>
 
       </div>
 

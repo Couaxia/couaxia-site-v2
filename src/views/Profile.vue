@@ -23,7 +23,6 @@ import type {
 
 import {
   checkUsernameAvailable,
-  deleteMyAvatar,
   getCurrentProfile,
   getOfficialAvatars,
   getProfileAvatar,
@@ -32,7 +31,6 @@ import {
   logoutProfile,
   selectOfficialAvatar,
   updateMyProfile,
-  uploadMyAvatar
 } from "../services/profile.service";
 import type {
   OfficialAvatar,
@@ -97,8 +95,6 @@ const loadingOfficialAvatars =
 const uploadingAvatar =
   ref(false);
 
-const deletingAvatar =
-  ref(false);
 
 const loggingOut =
   ref(false);
@@ -130,16 +126,6 @@ const formBio =
 /* =========================================================
    AVATAR
 ========================================================= */
-
-const selectedAvatarFile =
-  ref<File | null>(
-    null
-  );
-
-const avatarPreviewUrl =
-  ref<string | null>(
-    null
-  );
 
 const selectedOfficialAvatar =
   ref<string | null>(
@@ -726,83 +712,11 @@ async function checkUsername() {
 
 
 /* =========================================================
-   AVATAR FILE SELECTION
-========================================================= */
-
-function handleAvatarFileChange(
-  event:
-    Event
-) {
-
-  const input =
-    event.target as HTMLInputElement;
-
-
-  const file =
-    input.files?.[0]
-    ??
-    null;
-
-
-  if (!file) {
-    return;
-  }
-
-
-  selectedAvatarFile.value =
-    file;
-
-
-  selectedOfficialAvatar.value =
-    null;
-
-
-  if (
-    avatarPreviewUrl.value
-  ) {
-
-    URL.revokeObjectURL(
-      avatarPreviewUrl.value
-    );
-
-  }
-
-
-  avatarPreviewUrl.value =
-    URL.createObjectURL(
-      file
-    );
-
-}
-
-
-/* =========================================================
    CLEAR AVATAR SELECTION
 ========================================================= */
 
 function clearAvatarSelection() {
-
-  selectedAvatarFile.value =
-    null;
-
-
-  selectedOfficialAvatar.value =
-    null;
-
-
-  if (
-    avatarPreviewUrl.value
-  ) {
-
-    URL.revokeObjectURL(
-      avatarPreviewUrl.value
-    );
-
-    avatarPreviewUrl.value =
-      null;
-
-  }
-
+  selectedOfficialAvatar.value = null;
 }
 
 
@@ -851,24 +765,6 @@ async function chooseOfficialAvatar(
       avatar.url;
 
 
-    selectedAvatarFile.value =
-      null;
-
-
-    if (
-      avatarPreviewUrl.value
-    ) {
-
-      URL.revokeObjectURL(
-        avatarPreviewUrl.value
-      );
-
-      avatarPreviewUrl.value =
-        null;
-
-    }
-
-
     successMessage.value =
       "Ton avatar officiel a bien été sélectionné. 💜";
 
@@ -898,154 +794,6 @@ async function chooseOfficialAvatar(
 
 }
 
-
-/* =========================================================
-   UPLOAD PERSONAL AVATAR
-========================================================= */
-
-async function uploadSelectedAvatar() {
-
-  if (
-    !selectedAvatarFile.value
-    ||
-    uploadingAvatar.value
-  ) {
-    return;
-  }
-
-
-  uploadingAvatar.value =
-    true;
-
-
-  errorMessage.value =
-    "";
-
-  successMessage.value =
-    "";
-
-
-  try {
-
-    const newAvatarUrl =
-      await uploadMyAvatar(
-        selectedAvatarFile.value
-      );
-
-
-    if (profile.value) {
-
-      profile.value = {
-        ...profile.value,
-        avatar_url:
-          newAvatarUrl
-      };
-
-    }
-
-
-    clearAvatarSelection();
-
-
-    successMessage.value =
-      "Ton avatar personnalisé a bien été ajouté. 💜";
-
-
-  } catch (error) {
-
-    console.error(
-      "Erreur upload avatar :",
-      error
-    );
-
-
-    errorMessage.value =
-
-      error instanceof Error
-
-        ? error.message
-
-        : "Impossible d'envoyer ton avatar.";
-
-  } finally {
-
-    uploadingAvatar.value =
-      false;
-
-  }
-
-}
-
-
-/* =========================================================
-   DELETE PERSONAL AVATAR
-========================================================= */
-
-async function removeAvatar() {
-
-  if (
-    deletingAvatar.value
-    ||
-    !profile.value
-  ) {
-    return;
-  }
-
-
-  deletingAvatar.value =
-    true;
-
-
-  errorMessage.value =
-    "";
-
-  successMessage.value =
-    "";
-
-
-  try {
-
-    await deleteMyAvatar();
-
-
-    profile.value = {
-      ...profile.value,
-      avatar_url:
-        null
-    };
-
-
-    clearAvatarSelection();
-
-
-    successMessage.value =
-      "Ton avatar a été supprimé.";
-
-
-  } catch (error) {
-
-    console.error(
-      "Erreur suppression avatar :",
-      error
-    );
-
-
-    errorMessage.value =
-
-      error instanceof Error
-
-        ? error.message
-
-        : "Impossible de supprimer ton avatar.";
-
-  } finally {
-
-    deletingAvatar.value =
-      false;
-
-  }
-
-}
 
 
 /* =========================================================
@@ -1133,31 +881,6 @@ async function saveProfile() {
 
     profile.value =
       updatedProfile;
-
-
-    /*
-     * Si un fichier perso a été choisi,
-     * on l'upload après la sauvegarde.
-     */
-
-    if (
-      selectedAvatarFile.value
-    ) {
-
-      const newAvatarUrl =
-        await uploadMyAvatar(
-          selectedAvatarFile.value
-        );
-
-
-      profile.value = {
-        ...profile.value,
-        avatar_url:
-          newAvatarUrl
-      };
-
-    }
-
 
     clearAvatarSelection();
 
@@ -1901,170 +1624,6 @@ onBeforeUnmount(
             </p>
 
           </div>
-
-
-          <!-- =================================================
-               CUSTOM AVATAR
-          ================================================== -->
-
-          <div
-            class="profile-field"
-          >
-
-            <label
-              for="profile-avatar-file"
-            >
-              Avatar personnalisé
-            </label>
-
-
-            <p
-              class="profile-avatar-section__description"
-            >
-              Tu peux aussi utiliser
-              ta propre image.
-            </p>
-
-
-            <input
-              id="profile-avatar-file"
-              type="file"
-              accept="
-                image/png,
-                image/jpeg,
-                image/webp
-              "
-              @change="
-                handleAvatarFileChange
-              "
-            >
-
-
-            <small>
-              PNG, JPG ou WebP.
-              2 Mo maximum.
-            </small>
-
-
-            <!-- PREVIEW -->
-
-            <div
-              v-if="
-                avatarPreviewUrl
-              "
-              class="
-                profile-custom-avatar-preview
-              "
-            >
-
-              <img
-                :src="
-                  avatarPreviewUrl
-                "
-                alt="
-                  Aperçu du nouvel avatar
-                "
-              >
-
-
-              <div
-                class="
-                  profile-custom-avatar-preview__actions
-                "
-              >
-
-                <button
-                  type="button"
-                  class="
-                    profile-button
-                    profile-button--primary
-                  "
-                  :disabled="
-                    uploadingAvatar
-                  "
-                  @click="
-                    uploadSelectedAvatar
-                  "
-                >
-                  {{
-                    uploadingAvatar
-                      ? "Envoi..."
-                      : "Utiliser cet avatar"
-                  }}
-                </button>
-
-
-                <button
-                  type="button"
-                  class="
-                    profile-button
-                    profile-button--secondary
-                  "
-                  :disabled="
-                    uploadingAvatar
-                  "
-                  @click="
-                    clearAvatarSelection
-                  "
-                >
-                  Annuler
-                </button>
-
-              </div>
-
-            </div>
-
-
-            <!-- CURRENT AVATAR -->
-
-            <div
-              v-else-if="
-                avatarUrl
-              "
-              class="
-                profile-current-avatar
-              "
-            >
-
-              <span>
-                Avatar actuel
-              </span>
-
-
-              <img
-                :src="
-                  avatarUrl
-                "
-                :alt="
-                  displayName
-                "
-              >
-
-
-              <button
-                type="button"
-                class="
-                  profile-button
-                  profile-button--secondary
-                "
-                :disabled="
-                  deletingAvatar
-                "
-                @click="
-                  removeAvatar
-                "
-              >
-                {{
-                  deletingAvatar
-                    ? "Suppression..."
-                    : "Retirer l'avatar"
-                }}
-              </button>
-
-            </div>
-
-          </div>
-
 
           <!-- =================================================
                BIO
