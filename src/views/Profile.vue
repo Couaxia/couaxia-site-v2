@@ -28,6 +28,7 @@ import {
   getProfileAvatar,
   getProfileDisplayName,
   getProfileInitial,
+  getProfileArtworkLikesCount,
   logoutProfile,
   selectOfficialAvatar,
   updateMyProfile,
@@ -36,6 +37,9 @@ import type {
   OfficialAvatar,
   Profile
 } from "../services/profile.service";
+
+import { getMyCardCollection } from "../services/cards.service";
+import type { CardCollection } from "../types/card.types";
 
 import AppLoader
     from "../../src/components/ui/AppLoader.vue";
@@ -48,6 +52,48 @@ const profile =
   ref<Profile | null>(
     null
   );
+
+const artworkLikesCount = ref<number | null>(null);
+const cardCollection = ref<CardCollection | null>(null);
+const loadingProfileStats = ref(false);
+const profileStatsError = ref("");
+
+const collectionPreview = computed(() =>
+  (cardCollection.value?.cards ?? [])
+    .filter((entry) => entry.quantity > 0)
+    .slice()
+    .sort((a, b) => new Date(b.lastObtainedAt).getTime() - new Date(a.lastObtainedAt).getTime())
+    .slice(0, 8)
+);
+
+async function loadProfileStats() {
+  if (!profile.value) return;
+  loadingProfileStats.value = true;
+  profileStatsError.value = "";
+  artworkLikesCount.value = null;
+  cardCollection.value = null;
+
+  const [likes, collection] = await Promise.allSettled([
+    getProfileArtworkLikesCount(profile.value.id),
+    getMyCardCollection()
+  ]);
+
+  if (likes.status === "fulfilled") {
+    artworkLikesCount.value = likes.value;
+  } else {
+    console.error("Erreur statistiques des likes :", likes.reason);
+    profileStatsError.value = "Certaines statistiques sont indisponibles.";
+  }
+
+  if (collection.status === "fulfilled") {
+    cardCollection.value = collection.value;
+  } else {
+    console.error("Erreur collection du profil :", collection.reason);
+    profileStatsError.value = "Certaines statistiques sont indisponibles.";
+  }
+
+  loadingProfileStats.value = false;
+}
 
 const officialAvatars =
   ref<OfficialAvatar[]>(
@@ -479,7 +525,8 @@ async function loadProfile() {
 
       await Promise.all([
         loadOfficialAvatars(),
-        loadPollSuggestions()
+        loadPollSuggestions(),
+        loadProfileStats()
       ]);
 
 
@@ -957,7 +1004,8 @@ async function logout() {
 
     pollSuggestions.value =
       [];
-
+    artworkLikesCount.value = null;
+    cardCollection.value = null;
 
     if (pollSuggestionsChannel) {
 
@@ -1714,6 +1762,60 @@ onBeforeUnmount(
 
 
         <!-- =================================================
+             STATISTIQUES ET COLLECTION
+        ================================================== -->
+        <section class="profile-collection" aria-labelledby="profile-collection-title">
+          <header class="profile-collection__header">
+            <div>
+              <span class="profile-collection__eyebrow">💜 MON UNIVERS</span>
+              <h2 id="profile-collection-title">Mes statistiques et mes cartes</h2>
+              <p>Retrouve tes coups de cœur et les cartes que tu as obtenues.</p>
+            </div>
+            <button type="button" class="profile-collection__refresh" :disabled="loadingProfileStats" @click="loadProfileStats">
+              {{ loadingProfileStats ? "Actualisation..." : "↻ Actualiser" }}
+            </button>
+          </header>
+
+          <div class="profile-collection__stats">
+            <div class="profile-collection__stat">
+              <span aria-hidden="true">❤️</span>
+              <strong>{{ artworkLikesCount === null ? "—" : artworkLikesCount }}</strong>
+              <span>Illustrations aimées</span>
+            </div>
+            <div class="profile-collection__stat">
+              <span aria-hidden="true">🃏</span>
+              <strong>{{ cardCollection?.stats.uniqueCards ?? (loadingProfileStats ? "—" : 0) }}</strong>
+              <span>Cartes différentes</span>
+            </div>
+            <div class="profile-collection__stat">
+              <span aria-hidden="true">✨</span>
+              <strong>{{ cardCollection?.stats.totalCopies ?? (loadingProfileStats ? "—" : 0) }}</strong>
+              <span>Exemplaires obtenus</span>
+            </div>
+          </div>
+
+          <p v-if="profileStatsError" class="profile-collection__error" role="alert">⚠️ {{ profileStatsError }}</p>
+
+          <div class="profile-collection__subheading">
+            <h3>Ma collection de cartes</h3>
+            <span v-if="cardCollection">{{ cardCollection.stats.completion }} % complétée</span>
+          </div>
+          <p v-if="loadingProfileStats" class="profile-collection__empty">🐙 Chargement de ta collection...</p>
+          <div v-else-if="collectionPreview.length" class="profile-collection__grid">
+            <article v-for="entry in collectionPreview" :key="entry.id" class="profile-collection__card">
+              <div class="profile-collection__image" :class="'profile-collection__image--' + entry.card.orientation">
+                <img :src="entry.card.imageUrl" :alt="entry.card.name" loading="lazy" />
+                <span v-if="entry.quantity > 1" class="profile-collection__quantity">×{{ entry.quantity }}</span>
+              </div>
+              <strong>{{ entry.card.name }}</strong>
+              <small>{{ entry.card.rarity }} · N°{{ entry.card.number }}</small>
+            </article>
+          </div>
+          <p v-else-if="cardCollection" class="profile-collection__empty">Tu n'as pas encore obtenu de cartes. 🐙</p>
+          <p v-else class="profile-collection__empty">Ta collection n'est pas disponible pour le moment.</p>
+        </section>
+
+        <!-- =================================================
              POLL SUGGESTIONS
         ================================================== -->
 
@@ -1916,6 +2018,35 @@ onBeforeUnmount(
 </template>
 
 <style scoped>
+
+.profile-collection { margin-top:34px; padding:clamp(22px,4vw,34px); border:1px solid rgba(109,0,163,.34); border-radius:26px; background:rgba(22,5,38,.72); }
+:global(html[data-theme="light"]) .profile-collection { background:rgba(255,255,255,.82); border-color:rgba(109,0,163,.18); }
+.profile-collection__header { display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:16px; margin-bottom:22px; }
+.profile-collection__eyebrow { color:#22f2ef; font-size:.76rem; font-weight:900; letter-spacing:.15em; }
+.profile-collection__header h2 { margin:8px 0; color:var(--text-primary,#fff); font-size:clamp(1.5rem,3vw,2.1rem); }
+.profile-collection__header p { margin:0; color:var(--text-secondary,#b7a9c6); }
+.profile-collection__refresh { padding:10px 14px; border:1px solid rgba(215,153,255,.35); border-radius:12px; background:rgba(109,0,163,.15); color:var(--text-primary,#fff); cursor:pointer; }
+.profile-collection__refresh:disabled { opacity:.6; cursor:wait; }
+.profile-collection__stats { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+.profile-collection__stat { display:flex; flex-direction:column; align-items:center; gap:8px; padding:20px 8px; border:1px solid rgba(215,153,255,.2); border-radius:17px; background:rgba(109,0,163,.12); text-align:center; }
+.profile-collection__stat > span:first-child { font-size:1.5rem; }
+.profile-collection__stat strong { font-size:1.9rem; color:var(--text-primary,#fff); }
+.profile-collection__stat > span:last-child { font-size:.82rem; color:var(--text-secondary,#b7a9c6); }
+.profile-collection__subheading { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin:30px 0 16px; }
+.profile-collection__subheading h3 { margin:0; color:var(--text-primary,#fff); }
+.profile-collection__subheading span { color:#d799ff; font-weight:700; }
+.profile-collection__grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); gap:16px; }
+.profile-collection__card { min-width:0; display:flex; flex-direction:column; gap:6px; padding:10px; border-radius:16px; background:rgba(109,0,163,.12); border:1px solid rgba(215,153,255,.16); }
+.profile-collection__card strong { color:var(--text-primary,#fff); overflow-wrap:anywhere; }
+.profile-collection__card small { color:var(--text-secondary,#b7a9c6); text-transform:capitalize; }
+.profile-collection__image { position:relative; width:100%; aspect-ratio:3/4; display:grid; place-items:center; overflow:hidden; border-radius:10px; background:rgba(0,0,0,.15); }
+.profile-collection__image--landscape { aspect-ratio:4/3; }
+.profile-collection__image img { display:block; width:100%; height:100%; object-fit:contain; }
+.profile-collection__quantity { position:absolute; right:6px; top:6px; padding:3px 7px; border-radius:999px; background:#6d00a3; color:white; font-weight:800; font-size:.75rem; }
+.profile-collection__empty { padding:25px 12px; border:1px dashed rgba(215,153,255,.28); border-radius:16px; color:var(--text-secondary,#b7a9c6); text-align:center; }
+.profile-collection__error { color:#ff789b; }
+@media(max-width:600px) { .profile-collection__stats { grid-template-columns:repeat(2,minmax(0,1fr)); } .profile-collection__stat:last-child { grid-column:1/-1; } .profile-collection { padding:20px 14px; } }
+
 
 .profile-suggestions {
   width: 100%;
