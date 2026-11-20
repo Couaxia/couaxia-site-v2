@@ -1,0 +1,59 @@
+
+services:
+
+  # ========================================
+  # FRONTEND — VUE + NGINX
+  # ========================================
+
+  couaxia-frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: frontend
+      args:
+        VITE_SUPABASE_URL: ${VITE_SUPABASE_URL}
+        VITE_SUPABASE_ANON_KEY: ${VITE_SUPABASE_ANON_KEY}
+        VITE_API_URL: http://localhost:8080
+
+    container_name: couaxia-frontend
+
+    ports:
+      - "127.0.0.1:8080:80"
+
+    depends_on:
+      couaxia-backend:
+        condition: service_healthy
+
+    # Limites de ressources
+    mem_limit: 128m
+    cpus: 0.5
+
+    restart: unless-stopped
+
+  # ========================================
+  # BACKEND — NODE + EXPRESS
+  # ========================================
+
+  couaxia-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: backend
+
+    container_name: couaxia-backend
+
+    env_file:
+      - .env
+
+    environment:
+      NODE_ENV: production
+      PORT: "10000"
+
+    expose:
+      - "10000"
+
+    # Limites de ressources
+    mem_limit: 512m
+    cpus: 1.0
+
+    restart: unless-stopped

@@ -1,10 +1,30 @@
+
+# Dépendances et compilations locales
 node_modules
 dist
+dist-server
+coverage
+
+# Git
 .git
 .gitignore
+
+# Secrets et environnement
 .env
-.env.local
-npm-debug.log
-README.md
+.env.*
+!.env.example
+
+# Configuration locale
 .vscode
 .idea
+
+# Logs
+*.log
+npm-debug.log*
+
+# Fichiers système
+.DS_Store
+Thumbs.db
+
+# Docker Compose local
+compose.override.yaml
