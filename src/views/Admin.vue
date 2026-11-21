@@ -66,6 +66,9 @@ import AdminArtworks from
 import AdminCards from
     "../components/admin/AdminCards.vue";
 
+import ArtworkProtector from
+    "../components/admin/ArtworkProtector.vue";
+
 
 import AdminAnnouncements from
     "../components/admin/AdminAnnouncements.vue";
@@ -86,6 +89,7 @@ type AdminTab =
     | "suggestions"
     | "users"
     | "artworks"
+    | "artwork-protector"
     | "cards"
     | "announcements"
     | "messages";
@@ -233,6 +237,20 @@ const tabs:
 
             description:
                 "Ajoute et organise les créations affichées dans les crédits."
+        },
+
+        {
+            id:
+                "artwork-protector",
+
+            label:
+                "Protection des arts",
+
+            icon:
+                "🛡️",
+
+            description:
+                "Génère des versions protégées de tes illustrations avec ton watermark."
         },
 
         {
@@ -863,6 +881,12 @@ onMounted(
 
                     <AdminArtworks
                         v-else-if="activeTab === 'artworks'"
+                    />
+
+                    <!-- PROTECTION DES ARTS -->
+
+                    <ArtworkProtector
+                        v-else-if="activeTab === 'artwork-protector'"
                     />
 
                     <!-- CARTES -->

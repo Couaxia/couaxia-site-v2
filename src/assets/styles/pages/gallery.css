@@ -4078,3 +4078,64 @@ html[data-theme="light"]
     }
 
 }
+
+/* =========================================================
+   WATERMARK - CARTES
+========================================================= */
+
+.credits-card__visual {
+    position: relative;
+    overflow: hidden;
+}
+
+.credits-card__watermark {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.credits-card__watermark img {
+    display: block;
+    width: 100%;
+    height: 100%;
+
+    object-fit: fill;
+
+    opacity: 0.25;
+    user-select: none;
+    pointer-events: none;
+}
+
+/* =========================================================
+   WATERMARK - LIGHTBOX
+========================================================= */
+
+.credits-lightbox .credits-lightbox__watermark {
+    position: absolute;
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    z-index: 2;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.credits-lightbox .credits-lightbox__watermark img {
+    display: block;
+
+    width: 100%;
+    height: 100%;
+
+    max-width: none;
+    object-fit: fill;
+
+    opacity: 0.25;
+
+    user-select: none;
+    pointer-events: none;
+}
