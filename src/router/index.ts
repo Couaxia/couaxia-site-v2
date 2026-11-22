@@ -31,6 +31,12 @@ import AdminView from "../views/Admin.vue";
 
 import TwitchView from "../views/Twitch.vue";
 
+/* =========================================================
+   PAGE 404
+========================================================= */
+
+import NotFoundView from "../views/NotFound.vue";
+
 
 /* =========================================================
    ROUTES
@@ -213,6 +219,20 @@ const routes = [
                 import(
                     "../views/Contact.vue"
                 )
+    },
+
+
+    /* =====================================================
+       PAGE 404 - ROUTE INTROUVABLE
+    ====================================================== */
+
+    {
+        path: "/:pathMatch(.*)*",
+
+        name: "not-found",
+
+        component:
+            NotFoundView
     }
 
 ];
