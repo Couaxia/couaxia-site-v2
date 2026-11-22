@@ -1,3 +1,4 @@
+
 import {
     createRouter,
     createWebHistory
@@ -197,12 +198,15 @@ const routes = [
             TwitchView
     },
 
-    {
-        path:
-            "/contact",
 
-        name:
-            "contact",
+    /* =====================================================
+       CONTACT
+    ====================================================== */
+
+    {
+        path: "/contact",
+
+        name: "contact",
 
         component:
             () =>
@@ -224,7 +228,65 @@ const router =
         history:
             createWebHistory(),
 
-        routes
+        routes,
+
+        /* =================================================
+           SCROLL BEHAVIOR
+           Gestion du défilement entre les pages
+        ================================================= */
+
+        scrollBehavior(
+            to,
+            _from,
+            savedPosition
+        ) {
+
+            /* =============================================
+               RETOUR ARRIÈRE / AVANT
+               Restaurer la position précédente
+            ============================================= */
+
+            if (savedPosition) {
+
+                return savedPosition;
+
+            }
+
+
+            /* =============================================
+               NAVIGATION VERS UNE ANCRE
+               Exemple : /about#histoire
+            ============================================= */
+
+            if (to.hash) {
+
+                return {
+
+                    el: to.hash,
+
+                    behavior: "smooth"
+
+                };
+
+            }
+
+
+            /* =============================================
+               CHANGEMENT DE PAGE
+               Toujours revenir en haut
+            ============================================= */
+
+            return {
+
+                top: 0,
+
+                left: 0,
+
+                behavior: "auto"
+
+            };
+
+        }
 
     });
 

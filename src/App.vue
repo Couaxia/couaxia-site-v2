@@ -1,3 +1,4 @@
+
 <script setup lang="ts">
 
 /* =========================================================
@@ -21,6 +22,8 @@ import {
 
 import AppHeader from "./components/layout/AppHeader.vue";
 
+import AppFooter from "./components/layout/Footer.vue";
+
 import ScrollPage from "./components/layout/ScrollPage.vue";
 
 /* =========================================================
@@ -35,7 +38,7 @@ import CustomCursor from "./components/ui/CustomCursor.vue";
    GLOBAL LOADER
 ========================================================= */
 
-import AppLoader from "././components/ui/AppLoader.vue";
+import AppLoader from "./components/ui/AppLoader.vue";
 
 /* =========================================================
    CONTENT PROTECTION
@@ -65,14 +68,12 @@ let loadingTimer: ReturnType<typeof setTimeout> | null = null;
 ========================================================= */
 
 function startLoading() {
-
     if (loadingTimer) {
         clearTimeout(loadingTimer);
         loadingTimer = null;
     }
 
     isPageLoading.value = true;
-
 }
 
 /* =========================================================
@@ -80,18 +81,14 @@ function startLoading() {
 ========================================================= */
 
 function stopLoading() {
-
     if (loadingTimer) {
         clearTimeout(loadingTimer);
     }
 
     loadingTimer = setTimeout(() => {
-
         isPageLoading.value = false;
         loadingTimer = null;
-
     }, 250);
-
 }
 
 /* =========================================================
@@ -99,21 +96,15 @@ function stopLoading() {
 ========================================================= */
 
 const removeBeforeEach = router.beforeEach(() => {
-
     startLoading();
-
 });
 
 const removeAfterEach = router.afterEach(() => {
-
     stopLoading();
-
 });
 
 const removeOnError = router.onError(() => {
-
     stopLoading();
-
 });
 
 /* =========================================================
@@ -121,9 +112,7 @@ const removeOnError = router.onError(() => {
 ========================================================= */
 
 onMounted(() => {
-
     enableContentProtection();
-
 });
 
 /* =========================================================
@@ -131,7 +120,6 @@ onMounted(() => {
 ========================================================= */
 
 onBeforeUnmount(() => {
-
     disableContentProtection();
 
     removeBeforeEach();
@@ -142,7 +130,6 @@ onBeforeUnmount(() => {
         clearTimeout(loadingTimer);
         loadingTimer = null;
     }
-
 });
 
 </script>
@@ -154,53 +141,74 @@ onBeforeUnmount(() => {
     ====================================================== -->
 
     <Teleport to="body">
-
         <Transition name="couaxia-loader">
-
             <AppLoader
                 v-if="isPageLoading"
                 text="Chargement de l'univers Couaxia..."
                 size="large"
                 overlay
             />
-
         </Transition>
-
     </Teleport>
 
     <!-- =====================================================
-         HEADER
+         APP LAYOUT
     ====================================================== -->
 
-    <AppHeader />
+    <div class="couaxia-app-layout">
 
-    <!-- =====================================================
-         CUSTOM CURSOR
-    ====================================================== -->
+        <!-- HEADER -->
+
+        <AppHeader />
+
+        <!-- CURRENT PAGE -->
+
+        <div class="couaxia-app-content">
+            <RouterView />
+        </div>
+
+        <!-- GLOBAL FOOTER -->
+
+        <AppFooter />
+
+    </div>
+
+    <!-- CUSTOM CURSOR -->
 
     <CustomCursor />
 
-    <!-- =====================================================
-         CURRENT PAGE
-    ====================================================== -->
-
-    <RouterView />
-
-    <!-- =====================================================
-         GLOBAL MASCOT
-    ====================================================== -->
+    <!-- GLOBAL MASCOT -->
 
     <Mascot />
 
-    <!-- =====================================================
-         GLOBAL SCROLL BUTTONS
-    ====================================================== -->
+    <!-- GLOBAL SCROLL BUTTONS -->
 
     <ScrollPage />
 
 </template>
 
 <style scoped>
+
+/* =========================================================
+   APP LAYOUT
+========================================================= */
+
+.couaxia-app-layout {
+    min-height: 100vh;
+    min-height: 100dvh;
+
+    display: flex;
+    flex-direction: column;
+
+    width: 100%;
+    min-width: 0;
+}
+
+.couaxia-app-content {
+    flex: 1 0 auto;
+    min-width: 0;
+    width: 100%;
+}
 
 /* =========================================================
    LOADER TRANSITION
