@@ -4,7 +4,8 @@ import {
   computed,
   onBeforeUnmount,
   onMounted,
-  ref
+  ref,
+  watch
 } from "vue";
 
 import "../assets/styles/pages/profile.css";
@@ -43,6 +44,8 @@ import type { FavoriteArtwork } from "../services/profile-favorites.service";
 
 import { getMyCardCollection } from "../services/cards.service";
 import type { CardCollection } from "../types/card.types";
+import { getUnlockedBadges, saveUnlockedBadges } from "../services/profile-badges.service";
+import { getFeaturedBadges, setFeaturedBadges } from "../services/profile-featured-badges.service";
 
 import AppLoader
     from "../../src/components/ui/AppLoader.vue";
@@ -148,6 +151,188 @@ async function loadProfileStats() {
   loadingProfileStats.value = false;
 }
 
+// Déclaré avant le watch(profileBadges) pour éviter une ReferenceError.
+const pollSuggestions =
+  ref<PollSuggestion[]>(
+    []
+  );
+
+/* =========================================================
+   BADGES ÉVOLUTIFS — chaque palier reste acquis
+========================================================= */
+type BadgeRarity = "Commun" | "Rare" | "Épique" | "Légendaire" | "Mythique";
+type BadgeFamily = "favorites" | "unique-cards" | "copies" | "suggestions" | "loyalty" | "special";
+interface ProfileBadge {
+  id: string;
+  family: BadgeFamily;
+  level: number;
+  icon: string;
+  title: string;
+  description: string;
+  rarity: BadgeRarity;
+  current: number;
+  target: number;
+  unlocked: boolean;
+  progress: number;
+  unlockedAt: string | null;
+}
+const badgeFamilies: { family: BadgeFamily; icons: string[]; names: string[]; goals: number[]; description: string }[] = [
+  { family: "favorites", icons: ["❤️","💖","💝","💎","👑"], names: ["Premier coup de cœur","Amoureux des arts","Passionné d'art","Gardien des œuvres","Maître de la galerie"], goals: [1,10,25,50,100], description: "illustrations aimées" },
+  { family: "unique-cards", icons: ["🎴","🃏","✨","🏆","👑"], names: ["Première carte","Collectionneur","Grand collectionneur","Expert des cartes","Maître collectionneur"], goals: [1,5,10,25,50], description: "cartes différentes" },
+  { family: "copies", icons: ["🎴","📚","🎁","💫","👑"], names: ["Premiers exemplaires","Pile de cartes","Réserve de cartes","Trésor de cartes","Roi des cartes"], goals: [1,10,50,100,250], description: "exemplaires obtenus" },
+  { family: "suggestions", icons: ["💡","🗳️","🧠","🌠","🔮"], names: ["Boîte à idées","Créatif POUP","Inventeur","Architecte d'idées","Visionnaire POUP"], goals: [1,5,10,25,50], description: "suggestions proposées" },
+  { family: "loyalty", icons: ["🐙","🌱","🌟","🌌","👑"], names: ["Bienvenue à bord","Première semaine","Membre fidèle","Explorateur de Saphira","Vétéran de Saphira"], goals: [0,7,30,90,365], description: "jours depuis l'inscription" }
+];
+const rarityByLevel: BadgeRarity[] = ["Commun", "Commun", "Rare", "Épique", "Légendaire"];
+const storedBadgeDates = ref<Record<string,string>>({});
+const badgesError = ref("");
+const badgesSaving = ref(false);
+const badgesReady = ref(false);
+const badgeFilter = ref<"progress" | "unlocked" | "secrets">("progress");
+const membershipDays = computed(() => {
+  const created = profile.value?.created_at ? new Date(profile.value.created_at).getTime() : NaN;
+  return Number.isFinite(created) ? Math.max(0, Math.floor((Date.now() - created) / 86400000)) : 0;
+});
+const profileBadges = computed<ProfileBadge[]>(() => {
+  const values: Record<Exclude<BadgeFamily,"special">,number> = {
+    favorites: artworkLikesCount.value ?? 0,
+    "unique-cards": cardCollection.value?.stats.uniqueCards ?? 0,
+    copies: cardCollection.value?.stats.totalCopies ?? 0,
+    suggestions: pollSuggestions.value.length,
+    loyalty: membershipDays.value
+  };
+  return badgeFamilies.flatMap(group => group.goals.map((target, index) => {
+    const current = values[group.family as Exclude<BadgeFamily,"special">];
+    const id = `${group.family}-${index+1}`;
+    const previousTarget = index === 0 ? 0 : group.goals[index-1];
+    const stored = storedBadgeDates.value[id] ?? null;
+    return {
+      id, family: group.family, level: index+1, icon: group.icons[index],
+      title: group.names[index], description: group.family === "loyalty" ? (index === 0 ? "Rejoindre l'équipage POUP" : `Être inscrit depuis ${target} jours`) : `Atteindre ${target} ${group.description}`,
+      rarity: rarityByLevel[index], current, target,
+      unlocked: stored !== null || (badgesReady.value && current >= target),
+      progress: target === 0 ? 100 : Math.min(100, Math.round(Math.max(0,current-previousTarget)/(target-previousTarget)*100)),
+      unlockedAt: stored
+    };
+  }));
+});
+// Les objectifs secrets restent anonymes jusqu'à leur déblocage.
+// Ils sont basés uniquement sur des statistiques déjà disponibles dans ce profil.
+const secretBadges = computed<ProfileBadge[]>(() => {
+  const likes = artworkLikesCount.value ?? 0;
+  const unique = cardCollection.value?.stats.uniqueCards ?? 0;
+  const copies = cardCollection.value?.stats.totalCopies ?? 0;
+  const suggestions = pollSuggestions.value.length;
+  const days = membershipDays.value;
+  const secrets = [
+    { id: "secret-art-ideas", icon: "🎨", title: "L'inspiration du poulpe", description: "Aimer 5 illustrations et proposer une suggestion", rarity: "Rare" as BadgeRarity, done: likes >= 5 && suggestions >= 1 },
+    { id: "secret-collector", icon: "🌈", title: "Curiosité sans limites", description: "Posséder 10 cartes différentes et aimer 10 illustrations", rarity: "Épique" as BadgeRarity, done: unique >= 10 && likes >= 10 },
+    { id: "secret-treasure", icon: "💎", title: "Trésor englouti", description: "Posséder 50 exemplaires et proposer 5 suggestions", rarity: "Légendaire" as BadgeRarity, done: copies >= 50 && suggestions >= 5 },
+    { id: "secret-loyal", icon: "🌌", title: "Gardien de Saphira", description: "Être inscrit depuis 90 jours et aimer 25 illustrations", rarity: "Épique" as BadgeRarity, done: days >= 90 && likes >= 25 }
+  ];
+  return secrets.map((secret) => {
+    const stored = storedBadgeDates.value[secret.id] ?? null;
+    const unlocked = stored !== null || (badgesReady.value && secret.done);
+    return {
+      id: secret.id, family: "special" as BadgeFamily, level: 1,
+      icon: unlocked ? secret.icon : "❔",
+      title: unlocked ? secret.title : "Succès secret",
+      description: unlocked ? secret.description : "Condition mystérieuse : découvre-la en jouant !",
+      rarity: secret.rarity, current: unlocked ? 1 : 0, target: 1,
+      unlocked, progress: unlocked ? 100 : 0, unlockedAt: stored
+    };
+  });
+});
+const allBadges = computed(() => [...profileBadges.value, ...secretBadges.value]);
+const unlockedBadgesCount = computed(() => allBadges.value.filter(b => b.unlocked).length);
+
+// Badges épinglés : trois emplacements maximum, conservés dans Supabase.
+const featuredBadgeIds = ref<string[]>([]);
+const featuredBadgesError = ref("");
+const featuredBadgesSaving = ref(false);
+const featuredBadges = computed(() => featuredBadgeIds.value
+  .map(id => allBadges.value.find(b => b.id === id))
+  .filter((badge): badge is ProfileBadge => Boolean(badge?.unlocked)));
+async function loadFeaturedBadges() {
+  if (!profile.value) return;
+  featuredBadgesError.value = "";
+  try {
+    featuredBadgeIds.value = await getFeaturedBadges(profile.value.id);
+  } catch (error) {
+    console.error("Chargement des badges exposés :", error);
+    featuredBadgesError.value = "Impossible de charger les badges exposés.";
+  }
+}
+async function toggleFeaturedBadge(id: string) {
+  if (!profile.value || featuredBadgesSaving.value) return;
+  const badge = allBadges.value.find(b => b.id === id);
+  if (!badge?.unlocked || !storedBadgeDates.value[id]) {
+    featuredBadgesError.value = "Attends que ce succès soit enregistré avant de l'épingler.";
+    return;
+  }
+  const previous = [...featuredBadgeIds.value];
+  const next = previous.includes(id)
+    ? previous.filter(item => item !== id)
+    : [...previous, id];
+  if (next.length > 3) {
+    featuredBadgesError.value = "Tu peux exposer 3 badges maximum.";
+    return;
+  }
+  featuredBadgesSaving.value = true;
+  featuredBadgesError.value = "";
+  try {
+    await setFeaturedBadges(next);
+    featuredBadgeIds.value = next;
+  } catch (error) {
+    console.error("Enregistrement des badges exposés :", error);
+    featuredBadgesError.value = "Impossible d'enregistrer tes badges. Vérifie le script SQL Supabase.";
+  } finally {
+    featuredBadgesSaving.value = false;
+  }
+}
+
+// Un seul niveau par famille : le premier non débloqué, sinon le dernier terminé.
+const activeGoals = computed(() => badgeFamilies.map(group => {
+  const familyBadges = profileBadges.value.filter(b => b.family === group.family);
+  return familyBadges.find(b => !b.unlocked) ?? familyBadges[familyBadges.length - 1];
+}).filter((b): b is ProfileBadge => Boolean(b)));
+const visibleBadges = computed(() => {
+  if (badgeFilter.value === "progress") return activeGoals.value;
+  if (badgeFilter.value === "secrets") return secretBadges.value;
+  return allBadges.value.filter(b => b.unlocked);
+});
+
+async function loadBadges() {
+  if (!profile.value) return;
+  badgesError.value = "";
+  try { storedBadgeDates.value = await getUnlockedBadges(profile.value.id); }
+  catch (error) { console.error("Chargement badges :", error); badgesError.value = "Historique des badges indisponible. Vérifie la table user_badges dans Supabase."; }
+}
+let badgeSyncInProgress = false;
+async function syncBadges() {
+  if (!profile.value || !badgesReady.value || badgeSyncInProgress || badgesError.value) return;
+  const userId = profile.value.id;
+  const earned = allBadges.value.filter(b => b.unlocked && !storedBadgeDates.value[b.id]).map(b => b.id);
+  if (!earned.length) return;
+  badgeSyncInProgress = true;
+  badgesSaving.value = true;
+  try {
+    await saveUnlockedBadges(userId, earned);
+    if (profile.value?.id === userId) await loadBadges();
+  } catch (error) {
+    console.error("Enregistrement badges :", error);
+    badgesError.value = "Impossible d'enregistrer les badges. Vérifie les règles Supabase.";
+  } finally {
+    badgeSyncInProgress = false;
+    badgesSaving.value = false;
+    if (!badgesError.value && profile.value?.id === userId) {
+      const remaining = allBadges.value.some(b => b.unlocked && !storedBadgeDates.value[b.id]);
+      if (remaining) void syncBadges();
+    }
+  }
+}
+watch(allBadges, () => { if (badgesReady.value) void syncBadges(); });
+
 const officialAvatars =
   ref<OfficialAvatar[]>(
     []
@@ -158,10 +343,6 @@ const officialAvatars =
    POLL SUGGESTIONS
 ========================================================= */
 
-const pollSuggestions =
-  ref<PollSuggestion[]>(
-    []
-  );
 
 const loadingPollSuggestions =
   ref(false);
@@ -580,8 +761,12 @@ async function loadProfile() {
         loadOfficialAvatars(),
         loadPollSuggestions(),
         loadProfileStats(),
-        loadFavorites()
+        loadFavorites(),
+        loadBadges(),
+        loadFeaturedBadges()
       ]);
+      badgesReady.value = true;
+      void syncBadges();
 
 
       subscribeToPollSuggestions();
@@ -1061,6 +1246,9 @@ async function logout() {
     artworkLikesCount.value = null;
     cardCollection.value = null;
     favoriteArtworks.value = [];
+    storedBadgeDates.value = {};
+    featuredBadgeIds.value = [];
+    badgesReady.value = false;
 
     if (pollSuggestionsChannel) {
 
@@ -1416,6 +1604,21 @@ onBeforeUnmount(
             >
               @{{ profile.username }}
             </p>
+
+            <div class="profile-featured" aria-label="Badges exposés sur le profil">
+              <span class="profile-featured__label">🏅 Mes badges</span>
+              <div class="profile-featured__list">
+                <span v-for="badge in featuredBadges" :key="badge.id"
+                  class="profile-featured__badge" :class="'profile-featured__badge--' + badge.rarity.toLowerCase()"
+                  :title="badge.title + ' · ' + badge.rarity">
+                  <span aria-hidden="true">{{ badge.icon }}</span>
+                  <span>{{ badge.title }}</span>
+                </span>
+                <button v-if="featuredBadges.length < 3" type="button" class="profile-featured__add"
+                  @click="activeProfileTab = 'badges'; badgeFilter = 'unlocked'"
+                  title="Choisir un badge dans les succès obtenus">+ Ajouter un badge</button>
+              </div>
+            </div>
 
 
             <p
@@ -2114,17 +2317,47 @@ onBeforeUnmount(
           <p v-else class="profile-favorites__empty">Tu n'as pas encore d'illustrations favorites. 💜</p>
         </section>
 
-        <section
-          v-if="activeProfileTab === 'badges'"
-          class="profile-coming-soon"
-          aria-labelledby="profile-badges-title"
-        >
-          <span class="profile-coming-soon__icon" aria-hidden="true">🏅</span>
-          <h2 id="profile-badges-title">Mes badges et succès</h2>
-          <p>
-            Les badges de l'équipage POUP arriveront bientôt.
-            Tu pourras suivre tes défis et les récompenses débloquées ici.
-          </p>
+        <section v-if="activeProfileTab === 'badges'" class="profile-badges" aria-labelledby="profile-badges-title">
+          <header class="profile-badges__header">
+            <div>
+              <span class="profile-badges__eyebrow">🏅 LES SUCCÈS DE L'ÉQUIPAGE</span>
+              <h2 id="profile-badges-title">Mes succès évolutifs</h2>
+              <p>Un objectif à la fois par famille. Tous les niveaux obtenus restent acquis !</p>
+            </div>
+            <strong class="profile-badges__counter">{{ unlockedBadgesCount }} / {{ allBadges.length }} débloqués</strong>
+          </header>
+          <p v-if="badgesError" class="profile-badges__notice" role="alert">⚠️ {{ badgesError }}</p>
+          <p v-else-if="badgesSaving" class="profile-badges__notice" role="status">💜 Sauvegarde des nouveaux succès...</p>
+          <p v-if="profileStatsError || pollSuggestionsError" class="profile-badges__notice">Certaines statistiques sont indisponibles : la progression peut être incomplète.</p>
+          <p v-if="featuredBadgesError" class="profile-badges__notice" role="alert">⚠️ {{ featuredBadgesError }}</p>
+          <p class="profile-badges__notice">Épingle jusqu'à 3 succès obtenus pour les afficher près de ton avatar. Les secrets restent cachés jusqu'à leur découverte.</p>
+          <div class="profile-badges__filters" aria-label="Filtrer les succès">
+            <button type="button" :class="{ active: badgeFilter === 'progress' }" @click="badgeFilter = 'progress'">🎯 Objectifs actuels</button>
+            <button type="button" :class="{ active: badgeFilter === 'unlocked' }" @click="badgeFilter = 'unlocked'">🏆 Succès obtenus ({{ unlockedBadgesCount }})</button>
+            <button type="button" :class="{ active: badgeFilter === 'secrets' }" @click="badgeFilter = 'secrets'">🔒 Secrets</button>
+          </div>
+          <div class="profile-badges__grid">
+            <article v-for="badge in visibleBadges" :key="badge.id" class="profile-badges__card"
+              :class="['profile-badges__card--' + badge.rarity.toLowerCase(), { 'profile-badges__card--locked': !badge.unlocked }]">
+              <span class="profile-badges__icon" aria-hidden="true">{{ badge.icon }}</span>
+              <span class="profile-badges__rarity">{{ badge.family === 'special' && !badge.unlocked ? '🔒 Secret' : `${badge.rarity} · Niveau ${badge.level}` }}</span>
+              <h3>{{ badge.title }}</h3>
+              <p>{{ badge.description }}</p>
+              <strong class="profile-badges__status">{{ badge.unlocked ? '✓ Débloqué' : badge.family === 'special' ? '???' : `${badge.current} / ${badge.target}` }}</strong>
+              <small v-if="badge.unlockedAt" class="profile-badges__date">Obtenu le {{ formatDate(badge.unlockedAt) }}</small>
+              <button v-if="badge.unlocked && badgeFilter === 'unlocked'" type="button"
+                class="profile-badges__pin" :class="{ 'profile-badges__pin--active': featuredBadgeIds.includes(badge.id) }"
+                :disabled="featuredBadgesSaving || (!featuredBadgeIds.includes(badge.id) && featuredBadgeIds.length >= 3)"
+                :aria-pressed="featuredBadgeIds.includes(badge.id)"
+                @click="toggleFeaturedBadge(badge.id)">
+                {{ featuredBadgeIds.includes(badge.id) ? '📌 Retirer du profil' : '📍 Afficher sur mon profil' }}
+              </button>
+              <div v-if="badge.family !== 'special' || badge.unlocked" class="profile-badges__progress" role="progressbar" :aria-label="`Progression du succès ${badge.title}`" :aria-valuenow="badge.unlocked ? 100 : badge.progress" aria-valuemin="0" aria-valuemax="100">
+                <span :style="{ width: `${badge.unlocked ? 100 : badge.progress}%` }"></span>
+              </div>
+            </article>
+          </div>
+          <p v-if="!visibleBadges.length" class="profile-badges__notice">Aucun succès dans cette catégorie pour le moment.</p>
         </section>
 
       </template>
@@ -2353,6 +2586,131 @@ onBeforeUnmount(
     border-radius: 21px;
   }
 
+}
+
+
+/* =========================================================
+   BADGES ET SUCCÈS
+========================================================= */
+.profile-badges {
+  margin-top: 34px;
+  padding: clamp(22px, 4vw, 34px);
+  border: 1px solid rgba(215, 153, 255, .26);
+  border-radius: 26px;
+  background: rgba(22, 5, 38, .72);
+}
+:global(html[data-theme="light"]) .profile-badges {
+  background: rgba(255, 255, 255, .85);
+  border-color: rgba(109, 0, 163, .18);
+}
+.profile-badges__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 25px;
+}
+.profile-badges__eyebrow {
+  color: #22dcd9;
+  font-size: .76rem;
+  font-weight: 900;
+  letter-spacing: .13em;
+}
+.profile-badges__header h2 {
+  margin: 9px 0 7px;
+  color: var(--text-primary, #fff);
+  font-size: clamp(1.6rem, 3vw, 2.25rem);
+}
+.profile-badges__header p {
+  margin: 0;
+  color: var(--text-secondary, #b7a9c6);
+}
+.profile-badges__counter {
+  padding: 11px 15px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #6d00a3, #d523a3);
+  color: #fff;
+  white-space: nowrap;
+}
+.profile-badges__notice {
+  margin: 0 0 16px;
+  color: #ffb5ce;
+}
+.profile-badges__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  gap: 16px;
+}
+.profile-badges__card {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 9px;
+  padding: 23px 17px;
+  border: 1px solid rgba(215, 153, 255, .32);
+  border-radius: 19px;
+  background: linear-gradient(155deg, rgba(109, 0, 163, .20), rgba(242, 34, 146, .09));
+  text-align: center;
+  transition: transform .2s ease, border-color .2s ease;
+}
+.profile-badges__card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(242, 34, 146, .65);
+}
+.profile-badges__card--locked {
+  opacity: .67;
+  background: rgba(109, 0, 163, .07);
+}
+.profile-badges__icon { font-size: 2.7rem; line-height: 1.3; }
+.profile-badges__rarity {
+  padding: 4px 10px;
+  border: 1px solid rgba(215, 153, 255, .32);
+  border-radius: 999px;
+  color: #e2b3ff;
+  font-size: .72rem;
+  font-weight: 800;
+}
+.profile-badges__card h3 {
+  margin: 3px 0 0;
+  color: var(--text-primary, #fff);
+  font-size: 1.08rem;
+}
+.profile-badges__card p {
+  flex: 1;
+  margin: 0;
+  color: var(--text-secondary, #b7a9c6);
+  font-size: .88rem;
+  line-height: 1.5;
+}
+.profile-badges__status {
+  color: #ff7cce;
+  font-size: .85rem;
+}
+.profile-badges__progress {
+  width: 100%;
+  height: 9px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(215, 153, 255, .18);
+}
+.profile-badges__progress span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #8b16c7, #f22292);
+  transition: width .3s ease;
+}
+:global(html[data-theme="light"]) .profile-badges__card {
+  background: rgba(249, 240, 255, .9);
+  border-color: rgba(109, 0, 163, .2);
+}
+:global(html[data-theme="light"]) .profile-badges__rarity { color: #74269b; }
+:global(html[data-theme="light"]) .profile-badges__status { color: #a31279; }
+@media (max-width: 600px) {
+  .profile-badges { padding: 20px 14px; border-radius: 21px; }
+  .profile-badges__grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr)); }
 }
 
 </style>

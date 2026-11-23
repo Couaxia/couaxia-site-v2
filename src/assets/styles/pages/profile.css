@@ -4805,3 +4805,139 @@ html[data-theme="light"] .profile-suggestions__count {
 .profile-favorites__remove:focus-visible { outline:2px solid var(--profile-cyan); outline-offset:3px; }
 .profile-favorites__empty { padding:35px 15px; border:1px dashed var(--profile-border); border-radius:16px; color:var(--profile-text-secondary); text-align:center; }
 @media(max-width:600px) { .profile-favorites { padding:20px 14px; } .profile-favorites__grid { grid-template-columns:repeat(auto-fill,minmax(145px,1fr)); gap:12px; } }
+
+/* =========================================================
+   BADGES ET SUCCÈS — COUAXIA V2
+========================================================= */
+.profile-badges { margin-top: 34px; padding: clamp(22px, 4vw, 36px); border: 1px solid rgba(171, 65, 219, .35); border-radius: 26px; background: rgba(22, 5, 38, .72); }
+.profile-badges__header { display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:16px; margin-bottom:25px; }
+.profile-badges__eyebrow { color:#22f2ef; font-size:.76rem; font-weight:900; letter-spacing:.13em; }
+.profile-badges__header h2 { margin:9px 0; color:var(--profile-text, #fff); font-size:clamp(1.5rem,3vw,2rem); }
+.profile-badges__header p { margin:0; color:var(--profile-text-secondary,#c6b4d4); }
+.profile-badges__counter { color:#ffc0f3; background:rgba(151, 25, 173, .2); border:1px solid rgba(211, 90, 239, .35); padding:12px 16px; border-radius:999px; white-space:nowrap; }
+.profile-badges__grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:16px; }
+.profile-badges__card { position:relative; display:flex; flex-direction:column; align-items:center; text-align:center; gap:9px; padding:23px 15px; border:1px solid rgba(207, 102, 245, .35); border-radius:18px; background:rgba(56, 15, 77, .5); color:var(--profile-text,#fff); }
+.profile-badges__card--locked { opacity:.68; }
+.profile-badges__card--locked .profile-badges__icon { filter:grayscale(1); }
+.profile-badges__icon { font-size:2.4rem; }
+.profile-badges__rarity { font-size:.7rem; text-transform:uppercase; letter-spacing:.12em; color:#f5a1e3; font-weight:800; }
+.profile-badges__card h3 { font-size:1rem; margin:0; }
+.profile-badges__card p { font-size:.85rem; color:var(--profile-text-secondary,#c6b4d4); margin:0; flex:1; }
+.profile-badges__status { font-size:.85rem; color:#ffb7ef; }
+.profile-badges__progress { width:100%; height:8px; background:rgba(255,255,255,.12); border-radius:999px; overflow:hidden; }
+.profile-badges__progress span { display:block; height:100%; background:linear-gradient(90deg,#a13fe0,#e648ba,#22f2ef); border-radius:inherit; transition:width .3s ease; }
+.profile-badges__notice { color:#ffce8d; }
+html[data-theme="light"] .profile-badges { background:rgba(255,255,255,.82); border-color:rgba(109,0,163,.18); }
+html[data-theme="light"] .profile-badges__card { background:rgba(248,235,255,.9); border-color:rgba(140,55,175,.22); }
+html[data-theme="light"] .profile-badges__counter, html[data-theme="light"] .profile-badges__status { color:#8b197f; }
+html[data-theme="light"] .profile-badges__progress { background:rgba(90,25,110,.14); }
+@media(max-width:1050px) { .profile-badges__grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media(max-width:560px) { .profile-badges__grid { grid-template-columns:1fr; } .profile-badges { padding:20px 14px; } }
+@media(prefers-reduced-motion:reduce) { .profile-badges__progress span { transition:none; } }
+
+/* BADGES ÉVOLUTIFS */
+.profile-badges__filters { display:flex; flex-wrap:wrap; gap:10px; margin:0 0 22px; }
+.profile-badges__filters button { padding:10px 16px; border:1px solid var(--profile-border); border-radius:999px; color:var(--profile-text); background:var(--profile-panel-bg); cursor:pointer; font:inherit; font-weight:800; }
+.profile-badges__filters button.active { color:white; background:linear-gradient(135deg,#6d00a3,#d523a3); }
+.profile-badges__next { margin:0 0 26px; padding:18px; border:1px solid var(--profile-border); border-radius:18px; background:var(--profile-panel-bg); }
+.profile-badges__next h3 { margin:0 0 15px; color:var(--profile-text); }
+.profile-badges__next-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; }
+.profile-badges__next-grid article { display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; padding:12px; border-radius:12px; background:var(--profile-panel-hover); color:var(--profile-text); font-size:.8rem; }
+.profile-badges__next-grid strong { color:var(--profile-pink-light); }
+.profile-badges__date { font-size:.7rem; color:var(--profile-text-secondary); }
+.profile-badges__card--épique:not(.profile-badges__card--locked) { border-color:rgba(225,156,55,.55); }
+.profile-badges__card--légendaire:not(.profile-badges__card--locked) { border-color:rgba(255,204,64,.8); box-shadow:0 0 20px rgba(255,204,64,.1); }
+.profile-badges__card--locked { opacity:.72; }
+.profile-badges__card--locked .profile-badges__icon { filter:grayscale(1); }
+@media(max-width:560px) { .profile-badges__filters button { flex:1; padding:10px 8px; font-size:.76rem; } }
+
+/* =========================================================
+   COUAXIA V2 — OBJECTIFS ÉVOLUTIFS ET SECRETS
+   Complément compatible avec Profile.vue Objectifs_Secrets
+========================================================= */
+.profile-badges__filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 0 0 24px;
+}
+.profile-badges__filters button {
+    min-height: 44px;
+    padding: 10px 18px;
+    border: 1px solid var(--profile-border);
+    border-radius: 999px;
+    background: var(--profile-panel-bg);
+    color: var(--profile-text);
+    font: inherit;
+    font-size: .83rem;
+    font-weight: 850;
+    cursor: pointer;
+    transition: background .2s ease, border-color .2s ease, transform .2s ease;
+}
+.profile-badges__filters button:hover:not(.active) {
+    background: var(--profile-panel-hover);
+    border-color: var(--profile-pink-light);
+    transform: translateY(-1px);
+}
+.profile-badges__filters button.active {
+    color: #fff;
+    border-color: transparent;
+    background: linear-gradient(135deg, var(--profile-purple), var(--profile-pink));
+    box-shadow: 0 7px 20px rgba(190, 20, 165, .18);
+}
+.profile-badges__filters button:focus-visible {
+    outline: 2px solid var(--profile-cyan);
+    outline-offset: 3px;
+}
+.profile-badges__grid {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+}
+.profile-badges__card {
+    min-width: 0;
+    transition: transform .2s ease, border-color .2s ease;
+}
+.profile-badges__card:hover { transform: translateY(-3px); }
+.profile-badges__card--locked { opacity: .74; }
+.profile-badges__card--locked .profile-badges__icon { filter: grayscale(1); }
+.profile-badges__card h3,
+.profile-badges__card p { overflow-wrap: anywhere; }
+.profile-badges__date {
+    font-size: .72rem;
+    color: var(--profile-text-secondary);
+}
+html[data-theme="light"] .profile-badges__filters button:not(.active) {
+    background: rgba(109, 0, 163, .04);
+}
+@media (max-width: 560px) {
+    .profile-badges__filters { gap: 8px; }
+    .profile-badges__filters button {
+        flex: 1 1 100%;
+        padding: 10px 12px;
+    }
+    .profile-badges__grid { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .profile-badges__filters button,
+    .profile-badges__card { transition: none; }
+    .profile-badges__filters button:hover,
+    .profile-badges__card:hover { transform: none; }
+}
+
+/* =========================================================
+   BADGES EXPOSÉS PRÈS DE L'AVATAR — COUAXIA V2
+========================================================= */
+.profile-featured { width:100%; margin:12px 0 4px; }
+.profile-featured__label { display:block; margin-bottom:9px; color:var(--profile-cyan); font-size:.72rem; font-weight:850; letter-spacing:.07em; }
+.profile-featured__list { display:flex; flex-wrap:wrap; align-items:center; gap:9px; }
+.profile-featured__badge { display:inline-flex; align-items:center; gap:7px; max-width:100%; padding:8px 11px; border:1px solid var(--profile-border); border-radius:12px; color:var(--profile-text); background:var(--profile-panel-bg); font-size:.75rem; font-weight:800; overflow-wrap:anywhere; }
+.profile-featured__badge > span:first-child { font-size:1.1rem; }
+.profile-featured__badge--rare { border-color:rgba(34,242,239,.5); }
+.profile-featured__badge--épique { border-color:rgba(170,56,232,.7); }
+.profile-featured__badge--légendaire, .profile-featured__badge--mythique { border-color:rgba(255,185,60,.75); }
+.profile-featured__add { padding:8px 11px; border:1px dashed var(--profile-border); border-radius:12px; background:transparent; color:var(--profile-pink-light); font:inherit; font-size:.75rem; font-weight:800; cursor:pointer; }
+.profile-featured__add:hover { background:var(--profile-panel-hover); }
+.profile-badges__pin { margin-top:10px; padding:9px 12px; border:1px solid var(--profile-border); border-radius:10px; background:var(--profile-panel-bg); color:var(--profile-text); font:inherit; font-size:.73rem; font-weight:800; cursor:pointer; }
+.profile-badges__pin:hover:not(:disabled), .profile-badges__pin--active { border-color:var(--profile-pink-light); color:var(--profile-pink-light); }
+.profile-badges__pin:disabled { opacity:.4; cursor:not-allowed; }
+.profile-badges__pin:focus-visible, .profile-featured__add:focus-visible { outline:2px solid var(--profile-cyan); outline-offset:3px; }
+@media(max-width:650px) { .profile-featured__list { gap:7px; } .profile-featured__badge { font-size:.7rem; } }
