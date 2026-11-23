@@ -38,6 +38,9 @@ import type {
   Profile
 } from "../services/profile.service";
 
+import { getMyFavoriteArtworks, removeMyFavoriteArtwork } from "../services/profile-favorites.service";
+import type { FavoriteArtwork } from "../services/profile-favorites.service";
+
 import { getMyCardCollection } from "../services/cards.service";
 import type { CardCollection } from "../types/card.types";
 
@@ -48,12 +51,62 @@ import AppLoader
    STATE
 ========================================================= */
 
+type ProfileTab = "overview" | "cards" | "favorites" | "suggestions" | "badges";
+
+const activeProfileTab = ref<ProfileTab>("overview");
+
+const profileTabs: { id: ProfileTab; label: string; icon: string }[] = [
+  { id: "overview", label: "Aperçu", icon: "✨" },
+  { id: "cards", label: "Mes cartes", icon: "🃏" },
+  { id: "favorites", label: "Favoris", icon: "❤️" },
+  { id: "suggestions", label: "Suggestions", icon: "💡" },
+  { id: "badges", label: "Badges", icon: "🏅" }
+];
+
 const profile =
   ref<Profile | null>(
     null
   );
 
 const artworkLikesCount = ref<number | null>(null);
+const favoriteArtworks = ref<FavoriteArtwork[]>([]);
+const loadingFavorites = ref(false);
+const favoritesError = ref("");
+const removingFavoriteIds = ref<Set<string>>(new Set());
+
+async function loadFavorites() {
+  if (!profile.value) return;
+  loadingFavorites.value = true;
+  favoritesError.value = "";
+  try {
+    favoriteArtworks.value = await getMyFavoriteArtworks(profile.value.id);
+  } catch (error) {
+    console.error("Erreur chargement favoris :", error);
+    favoritesError.value = "Impossible de charger tes illustrations favorites.";
+  } finally {
+    loadingFavorites.value = false;
+  }
+}
+
+async function removeFavorite(artworkId: string) {
+  if (!profile.value || removingFavoriteIds.value.has(artworkId)) return;
+  removingFavoriteIds.value = new Set([...removingFavoriteIds.value, artworkId]);
+  favoritesError.value = "";
+  try {
+    await removeMyFavoriteArtwork(profile.value.id, artworkId);
+    favoriteArtworks.value = favoriteArtworks.value.filter(art => art.id !== artworkId);
+    artworkLikesCount.value = favoriteArtworks.value.length;
+    successMessage.value = "Illustration retirée de tes favoris. 💜";
+  } catch (error) {
+    console.error("Erreur retrait favori :", error);
+    favoritesError.value = "Impossible de retirer ce favori.";
+  } finally {
+    const next = new Set(removingFavoriteIds.value);
+    next.delete(artworkId);
+    removingFavoriteIds.value = next;
+  }
+}
+
 const cardCollection = ref<CardCollection | null>(null);
 const loadingProfileStats = ref(false);
 const profileStatsError = ref("");
@@ -526,7 +579,8 @@ async function loadProfile() {
       await Promise.all([
         loadOfficialAvatars(),
         loadPollSuggestions(),
-        loadProfileStats()
+        loadProfileStats(),
+        loadFavorites()
       ]);
 
 
@@ -1006,6 +1060,7 @@ async function logout() {
       [];
     artworkLikesCount.value = null;
     cardCollection.value = null;
+    favoriteArtworks.value = [];
 
     if (pollSuggestionsChannel) {
 
@@ -1759,24 +1814,42 @@ onBeforeUnmount(
           </div>
 
         </form>
+        <!-- =================================================
+             NAVIGATION DU PROFIL
+        ================================================== -->
+        <nav class="profile-tabs" aria-label="Rubriques de mon profil">
+          <button
+            v-for="tab in profileTabs"
+            :key="tab.id"
+            type="button"
+            class="profile-tabs__button"
+            :class="{ 'profile-tabs__button--active': activeProfileTab === tab.id }"
+            :aria-current="activeProfileTab === tab.id ? 'page' : undefined"
+            @click="activeProfileTab = tab.id"
+          >
+            <span aria-hidden="true">{{ tab.icon }}</span>
+            {{ tab.label }}
+          </button>
+        </nav>
+
 
 
         <!-- =================================================
              STATISTIQUES ET COLLECTION
         ================================================== -->
-        <section class="profile-collection" aria-labelledby="profile-collection-title">
+        <section v-if="activeProfileTab === 'overview' || activeProfileTab === 'cards'" class="profile-collection" aria-labelledby="profile-collection-title">
           <header class="profile-collection__header">
             <div>
               <span class="profile-collection__eyebrow">💜 MON UNIVERS</span>
-              <h2 id="profile-collection-title">Mes statistiques et mes cartes</h2>
-              <p>Retrouve tes coups de cœur et les cartes que tu as obtenues.</p>
+              <h2 id="profile-collection-title">{{ activeProfileTab === "overview" ? "Mon univers en chiffres" : "Ma collection de cartes" }}</h2>
+              <p>{{ activeProfileTab === "overview" ? "Retrouve tes statistiques personnelles." : "Découvre tes cartes, leurs raretés et tes doublons." }}</p>
             </div>
             <button type="button" class="profile-collection__refresh" :disabled="loadingProfileStats" @click="loadProfileStats">
               {{ loadingProfileStats ? "Actualisation..." : "↻ Actualiser" }}
             </button>
           </header>
 
-          <div class="profile-collection__stats">
+          <div v-if="activeProfileTab === 'overview'" class="profile-collection__stats">
             <div class="profile-collection__stat">
               <span aria-hidden="true">❤️</span>
               <strong>{{ artworkLikesCount === null ? "—" : artworkLikesCount }}</strong>
@@ -1796,12 +1869,12 @@ onBeforeUnmount(
 
           <p v-if="profileStatsError" class="profile-collection__error" role="alert">⚠️ {{ profileStatsError }}</p>
 
-          <div class="profile-collection__subheading">
+          <div v-if="activeProfileTab === 'cards'" class="profile-collection__subheading">
             <h3>Ma collection de cartes</h3>
             <span v-if="cardCollection">{{ cardCollection.stats.completion }} % complétée</span>
           </div>
-          <p v-if="loadingProfileStats" class="profile-collection__empty">🐙 Chargement de ta collection...</p>
-          <div v-else-if="collectionPreview.length" class="profile-collection__grid">
+          <p v-if="activeProfileTab === 'cards' && loadingProfileStats" class="profile-collection__empty">🐙 Chargement de ta collection...</p>
+          <div v-else-if="activeProfileTab === 'cards' && collectionPreview.length" class="profile-collection__grid">
             <article v-for="entry in collectionPreview" :key="entry.id" class="profile-collection__card">
               <div class="profile-collection__image" :class="'profile-collection__image--' + entry.card.orientation">
                 <img :src="entry.card.imageUrl" :alt="entry.card.name" loading="lazy" />
@@ -1811,8 +1884,8 @@ onBeforeUnmount(
               <small>{{ entry.card.rarity }} · N°{{ entry.card.number }}</small>
             </article>
           </div>
-          <p v-else-if="cardCollection" class="profile-collection__empty">Tu n'as pas encore obtenu de cartes. 🐙</p>
-          <p v-else class="profile-collection__empty">Ta collection n'est pas disponible pour le moment.</p>
+          <p v-else-if="activeProfileTab === 'cards' && cardCollection" class="profile-collection__empty">Tu n'as pas encore obtenu de cartes. 🐙</p>
+          <p v-else-if="activeProfileTab === 'cards'" class="profile-collection__empty">Ta collection n'est pas disponible pour le moment.</p>
         </section>
 
         <!-- =================================================
@@ -1820,6 +1893,7 @@ onBeforeUnmount(
         ================================================== -->
 
         <section
+          v-if="activeProfileTab === 'suggestions'"
           class="profile-suggestions"
           aria-labelledby="profile-suggestions-title"
         >
@@ -2007,6 +2081,50 @@ onBeforeUnmount(
 
           </div>
 
+        </section>
+
+        <section v-if="activeProfileTab === 'favorites'" class="profile-favorites" aria-labelledby="profile-favorites-title">
+          <header class="profile-favorites__header">
+            <div>
+              <span class="profile-favorites__eyebrow">❤️ MES COUPS DE CŒUR</span>
+              <h2 id="profile-favorites-title">Mes illustrations favorites</h2>
+              <p>Retrouve les créations que tu as aimées dans la galerie Couaxia.</p>
+            </div>
+            <button type="button" class="profile-button profile-button--secondary" :disabled="loadingFavorites" @click="loadFavorites">
+              {{ loadingFavorites ? "Chargement..." : "↻ Actualiser" }}
+            </button>
+          </header>
+          <p v-if="favoritesError" class="profile-message profile-message--error" role="alert">{{ favoritesError }}</p>
+          <p v-if="loadingFavorites" class="profile-favorites__empty">🐙 Chargement de tes favoris...</p>
+          <div v-else-if="favoriteArtworks.length" class="profile-favorites__grid">
+            <article v-for="artwork in favoriteArtworks" :key="artwork.id" class="profile-favorites__card">
+              <div class="profile-favorites__media">
+                <img v-if="artwork.mediaType !== 'video'" :src="artwork.imageUrl" :alt="artwork.title" loading="lazy" />
+                <video v-else :src="artwork.imageUrl" controls preload="metadata" :aria-label="artwork.title"></video>
+              </div>
+              <div class="profile-favorites__info">
+                <strong>{{ artwork.title }}</strong>
+                <span>🎨 {{ artwork.artistName }}</span>
+                <button type="button" class="profile-favorites__remove" :disabled="removingFavoriteIds.has(artwork.id)" :aria-label="`Retirer ${artwork.title} des favoris`" @click="removeFavorite(artwork.id)">
+                  {{ removingFavoriteIds.has(artwork.id) ? "Retrait..." : "♥ Retirer des favoris" }}
+                </button>
+              </div>
+            </article>
+          </div>
+          <p v-else class="profile-favorites__empty">Tu n'as pas encore d'illustrations favorites. 💜</p>
+        </section>
+
+        <section
+          v-if="activeProfileTab === 'badges'"
+          class="profile-coming-soon"
+          aria-labelledby="profile-badges-title"
+        >
+          <span class="profile-coming-soon__icon" aria-hidden="true">🏅</span>
+          <h2 id="profile-badges-title">Mes badges et succès</h2>
+          <p>
+            Les badges de l'équipage POUP arriveront bientôt.
+            Tu pourras suivre tes défis et les récompenses débloquées ici.
+          </p>
         </section>
 
       </template>
