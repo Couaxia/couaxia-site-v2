@@ -45,7 +45,10 @@ import type { FavoriteArtwork } from "../services/profile-favorites.service";
 import { getMyCardCollection } from "../services/cards.service";
 import type { CardCollection } from "../types/card.types";
 import { getUnlockedBadges, saveUnlockedBadges } from "../services/profile-badges.service";
+import { announceUnlockedBadges } from "../services/badge-notifications.service";
 import { getFeaturedBadges, setFeaturedBadges } from "../services/profile-featured-badges.service";
+import { getProfileTitle, setProfileTitle } from "../services/profile-titles.service";
+import { TRACKED_PAGES, getVisitedPages, type TrackedPageId } from "../services/page-visits.service";
 
 import AppLoader
     from "../../src/components/ui/AppLoader.vue";
@@ -161,7 +164,7 @@ const pollSuggestions =
    BADGES ÉVOLUTIFS — chaque palier reste acquis
 ========================================================= */
 type BadgeRarity = "Commun" | "Rare" | "Épique" | "Légendaire" | "Mythique";
-type BadgeFamily = "favorites" | "unique-cards" | "copies" | "suggestions" | "loyalty" | "special";
+type BadgeFamily = "favorites" | "unique-cards" | "copies" | "suggestions" | "loyalty" | "exploration" | "pages" | "special";
 interface ProfileBadge {
   id: string;
   family: BadgeFamily;
@@ -181,28 +184,48 @@ const badgeFamilies: { family: BadgeFamily; icons: string[]; names: string[]; go
   { family: "unique-cards", icons: ["🎴","🃏","✨","🏆","👑"], names: ["Première carte","Collectionneur","Grand collectionneur","Expert des cartes","Maître collectionneur"], goals: [1,5,10,25,50], description: "cartes différentes" },
   { family: "copies", icons: ["🎴","📚","🎁","💫","👑"], names: ["Premiers exemplaires","Pile de cartes","Réserve de cartes","Trésor de cartes","Roi des cartes"], goals: [1,10,50,100,250], description: "exemplaires obtenus" },
   { family: "suggestions", icons: ["💡","🗳️","🧠","🌠","🔮"], names: ["Boîte à idées","Créatif POUP","Inventeur","Architecte d'idées","Visionnaire POUP"], goals: [1,5,10,25,50], description: "suggestions proposées" },
+  { family: "exploration", icons: ["🧭","🗺️","🚀","🌍","👑"], names: ["Première découverte","Curieux de l’équipage","Explorateur POUP","Grand voyageur","Maître de Couaxia V2"], goals: [1,3,5,7,9], description: "pages différentes visitées" },
   { family: "loyalty", icons: ["🐙","🌱","🌟","🌌","👑"], names: ["Bienvenue à bord","Première semaine","Membre fidèle","Explorateur de Saphira","Vétéran de Saphira"], goals: [0,7,30,90,365], description: "jours depuis l'inscription" }
 ];
+const visitedPages = ref<TrackedPageId[]>([]);
+const visitedPagesError = ref("");
+async function loadVisitedPages() {
+  if (!profile.value) return;
+  try {
+    visitedPages.value = await getVisitedPages(profile.value.id);
+    visitedPagesError.value = "";
+  } catch (error) {
+    console.error("Chargement des pages visitées :", error);
+    visitedPagesError.value = "Impossible de charger les visites de pages.";
+  }
+}
+function onPageVisited(event: Event) {
+  const detail = (event as CustomEvent<{ userId: string; pageId: TrackedPageId }>).detail;
+  if (profile.value?.id === detail?.userId && !visitedPages.value.includes(detail.pageId)) {
+    visitedPages.value = [...visitedPages.value, detail.pageId];
+  }
+}
 const rarityByLevel: BadgeRarity[] = ["Commun", "Commun", "Rare", "Épique", "Légendaire"];
 const storedBadgeDates = ref<Record<string,string>>({});
 const badgesError = ref("");
 const badgesSaving = ref(false);
 const badgesReady = ref(false);
-const badgeFilter = ref<"progress" | "unlocked" | "secrets">("progress");
+const badgeFilter = ref<"progress" | "unlocked" | "pages" | "secrets">("progress");
 const membershipDays = computed(() => {
   const created = profile.value?.created_at ? new Date(profile.value.created_at).getTime() : NaN;
   return Number.isFinite(created) ? Math.max(0, Math.floor((Date.now() - created) / 86400000)) : 0;
 });
 const profileBadges = computed<ProfileBadge[]>(() => {
-  const values: Record<Exclude<BadgeFamily,"special">,number> = {
+  const values: Record<Exclude<BadgeFamily,"special" | "pages">,number> = {
     favorites: artworkLikesCount.value ?? 0,
     "unique-cards": cardCollection.value?.stats.uniqueCards ?? 0,
     copies: cardCollection.value?.stats.totalCopies ?? 0,
     suggestions: pollSuggestions.value.length,
-    loyalty: membershipDays.value
+    loyalty: membershipDays.value,
+    exploration: visitedPages.value.length
   };
   return badgeFamilies.flatMap(group => group.goals.map((target, index) => {
-    const current = values[group.family as Exclude<BadgeFamily,"special">];
+    const current = values[group.family as Exclude<BadgeFamily,"special" | "pages">];
     const id = `${group.family}-${index+1}`;
     const previousTarget = index === 0 ? 0 : group.goals[index-1];
     const stored = storedBadgeDates.value[id] ?? null;
@@ -243,7 +266,19 @@ const secretBadges = computed<ProfileBadge[]>(() => {
     };
   });
 });
-const allBadges = computed(() => [...profileBadges.value, ...secretBadges.value]);
+const pageBadges = computed<ProfileBadge[]>(() => TRACKED_PAGES.map(page => {
+  const id = `page-${page.id}`;
+  const stored = storedBadgeDates.value[id] ?? null;
+  const visited = visitedPages.value.includes(page.id);
+  const unlocked = stored !== null || (badgesReady.value && visited);
+  return {
+    id, family: "pages", level: 1, icon: page.icon,
+    title: page.badge, description: `Découvrir la page ${page.title}`,
+    rarity: "Commun", current: unlocked ? 1 : 0, target: 1,
+    unlocked, progress: unlocked ? 100 : 0, unlockedAt: stored
+  };
+}));
+const allBadges = computed(() => [...profileBadges.value, ...pageBadges.value, ...secretBadges.value]);
 const unlockedBadgesCount = computed(() => allBadges.value.filter(b => b.unlocked).length);
 
 // Badges épinglés : trois emplacements maximum, conservés dans Supabase.
@@ -291,6 +326,36 @@ async function toggleFeaturedBadge(id: string) {
   }
 }
 
+// Titres de profil : chaque succès enregistré peut être utilisé comme titre.
+// Un seul titre actif, stocké dans Supabase. Aucun titre n'est attribué sans succès.
+const selectedTitleBadgeId = ref<string | null>(null);
+const titleSaving = ref(false);
+const titleError = ref("");
+const availableTitles = computed(() => allBadges.value.filter(b => Boolean(storedBadgeDates.value[b.id])));
+const activeTitle = computed(() => availableTitles.value.find(b => b.id === selectedTitleBadgeId.value) ?? null);
+async function loadProfileTitle() {
+  if (!profile.value) return;
+  titleError.value = "";
+  try { selectedTitleBadgeId.value = await getProfileTitle(profile.value.id); }
+  catch (error) { console.error("Chargement du titre :", error); titleError.value = "Impossible de charger ton titre."; }
+}
+async function chooseProfileTitle(badgeId: string | null) {
+  if (!profile.value || titleSaving.value) return;
+  if (badgeId !== null && !storedBadgeDates.value[badgeId]) {
+    titleError.value = "Ce titre doit d'abord être débloqué et enregistré.";
+    return;
+  }
+  titleSaving.value = true;
+  titleError.value = "";
+  try {
+    await setProfileTitle(profile.value.id, badgeId);
+    selectedTitleBadgeId.value = badgeId;
+  } catch (error) {
+    console.error("Sauvegarde du titre :", error);
+    titleError.value = "Impossible de sauvegarder ton titre. Vérifie les permissions Supabase.";
+  } finally { titleSaving.value = false; }
+}
+
 // Un seul niveau par famille : le premier non débloqué, sinon le dernier terminé.
 const activeGoals = computed(() => badgeFamilies.map(group => {
   const familyBadges = profileBadges.value.filter(b => b.family === group.family);
@@ -299,6 +364,7 @@ const activeGoals = computed(() => badgeFamilies.map(group => {
 const visibleBadges = computed(() => {
   if (badgeFilter.value === "progress") return activeGoals.value;
   if (badgeFilter.value === "secrets") return secretBadges.value;
+  if (badgeFilter.value === "pages") return pageBadges.value;
   return allBadges.value.filter(b => b.unlocked);
 });
 
@@ -317,8 +383,17 @@ async function syncBadges() {
   badgeSyncInProgress = true;
   badgesSaving.value = true;
   try {
+    // La notification ne part qu'après confirmation de l'écriture en base.
+    // On garde une copie des informations avant le rechargement des badges.
+    const newlyUnlocked = allBadges.value
+      .filter(b => earned.includes(b.id))
+      .map(b => ({ id: b.id, title: b.title, icon: b.icon, rarity: b.rarity }));
     await saveUnlockedBadges(userId, earned);
-    if (profile.value?.id === userId) await loadBadges();
+    if (profile.value?.id === userId) {
+      await loadBadges();
+      const confirmed = newlyUnlocked.filter(b => Boolean(storedBadgeDates.value[b.id]));
+      announceUnlockedBadges(confirmed);
+    }
   } catch (error) {
     console.error("Enregistrement badges :", error);
     badgesError.value = "Impossible d'enregistrer les badges. Vérifie les règles Supabase.";
@@ -763,7 +838,9 @@ async function loadProfile() {
         loadProfileStats(),
         loadFavorites(),
         loadBadges(),
-        loadFeaturedBadges()
+        loadFeaturedBadges(),
+        loadProfileTitle(),
+        loadVisitedPages()
       ]);
       badgesReady.value = true;
       void syncBadges();
@@ -1248,6 +1325,7 @@ async function logout() {
     favoriteArtworks.value = [];
     storedBadgeDates.value = {};
     featuredBadgeIds.value = [];
+    selectedTitleBadgeId.value = null;
     badgesReady.value = false;
 
     if (pollSuggestionsChannel) {
@@ -1339,9 +1417,10 @@ function formatDate(
    MOUNT
 ========================================================= */
 
-onMounted(
-  loadProfile
-);
+onMounted(() => {
+  window.addEventListener("couaxia:page-visited", onPageVisited);
+  void loadProfile();
+});
 
 
 /* =========================================================
@@ -1350,6 +1429,7 @@ onMounted(
 
 onBeforeUnmount(
   () => {
+    window.removeEventListener("couaxia:page-visited", onPageVisited);
 
     if (pollSuggestionsChannel) {
 
@@ -1604,6 +1684,11 @@ onBeforeUnmount(
             >
               @{{ profile.username }}
             </p>
+
+            <div v-if="activeTitle" class="profile-title-display" :class="'profile-title-display--' + activeTitle.rarity.toLowerCase()">
+              <span aria-hidden="true">{{ activeTitle.icon }}</span>
+              <span>{{ activeTitle.title }}</span>
+            </div>
 
             <div class="profile-featured" aria-label="Badges exposés sur le profil">
               <span class="profile-featured__label">🏅 Mes badges</span>
@@ -2329,13 +2414,34 @@ onBeforeUnmount(
           <p v-if="badgesError" class="profile-badges__notice" role="alert">⚠️ {{ badgesError }}</p>
           <p v-else-if="badgesSaving" class="profile-badges__notice" role="status">💜 Sauvegarde des nouveaux succès...</p>
           <p v-if="profileStatsError || pollSuggestionsError" class="profile-badges__notice">Certaines statistiques sont indisponibles : la progression peut être incomplète.</p>
+          <p v-if="visitedPagesError" class="profile-badges__notice" role="alert">⚠️ {{ visitedPagesError }}</p>
           <p v-if="featuredBadgesError" class="profile-badges__notice" role="alert">⚠️ {{ featuredBadgesError }}</p>
+          <div class="profile-titles" aria-label="Personnaliser mon titre de profil">
+            <div class="profile-titles__heading">
+              <div>
+                <h3>👑 Mon titre de profil</h3>
+                <p>Choisis un succès obtenu comme titre sous ton pseudo. Tu peux le changer à tout moment.</p>
+              </div>
+              <span class="profile-titles__current">{{ activeTitle ? activeTitle.icon + ' ' + activeTitle.title : 'Aucun titre' }}</span>
+            </div>
+            <p v-if="titleError" class="profile-badges__notice" role="alert">⚠️ {{ titleError }}</p>
+            <div class="profile-titles__choices">
+              <button type="button" :disabled="titleSaving" :class="{ active: selectedTitleBadgeId === null }" @click="chooseProfileTitle(null)">Sans titre</button>
+              <button v-for="badge in availableTitles" :key="badge.id" type="button"
+                :disabled="titleSaving" :class="{ active: selectedTitleBadgeId === badge.id }"
+                :aria-pressed="selectedTitleBadgeId === badge.id"
+                @click="chooseProfileTitle(badge.id)">{{ badge.icon }} {{ badge.title }}</button>
+            </div>
+            <small v-if="!availableTitles.length">Débloque ton premier succès pour obtenir un titre !</small>
+          </div>
           <p class="profile-badges__notice">Épingle jusqu'à 3 succès obtenus pour les afficher près de ton avatar. Les secrets restent cachés jusqu'à leur découverte.</p>
           <div class="profile-badges__filters" aria-label="Filtrer les succès">
             <button type="button" :class="{ active: badgeFilter === 'progress' }" @click="badgeFilter = 'progress'">🎯 Objectifs actuels</button>
             <button type="button" :class="{ active: badgeFilter === 'unlocked' }" @click="badgeFilter = 'unlocked'">🏆 Succès obtenus ({{ unlockedBadgesCount }})</button>
+            <button type="button" :class="{ active: badgeFilter === 'pages' }" @click="badgeFilter = 'pages'">🧭 Pages visitées ({{ visitedPages.length }}/{{ TRACKED_PAGES.length }})</button>
             <button type="button" :class="{ active: badgeFilter === 'secrets' }" @click="badgeFilter = 'secrets'">🔒 Secrets</button>
           </div>
+          <p v-if="badgeFilter === 'pages'" class="profile-badges__notice">Visite chaque page en étant connecté pour débloquer son succès. Chaque page ne compte qu’une fois.</p>
           <div class="profile-badges__grid">
             <article v-for="badge in visibleBadges" :key="badge.id" class="profile-badges__card"
               :class="['profile-badges__card--' + badge.rarity.toLowerCase(), { 'profile-badges__card--locked': !badge.unlocked }]">

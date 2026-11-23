@@ -4941,3 +4941,23 @@ html[data-theme="light"] .profile-badges__filters button:not(.active) {
 .profile-badges__pin:disabled { opacity:.4; cursor:not-allowed; }
 .profile-badges__pin:focus-visible, .profile-featured__add:focus-visible { outline:2px solid var(--profile-cyan); outline-offset:3px; }
 @media(max-width:650px) { .profile-featured__list { gap:7px; } .profile-featured__badge { font-size:.7rem; } }
+
+/* =========================================================
+   TITRES PERSONNALISABLES — COUAXIA V2
+========================================================= */
+.profile-title-display { display:inline-flex; align-items:center; gap:8px; width:fit-content; max-width:100%; margin:8px 0 4px; padding:7px 13px; border:1px solid rgba(236,79,183,.55); border-radius:999px; background:rgba(179,21,155,.12); color:var(--profile-pink-light,#ff70c9); font-size:.82rem; font-weight:800; overflow-wrap:anywhere; }
+.profile-title-display--rare { border-color:rgba(51,215,245,.6); color:var(--profile-cyan,#50e8ed); }
+.profile-title-display--épique { border-color:rgba(172,96,255,.65); color:#cba1ff; }
+.profile-title-display--légendaire, .profile-title-display--mythique { border-color:rgba(255,191,75,.7); color:#ffd27d; }
+.profile-titles { margin:18px 0 22px; padding:18px; border:1px solid var(--profile-border,rgba(220,105,238,.3)); border-radius:18px; background:var(--profile-panel-bg,rgba(60,18,78,.3)); }
+.profile-titles__heading { display:flex; align-items:start; justify-content:space-between; gap:14px; flex-wrap:wrap; margin-bottom:14px; }
+.profile-titles__heading h3 { margin:0 0 6px; font-size:1.15rem; color:var(--profile-text,#fff); }
+.profile-titles__heading p { margin:0; color:var(--profile-text-secondary,#c6a9cd); font-size:.85rem; }
+.profile-titles__current { border:1px solid var(--profile-border,rgba(220,105,238,.3)); border-radius:999px; padding:7px 12px; color:var(--profile-pink-light,#ff70c9); font-size:.78rem; font-weight:800; }
+.profile-titles__choices { display:flex; flex-wrap:wrap; gap:9px; }
+.profile-titles__choices button { padding:9px 12px; border:1px solid var(--profile-border,rgba(220,105,238,.3)); border-radius:12px; background:var(--profile-panel-bg,rgba(60,18,78,.3)); color:var(--profile-text,#fff); font:inherit; font-size:.78rem; font-weight:750; cursor:pointer; transition:background .2s,border-color .2s; }
+.profile-titles__choices button:hover:not(:disabled), .profile-titles__choices button.active { border-color:var(--profile-pink-light,#ff70c9); background:rgba(217,22,160,.2); }
+.profile-titles__choices button:disabled { opacity:.55; cursor:wait; }
+.profile-titles__choices button:focus-visible { outline:2px solid var(--profile-cyan,#50e8ed); outline-offset:3px; }
+@media(max-width:600px) { .profile-titles { padding:13px; } .profile-title-display { font-size:.75rem; } }
+@media(prefers-reduced-motion:reduce) { .profile-titles__choices button { transition:none; } }
