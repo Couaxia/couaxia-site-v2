@@ -41,6 +41,12 @@ import CustomCursor from "./components/ui/CustomCursor.vue";
 import AppLoader from "./components/ui/AppLoader.vue";
 
 /* =========================================================
+   BADGE UNLOCK NOTIFICATIONS
+========================================================= */
+
+import BadgeUnlockToast from "./components/ui/BadgeUnlockToast.vue";
+
+/* =========================================================
    CONTENT PROTECTION
 ========================================================= */
 
@@ -184,6 +190,12 @@ onBeforeUnmount(() => {
     <!-- GLOBAL SCROLL BUTTONS -->
 
     <ScrollPage />
+
+    <!-- =====================================================
+         BADGE UNLOCK NOTIFICATIONS
+    ====================================================== -->
+
+    <BadgeUnlockToast />
 
 </template>
 
