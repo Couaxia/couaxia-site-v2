@@ -18,7 +18,9 @@ import {
 
 } from "../../lib/supabase";
 
-
+import { onBadgeUnlocked, type BadgeUnlockNotification } from "../../services/badge-notifications.service";
+import { useRouter } from "vue-router";
+const router = useRouter();
 
 /* =========================================================
 
@@ -43,8 +45,6 @@ type AnnouncementType =
     | "stream"
 
     | "other";
-
-
 
 interface Announcement {
 
@@ -118,8 +118,6 @@ interface Announcement {
 
 }
 
-
-
 /* =========================================================
 
    STATE
@@ -134,8 +132,6 @@ const isOpen =
 
     );
 
-
-
 const loading =
 
     ref(
@@ -143,8 +139,6 @@ const loading =
         true
 
     );
-
-
 
 const announcements =
 
@@ -154,8 +148,6 @@ const announcements =
 
     );
 
-
-
 const errorMessage =
 
     ref(
@@ -164,17 +156,17 @@ const errorMessage =
 
     );
 
-
 /* =========================================================
+
    SUPABASE AVAILABILITY
+
 ========================================================= */
 
 const supabaseRestricted = ref(false);
 
 const SUPABASE_RESTRICTED_MESSAGE =
+
     "Les nouveautés sont temporairement indisponibles car Supabase a atteint sa limite d'utilisation. Réessaie plus tard. 💜";
-
-
 
 /* =========================================================
 
@@ -190,8 +182,6 @@ const currentUserId =
 
     );
 
-
-
 const readAnnouncementIds =
 
     ref<Set<string>>(
@@ -200,8 +190,6 @@ const readAnnouncementIds =
 
     );
 
-
-
 const markingReadId =
 
     ref<string | null>(
@@ -209,8 +197,6 @@ const markingReadId =
         null
 
     );
-
-
 
 let authSubscription:
 
@@ -228,8 +214,6 @@ let authSubscription:
 
         null;
 
-
-
 let announcementsChannel:
 
     ReturnType<
@@ -244,57 +228,85 @@ let announcementsChannel:
 
         null;
 
-
 /* =========================================================
+
    SUPABASE RESTRICTION HELPERS
+
 ========================================================= */
 
 function isSupabaseRestrictionError(error: unknown): boolean {
+
     const possibleError = error as {
+
         status?: number;
+
         code?: string;
+
         message?: string;
+
     };
 
     const message = String(
+
         possibleError?.message
+
         ?? error
+
         ?? ""
+
     ).toLowerCase();
 
     return (
+
         possibleError?.status === 402
+
         || message.includes("service for this project is restricted")
+
         || message.includes("exceed_cached_egress")
+
         || message.includes("cached egress")
+
         || message.includes("status 402")
+
     );
+
 }
 
 function stopAnnouncementsRealtime() {
+
     if (!announcementsChannel) {
+
         return;
+
     }
 
     void supabase.removeChannel(announcementsChannel);
+
     announcementsChannel = null;
+
 }
 
 function setSupabaseRestricted(error?: unknown) {
+
     if (error) {
+
         console.debug(
+
             "Supabase temporairement indisponible :",
+
             error
+
         );
+
     }
 
     supabaseRestricted.value = true;
+
     errorMessage.value = SUPABASE_RESTRICTED_MESSAGE;
+
     stopAnnouncementsRealtime();
+
 }
-
-
-
 
 /* =========================================================
 
@@ -302,13 +314,64 @@ function setSupabaseRestricted(error?: unknown) {
 
 ========================================================= */
 
+/* =========================================================
+   ANNONCES MASQUÉES — PAR COMPTE / NAVIGATEUR
+   Ne supprime jamais les annonces publiques de Supabase.
+========================================================= */
+
+const hiddenAnnouncementIds = ref<Set<string>>(new Set());
+
+function hiddenAnnouncementsStorageKey(): string {
+    return `couaxia-hidden-announcements:${currentUserId.value ?? "anonymous"}`;
+}
+
+function loadHiddenAnnouncements(): void {
+    try {
+        const raw = localStorage.getItem(hiddenAnnouncementsStorageKey());
+        const parsed: unknown = raw ? JSON.parse(raw) : [];
+        hiddenAnnouncementIds.value = new Set(
+            Array.isArray(parsed)
+                ? parsed.filter((id): id is string => typeof id === "string")
+                : []
+        );
+    } catch (error) {
+        console.warn("Impossible de lire les annonces masquées :", error);
+        hiddenAnnouncementIds.value = new Set();
+    }
+}
+
+function saveHiddenAnnouncements(): void {
+    try {
+        localStorage.setItem(
+            hiddenAnnouncementsStorageKey(),
+            JSON.stringify([...hiddenAnnouncementIds.value])
+        );
+    } catch (error) {
+        console.warn("Impossible de sauvegarder les annonces masquées :", error);
+    }
+}
+
+function hideAnnouncement(announcementId: string): void {
+    hiddenAnnouncementIds.value = new Set([
+        ...hiddenAnnouncementIds.value,
+        announcementId
+    ]);
+    saveHiddenAnnouncements();
+}
+
+const visibleAnnouncements = computed(() =>
+    announcements.value.filter(
+        announcement => !hiddenAnnouncementIds.value.has(announcement.id)
+    )
+);
+
 const unreadAnnouncements =
 
     computed(
 
         () =>
 
-            announcements.value.filter(
+            visibleAnnouncements.value.filter(
 
                 announcement =>
 
@@ -322,7 +385,126 @@ const unreadAnnouncements =
 
     );
 
+/* =========================================================
+   SUCCÈS PERSONNELS — STOCKAGE LOCAL PAR UTILISATEUR
+========================================================= */
 
+/* Couleurs des raretés : valeur Supabase normalisée (accents et casse). */
+function badgeRarityClass(rarity: string | null | undefined): string {
+    const value = (rarity ?? "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .trim();
+
+    if (value.includes("legendaire") || value.includes("legendary")) return "rarity-legendary";
+    if (value.includes("epique") || value.includes("epic")) return "rarity-epic";
+    if (value.includes("rare")) return "rarity-rare";
+    return "rarity-common";
+}
+
+interface SavedBadgeNotification extends BadgeUnlockNotification {
+    unlockedAt: string;
+    read: boolean;
+}
+
+const badgeNotifications = ref<SavedBadgeNotification[]>([]);
+const BADGE_NOTIFICATION_LIFETIME_MS = 30 * 24 * 60 * 60 * 1000;
+
+function isBadgeNotificationRecent(item: SavedBadgeNotification): boolean {
+    const timestamp = Date.parse(item.unlockedAt);
+    return Number.isFinite(timestamp) &&
+        timestamp <= Date.now() &&
+        Date.now() - timestamp < BADGE_NOTIFICATION_LIFETIME_MS;
+}
+
+function removeExpiredBadgeNotifications(): void {
+    const active = badgeNotifications.value.filter(isBadgeNotificationRecent);
+    if (active.length !== badgeNotifications.value.length) {
+        badgeNotifications.value = active;
+        saveBadgeNotifications();
+    }
+}
+
+function deleteBadgeNotification(badgeId: string): void {
+    badgeNotifications.value = badgeNotifications.value.filter(item => item.id !== badgeId);
+    saveBadgeNotifications();
+}
+
+function clearReadBadgeNotifications(): void {
+    badgeNotifications.value = badgeNotifications.value.filter(item => !item.read);
+    saveBadgeNotifications();
+}
+
+let stopBadgeListener: (() => void) | null = null;
+
+function badgeStorageKey(userId: string): string {
+    return `couaxia-badge-notifications:${userId}`;
+}
+
+function loadBadgeNotifications() {
+    const userId = currentUserId.value;
+    badgeNotifications.value = [];
+    if (!userId) return;
+
+    try {
+        const raw = localStorage.getItem(badgeStorageKey(userId));
+        if (!raw) return;
+        const parsed: unknown = JSON.parse(raw);
+        if (!Array.isArray(parsed)) return;
+        badgeNotifications.value = parsed.filter((item): item is SavedBadgeNotification =>
+            !!item && typeof item === "object" &&
+            typeof item.id === "string" && typeof item.title === "string" &&
+            typeof item.unlockedAt === "string" && typeof item.read === "boolean"
+        ).filter(isBadgeNotificationRecent).slice(0, 100);
+        saveBadgeNotifications();
+    } catch (error) {
+        console.debug("Lecture des notifications de badges impossible :", error);
+    }
+}
+
+function saveBadgeNotifications() {
+    const userId = currentUserId.value;
+    if (!userId) return;
+    try {
+        localStorage.setItem(
+            badgeStorageKey(userId),
+            JSON.stringify(badgeNotifications.value.slice(0, 100))
+        );
+    } catch (error) {
+        console.debug("Sauvegarde des notifications de badges impossible :", error);
+    }
+}
+
+function receiveBadgeUnlocked(badge: BadgeUnlockNotification) {
+    if (!currentUserId.value) return;
+    removeExpiredBadgeNotifications();
+    if (badgeNotifications.value.some(item => item.id === badge.id)) return;
+
+    badgeNotifications.value = [{
+        ...badge,
+        unlockedAt: new Date().toISOString(),
+        read: false
+    }, ...badgeNotifications.value].slice(0, 100);
+    saveBadgeNotifications();
+}
+
+function markBadgeAsRead(badgeId: string) {
+    badgeNotifications.value = badgeNotifications.value.map(item =>
+        item.id === badgeId ? { ...item, read: true } : item
+    );
+    saveBadgeNotifications();
+}
+
+function openBadgeInProfile(badgeId: string) {
+    markBadgeAsRead(badgeId);
+    closeNotifications();
+    void router.push({ path: "/profile", hash: "#badges" });
+}
+
+const unreadBadgesCount = computed(() =>
+    badgeNotifications.value.filter(item => !item.read).length
+);
 
 const notificationCount =
 
@@ -330,11 +512,9 @@ const notificationCount =
 
         () =>
 
-            unreadAnnouncements.value.length
+            unreadAnnouncements.value.length + unreadBadgesCount.value
 
     );
-
-
 
 /* =========================================================
 
@@ -345,8 +525,6 @@ const notificationCount =
 const anonymousReadStorageKey =
 
     "couaxia-announcements-read";
-
-
 
 function saveAnonymousReadState() {
 
@@ -388,8 +566,6 @@ function saveAnonymousReadState() {
 
 }
 
-
-
 function loadAnonymousReadState() {
 
     try {
@@ -402,8 +578,6 @@ function loadAnonymousReadState() {
 
             );
 
-
-
         if (
 
             !stored
@@ -414,13 +588,9 @@ function loadAnonymousReadState() {
 
                 new Set();
 
-
-
             return;
 
         }
-
-
 
         const values =
 
@@ -429,8 +599,6 @@ function loadAnonymousReadState() {
                 stored
 
             );
-
-
 
         if (
 
@@ -446,13 +614,9 @@ function loadAnonymousReadState() {
 
                 new Set();
 
-
-
             return;
 
         }
-
-
 
         readAnnouncementIds.value =
 
@@ -486,8 +650,6 @@ function loadAnonymousReadState() {
 
         );
 
-
-
         readAnnouncementIds.value =
 
             new Set();
@@ -496,8 +658,6 @@ function loadAnonymousReadState() {
 
 }
 
-
-
 /* =========================================================
 
    LOAD CURRENT USER
@@ -505,32 +665,48 @@ function loadAnonymousReadState() {
 ========================================================= */
 
 async function loadCurrentUser() {
+
     if (supabaseRestricted.value) {
+
         currentUserId.value = null;
+
         return;
+
     }
 
     const { data, error } =
+
         await supabase.auth.getUser();
 
     if (error) {
+
         if (isSupabaseRestrictionError(error)) {
+
             setSupabaseRestricted(error);
+
         }
+
         else {
+
             console.debug(
+
                 "Aucun utilisateur connecté pour les notifications :",
+
                 error.message
+
             );
+
         }
 
         currentUserId.value = null;
+
         return;
+
     }
 
     currentUserId.value = data.user?.id ?? null;
-}
 
+}
 
 /* =========================================================
 
@@ -539,44 +715,70 @@ async function loadCurrentUser() {
 ========================================================= */
 
 async function loadReadState() {
+
     if (supabaseRestricted.value) {
+
         loadAnonymousReadState();
+
         return;
+
     }
 
     if (!currentUserId.value) {
+
         loadAnonymousReadState();
+
         return;
+
     }
 
     const { data, error } =
+
         await supabase
+
             .from("announcement_reads")
+
             .select("announcement_id")
+
             .eq("user_id", currentUserId.value);
 
     if (error) {
+
         if (isSupabaseRestrictionError(error)) {
+
             setSupabaseRestricted(error);
+
             loadAnonymousReadState();
+
             return;
+
         }
 
         console.error(
+
             "Erreur récupération notifications lues :",
+
             error
+
         );
+
         readAnnouncementIds.value = new Set();
+
         return;
+
     }
 
     readAnnouncementIds.value = new Set(
-        (data ?? [])
-            .map(row => row.announcement_id)
-            .filter((value): value is string => typeof value === "string")
-    );
-}
 
+        (data ?? [])
+
+            .map(row => row.announcement_id)
+
+            .filter((value): value is string => typeof value === "string")
+
+    );
+
+}
 
 /* =========================================================
 
@@ -602,8 +804,6 @@ function isAnnouncementRead(
 
 }
 
-
-
 /* =========================================================
 
    MARK AS READ
@@ -611,62 +811,104 @@ function isAnnouncementRead(
 ========================================================= */
 
 async function markAsRead(announcement: Announcement) {
+
     if (
+
         isAnnouncementRead(announcement.id)
+
         || markingReadId.value === announcement.id
+
     ) {
+
         return;
+
     }
 
     markingReadId.value = announcement.id;
 
     try {
+
         readAnnouncementIds.value = new Set([
+
             ...readAnnouncementIds.value,
+
             announcement.id
+
         ]);
 
         if (
+
             currentUserId.value
+
             && !supabaseRestricted.value
+
         ) {
+
             const { error } =
+
                 await supabase
+
                     .from("announcement_reads")
+
                     .insert({
+
                         user_id: currentUserId.value,
+
                         announcement_id: announcement.id
+
                     });
 
             if (error && error.code !== "23505") {
+
                 throw error;
+
             }
+
         }
+
         else {
+
             saveAnonymousReadState();
+
         }
+
     }
+
     catch (error) {
+
         if (isSupabaseRestrictionError(error)) {
+
             setSupabaseRestricted(error);
+
             saveAnonymousReadState();
+
             return;
+
         }
 
         console.error(
+
             "Erreur marquage notification comme lue :",
+
             error
+
         );
 
         const restored = new Set(readAnnouncementIds.value);
-        restored.delete(announcement.id);
-        readAnnouncementIds.value = restored;
-    }
-    finally {
-        markingReadId.value = null;
-    }
-}
 
+        restored.delete(announcement.id);
+
+        readAnnouncementIds.value = restored;
+
+    }
+
+    finally {
+
+        markingReadId.value = null;
+
+    }
+
+}
 
 /* =========================================================
 
@@ -675,24 +917,38 @@ async function markAsRead(announcement: Announcement) {
 ========================================================= */
 
 function subscribeToAuth() {
+
     if (
+
         supabaseRestricted.value
+
         || authSubscription
+
     ) {
+
         return;
+
     }
 
     const { data } =
+
         supabase.auth.onAuthStateChange(
+
             async (_event, session) => {
+
                 currentUserId.value = session?.user?.id ?? null;
+
+                loadBadgeNotifications();
+                loadHiddenAnnouncements();
                 await loadReadState();
+
             }
+
         );
 
     authSubscription = data.subscription;
-}
 
+}
 
 /* =========================================================
 
@@ -720,43 +976,29 @@ function getDefaultIcon(
 
             return "🗳️";
 
-
-
         case "game":
 
             return "🎮";
-
-
 
         case "artwork":
 
             return "🎨";
 
-
-
         case "lore":
 
             return "📖";
-
-
 
         case "event":
 
             return "📅";
 
-
-
         case "stream":
 
             return "🔴";
 
-
-
         case "other":
 
             return "✨";
-
-
 
         default:
 
@@ -765,8 +1007,6 @@ function getDefaultIcon(
     }
 
 }
-
-
 
 /* =========================================================
 
@@ -800,8 +1040,6 @@ function getAnnouncementIcon(
 
 }
 
-
-
 /* =========================================================
 
    ACTIVE ANNOUNCEMENT
@@ -828,13 +1066,9 @@ function isAnnouncementActive(
 
     }
 
-
-
     const now =
 
         Date.now();
-
-
 
     /* =====================================================
 
@@ -855,8 +1089,6 @@ function isAnnouncementActive(
                 announcement.published_at
 
             ).getTime();
-
-
 
         if (
 
@@ -880,8 +1112,6 @@ function isAnnouncementActive(
 
     }
 
-
-
     /* =====================================================
 
        EXPIRED
@@ -901,8 +1131,6 @@ function isAnnouncementActive(
                 announcement.expires_at
 
             ).getTime();
-
-
 
         if (
 
@@ -926,13 +1154,9 @@ function isAnnouncementActive(
 
     }
 
-
-
     return true;
 
 }
-
-
 
 /* =========================================================
 
@@ -988,8 +1212,6 @@ function sortAnnouncements(
 
             }
 
-
-
             /* =============================================
 
                IMPORTANT SECOND
@@ -1014,8 +1236,6 @@ function sortAnnouncements(
 
             }
 
-
-
             /* =============================================
 
                NEWEST FIRST
@@ -1034,8 +1254,6 @@ function sortAnnouncements(
 
                 ).getTime();
 
-
-
             const secondDate =
 
                 new Date(
@@ -1047,8 +1265,6 @@ function sortAnnouncements(
                     second.created_at
 
                 ).getTime();
-
-
 
             return (
 
@@ -1066,8 +1282,6 @@ function sortAnnouncements(
 
 }
 
-
-
 /* =========================================================
 
    LOAD ANNOUNCEMENTS
@@ -1075,78 +1289,130 @@ function sortAnnouncements(
 ========================================================= */
 
 async function loadAnnouncements(): Promise<boolean> {
+
     if (supabaseRestricted.value) {
+
         loading.value = false;
+
         errorMessage.value = SUPABASE_RESTRICTED_MESSAGE;
+
         return false;
+
     }
 
     loading.value = true;
+
     errorMessage.value = "";
 
     try {
+
         const { data, error } =
+
             await supabase
+
                 .from("announcements")
+
                 .select(`
+
                     id,
+
                     type,
+
                     title,
+
                     message,
+
                     icon,
+
                     image_url,
+
                     link_url,
+
                     link_label,
+
                     is_published,
+
                     is_pinned,
+
                     is_important,
+
                     published_at,
+
                     expires_at,
+
                     source_type,
+
                     source_id,
+
                     created_at,
+
                     updated_at
+
                 `)
+
                 .eq("is_published", true)
+
                 .order("created_at", { ascending: false });
 
         if (error) {
+
             throw error;
+
         }
 
         const rows = (data ?? []) as Announcement[];
 
         announcements.value = sortAnnouncements(
+
             rows.filter(isAnnouncementActive)
+
         );
 
         return true;
+
     }
+
     catch (error) {
+
         if (isSupabaseRestrictionError(error)) {
+
             setSupabaseRestricted(error);
+
             announcements.value = [];
+
             return false;
+
         }
 
         console.error(
+
             "Erreur chargement notifications :",
+
             error
+
         );
 
         announcements.value = [];
+
         errorMessage.value =
+
             error instanceof Error
+
                 ? error.message
+
                 : "Impossible de charger les notifications.";
 
         return false;
-    }
-    finally {
-        loading.value = false;
-    }
-}
 
+    }
+
+    finally {
+
+        loading.value = false;
+
+    }
+
+}
 
 /* =========================================================
 
@@ -1155,37 +1421,64 @@ async function loadAnnouncements(): Promise<boolean> {
 ========================================================= */
 
 function subscribeToAnnouncements() {
+
     if (
+
         supabaseRestricted.value
+
         || announcementsChannel
+
     ) {
+
         return;
+
     }
 
     announcementsChannel =
-        supabase
-            .channel("public-announcements-bell")
-            .on(
-                "postgres_changes",
-                {
-                    event: "*",
-                    schema: "public",
-                    table: "announcements"
-                },
-                () => {
-                    void loadAnnouncements();
-                }
-            )
-            .subscribe(status => {
-                if (
-                    status === "CHANNEL_ERROR"
-                    || status === "TIMED_OUT"
-                ) {
-                    stopAnnouncementsRealtime();
-                }
-            });
-}
 
+        supabase
+
+            .channel("public-announcements-bell")
+
+            .on(
+
+                "postgres_changes",
+
+                {
+
+                    event: "*",
+
+                    schema: "public",
+
+                    table: "announcements"
+
+                },
+
+                () => {
+
+                    void loadAnnouncements();
+
+                }
+
+            )
+
+            .subscribe(status => {
+
+                if (
+
+                    status === "CHANNEL_ERROR"
+
+                    || status === "TIMED_OUT"
+
+                ) {
+
+                    stopAnnouncementsRealtime();
+
+                }
+
+            });
+
+}
 
 /* =========================================================
 
@@ -1194,18 +1487,27 @@ function subscribeToAnnouncements() {
 ========================================================= */
 
 function toggleNotifications() {
+
     isOpen.value = !isOpen.value;
 
     if (
+
         isOpen.value
+
         && !supabaseRestricted.value
+
     ) {
+
         void loadAnnouncements();
+
     }
+
 }
 
 async function retryAnnouncements() {
+
     supabaseRestricted.value = false;
+
     errorMessage.value = "";
 
     await loadCurrentUser();
@@ -1215,18 +1517,26 @@ async function retryAnnouncements() {
     await loadReadState();
 
     if (
+
         loaded
+
         && !supabaseRestricted.value
+
     ) {
+
         subscribeToAnnouncements();
+
         subscribeToAuth();
+
     }
+
 }
 
 function closeNotifications() {
-    isOpen.value = false;
-}
 
+    isOpen.value = false;
+
+}
 
 /* =========================================================
 
@@ -1254,8 +1564,6 @@ function formatRelativeDate(
 
     }
 
-
-
     const date =
 
         new Date(
@@ -1263,8 +1571,6 @@ function formatRelativeDate(
             value
 
         );
-
-
 
     if (
 
@@ -1280,8 +1586,6 @@ function formatRelativeDate(
 
     }
 
-
-
     const diff =
 
         Date.now()
@@ -1289,8 +1593,6 @@ function formatRelativeDate(
         -
 
         date.getTime();
-
-
 
     const minute =
 
@@ -1300,8 +1602,6 @@ function formatRelativeDate(
 
         1000;
 
-
-
     const hour =
 
         60
@@ -1310,8 +1610,6 @@ function formatRelativeDate(
 
         minute;
 
-
-
     const day =
 
         24
@@ -1319,8 +1617,6 @@ function formatRelativeDate(
         *
 
         hour;
-
-
 
     if (
 
@@ -1333,8 +1629,6 @@ function formatRelativeDate(
         return "À l'instant";
 
     }
-
-
 
     if (
 
@@ -1362,8 +1656,6 @@ function formatRelativeDate(
 
             );
 
-
-
         return (
 
             `Il y a ${minutes} min`
@@ -1371,8 +1663,6 @@ function formatRelativeDate(
         );
 
     }
-
-
 
     if (
 
@@ -1400,8 +1690,6 @@ function formatRelativeDate(
 
             );
 
-
-
         return (
 
             `Il y a ${hours} h`
@@ -1409,8 +1697,6 @@ function formatRelativeDate(
         );
 
     }
-
-
 
     if (
 
@@ -1442,8 +1728,6 @@ function formatRelativeDate(
 
             );
 
-
-
         return (
 
             `Il y a ${days} j`
@@ -1451,8 +1735,6 @@ function formatRelativeDate(
         );
 
     }
-
-
 
     return new Intl.DateTimeFormat(
 
@@ -1482,8 +1764,6 @@ function formatRelativeDate(
 
 }
 
-
-
 /* =========================================================
 
    OPEN LINK
@@ -1508,8 +1788,6 @@ function openAnnouncementLink(
 
     }
 
-
-
     window.open(
 
         announcement.link_url,
@@ -1522,8 +1800,6 @@ function openAnnouncementLink(
 
 }
 
-
-
 /* =========================================================
 
    MOUNT
@@ -1531,24 +1807,37 @@ function openAnnouncementLink(
 ========================================================= */
 
 onMounted(
+
     async () => {
+
         await loadCurrentUser();
+        loadBadgeNotifications();
+        loadHiddenAnnouncements();
+        stopBadgeListener = onBadgeUnlocked(receiveBadgeUnlocked);
 
         const announcementsLoaded =
+
             await loadAnnouncements();
 
         await loadReadState();
 
         if (
-            announcementsLoaded
-            && !supabaseRestricted.value
-        ) {
-            subscribeToAnnouncements();
-            subscribeToAuth();
-        }
-    }
-);
 
+            announcementsLoaded
+
+            && !supabaseRestricted.value
+
+        ) {
+
+            subscribeToAnnouncements();
+
+            subscribeToAuth();
+
+        }
+
+    }
+
+);
 
 /* =========================================================
 
@@ -1561,14 +1850,12 @@ onBeforeUnmount(
     () => {
 
         stopAnnouncementsRealtime();
-
-
+        stopBadgeListener?.();
+        stopBadgeListener = null;
 
         authSubscription
 
             ?.unsubscribe();
-
-
 
         authSubscription =
 
@@ -1579,8 +1866,6 @@ onBeforeUnmount(
 );
 
 </script>
-
-
 
 <template>
 
@@ -1597,49 +1882,84 @@ onBeforeUnmount(
         ================================================== -->
 
         <!-- =========================================
+
             BOUTON NOTIFICATIONS
+
         ========================================= -->
 
         <button
+
             type="button"
+
             class="announcement-bell__button"
+
             :class="{
+
                 'has-notifications': notificationCount > 0
+
             }"
+
             aria-label="Afficher les notifications"
+
             :aria-expanded="isOpen"
+
             @click="toggleNotifications"
+
         >
+
             <!-- IMAGE FIXE OU GIF ANIMÉ -->
+
             <span
+
                 class="announcement-bell__icon"
+
                 aria-hidden="true"
+
             >
+
                 <img
+
                     :src="
+
                         notificationCount > 0
+
                              ? '/images/dinkdonk.gif'
+
                              : '/images/dinkdonk.png'
+
                     "
+
                     alt=""
+
                     class="announcement-bell__image"
+
                 />
+
             </span>
 
             <!-- COMPTEUR DE NOTIFICATIONS -->
+
             <span
+
                 v-if="notificationCount > 0"
+
                 class="announcement-bell__count"
+
             >
+
                 {{
+
                     notificationCount > 99
+
                         ? "99+"
+
                         : notificationCount
+
                 }}
+
             </span>
+
         </button>
-
-
 
         <!-- =================================================
 
@@ -1695,8 +2015,6 @@ onBeforeUnmount(
 
                             </span>
 
-
-
                             <h2>
 
                                 🔔 Nouveautés
@@ -1704,8 +2022,6 @@ onBeforeUnmount(
                             </h2>
 
                         </div>
-
-
 
                         <button
 
@@ -1728,8 +2044,6 @@ onBeforeUnmount(
                         </button>
 
                     </div>
-
-
 
                     <!-- =========================================
 
@@ -1757,8 +2071,6 @@ onBeforeUnmount(
 
                         ></span>
 
-
-
                         <strong>
 
                             Chargement...
@@ -1766,8 +2078,6 @@ onBeforeUnmount(
                         </strong>
 
                     </div>
-
-
 
                     <!-- =========================================
 
@@ -1803,15 +2113,11 @@ onBeforeUnmount(
 
                         </span>
 
-
-
                         <strong>
 
                             Impossible de charger les nouveautés.
 
                         </strong>
-
-
 
                         <button
 
@@ -1833,8 +2139,6 @@ onBeforeUnmount(
 
                     </div>
 
-
-
                     <!-- =========================================
 
                          EMPTY
@@ -1845,7 +2149,7 @@ onBeforeUnmount(
 
                         v-else-if="
 
-                            announcements.length === 0
+                            visibleAnnouncements.length === 0 && badgeNotifications.length === 0
 
                         "
 
@@ -1863,15 +2167,11 @@ onBeforeUnmount(
 
                         </span>
 
-
-
                         <strong>
 
                             Rien de nouveau pour le moment !
 
                         </strong>
-
-
 
                         <p>
 
@@ -1880,8 +2180,6 @@ onBeforeUnmount(
                         </p>
 
                     </div>
-
-
 
                     <!-- =========================================
 
@@ -1896,6 +2194,55 @@ onBeforeUnmount(
                         class="announcement-bell__list"
 
                     >
+                        <!-- Gestion des notifications de succès (sans modifier les annonces) -->
+                        <div v-if="badgeNotifications.some(item => item.read)" class="announcement-bell__badge-toolbar">
+                            <button type="button" class="announcement-bell__read-button" @click="clearReadBadgeNotifications">
+                                🗑️ Effacer les succès lus
+                            </button>
+                        </div>
+                        <!-- Succès personnels : affichés sans remplacer les annonces -->
+                        <article
+                            v-for="badge in badgeNotifications"
+                            :key="`badge-${badge.id}`"
+                            class="announcement-bell__item announcement-bell__item--badge"
+                            :class="[badgeRarityClass(badge.rarity), { 'announcement-bell__item--read': badge.read }]"
+                        >
+                            <div class="announcement-bell__item-icon" aria-hidden="true">
+                                {{ badge.icon || '🏆' }}
+                            </div>
+                            <div class="announcement-bell__item-content">
+                                <div class="announcement-bell__item-top">
+                                    <div class="announcement-bell__item-badges">
+                                        <span>🏆 Succès débloqué</span>
+                                        <span v-if="!badge.read" class="is-important">Nouveau</span>
+                                    </div>
+                                    <time>{{ formatRelativeDate(badge.unlockedAt) }}</time>
+                                </div>
+                                <h3>{{ badge.title }}</h3>
+                                <p>{{ badge.rarity }} · Badge ajouté à ta collection</p>
+                                <div class="announcement-bell__item-actions">
+                                    <button
+                                        type="button"
+                                        class="announcement-bell__item-link"
+                                        @click="openBadgeInProfile(badge.id)"
+                                    >Voir mon badge ↗</button>
+                                    <button
+                                        type="button"
+                                        class="announcement-bell__read-button"
+                                        :class="{ 'is-read': badge.read }"
+                                        :disabled="badge.read"
+                                        @click="markBadgeAsRead(badge.id)"
+                                    >{{ badge.read ? '✓ Lu' : '✓ Marquer comme lu' }}</button>
+                                    <button
+                                        type="button"
+                                        class="announcement-bell__badge-delete"
+                                        :aria-label="`Supprimer la notification ${badge.title}`"
+                                        @click="deleteBadgeNotification(badge.id)"
+                                    >🗑️ Supprimer</button>
+                                </div>
+                            </div>
+                        </article>
+
 
                         <article
 
@@ -1905,7 +2252,7 @@ onBeforeUnmount(
 
                                 in
 
-                                announcements
+                                visibleAnnouncements
 
                             "
 
@@ -1965,8 +2312,6 @@ onBeforeUnmount(
 
                             </div>
 
-
-
                             <!-- =================================
 
                                  CONTENT
@@ -2005,8 +2350,6 @@ onBeforeUnmount(
 
                                         </span>
 
-
-
                                         <span
 
                                             v-if="
@@ -2024,8 +2367,6 @@ onBeforeUnmount(
                                         </span>
 
                                     </div>
-
-
 
                                     <time
 
@@ -2059,15 +2400,11 @@ onBeforeUnmount(
 
                                 </div>
 
-
-
                                 <h3>
 
                                     {{ announcement.title }}
 
                                 </h3>
-
-
 
                                 <p
 
@@ -2082,8 +2419,6 @@ onBeforeUnmount(
                                     {{ announcement.message }}
 
                                 </p>
-
-
 
                                 <!-- =================================
 
@@ -2114,8 +2449,6 @@ onBeforeUnmount(
                                     class="announcement-bell__item-image"
 
                                 >
-
-
 
                                 <!-- =================================
 
@@ -2174,8 +2507,6 @@ onBeforeUnmount(
                                         </span>
 
                                     </button>
-
-
 
                                     <button
 
@@ -2245,6 +2576,15 @@ onBeforeUnmount(
 
                                     </button>
 
+                                    <button
+                                        type="button"
+                                        class="announcement-bell__badge-delete"
+                                        :aria-label="`Masquer l'annonce ${announcement.title}`"
+                                        @click="hideAnnouncement(announcement.id)"
+                                    >
+                                        🗑️ Supprimer
+                                    </button>
+
                                 </div>
 
                             </div>
@@ -2262,8 +2602,6 @@ onBeforeUnmount(
     </div>
 
 </template>
-
-
 
 <style scoped>
 
@@ -2415,8 +2753,6 @@ onBeforeUnmount(
 
 }
 
-
-
 /* =========================================================
 
    VARIABLES — LIGHT
@@ -2553,8 +2889,6 @@ onBeforeUnmount(
 
 }
 
-
-
 /* =========================================================
 
    CONTAINER
@@ -2580,8 +2914,6 @@ onBeforeUnmount(
         center;
 
 }
-
-
 
 /* =========================================================
 
@@ -2661,8 +2993,6 @@ onBeforeUnmount(
 
 }
 
-
-
 .announcement-bell__button:hover {
 
     transform:
@@ -2678,8 +3008,6 @@ onBeforeUnmount(
         rgba(242, 34, 146, 0.22);
 
 }
-
-
 
 /* =========================================================
 
@@ -2703,8 +3031,6 @@ onBeforeUnmount(
 
 }
 
-
-
 /* =========================================================
 
    BELL ANIMATION
@@ -2726,8 +3052,6 @@ onBeforeUnmount(
         infinite;
 
 }
-
-
 
 @keyframes announcementBellRing {
 
@@ -2784,8 +3108,6 @@ onBeforeUnmount(
     }
 
 }
-
-
 
 /* =========================================================
 
@@ -2868,8 +3190,6 @@ onBeforeUnmount(
         900;
 
 }
-
-
 
 /* =========================================================
 
@@ -2957,8 +3277,6 @@ onBeforeUnmount(
 
 }
 
-
-
 /* =========================================================
 
    TRANSITION
@@ -2977,8 +3295,6 @@ onBeforeUnmount(
 
 }
 
-
-
 .announcement-enter-from,
 
 .announcement-leave-to {
@@ -2994,8 +3310,6 @@ onBeforeUnmount(
         scale(0.97);
 
 }
-
-
 
 /* =========================================================
 
@@ -3033,8 +3347,6 @@ onBeforeUnmount(
 
 }
 
-
-
 .announcement-bell__label {
 
     color:
@@ -3055,8 +3367,6 @@ onBeforeUnmount(
 
 }
 
-
-
 .announcement-bell__header h2 {
 
     margin:
@@ -3072,8 +3382,6 @@ onBeforeUnmount(
         1.35rem;
 
 }
-
-
 
 /* =========================================================
 
@@ -3143,8 +3451,6 @@ onBeforeUnmount(
 
 }
 
-
-
 /* =========================================================
 
    STATES
@@ -3193,8 +3499,6 @@ onBeforeUnmount(
 
 }
 
-
-
 .announcement-bell__state strong,
 
 .announcement-bell__empty strong {
@@ -3209,8 +3513,6 @@ onBeforeUnmount(
 
 }
 
-
-
 .announcement-bell__empty > span,
 
 .announcement-bell__state > span:not(.announcement-bell__loader) {
@@ -3220,8 +3522,6 @@ onBeforeUnmount(
         2.4rem;
 
 }
-
-
 
 .announcement-bell__empty p {
 
@@ -3239,8 +3539,6 @@ onBeforeUnmount(
 
 }
 
-
-
 .announcement-bell__state--error {
 
     color:
@@ -3248,8 +3546,6 @@ onBeforeUnmount(
         #ff8cae;
 
 }
-
-
 
 .announcement-bell__loader {
 
@@ -3287,8 +3583,6 @@ onBeforeUnmount(
 
 }
 
-
-
 @keyframes announcementLoading {
 
     to {
@@ -3300,8 +3594,6 @@ onBeforeUnmount(
     }
 
 }
-
-
 
 .announcement-bell__retry {
 
@@ -3344,8 +3636,6 @@ onBeforeUnmount(
         pointer;
 
 }
-
-
 
 /* =========================================================
 
@@ -3405,8 +3695,6 @@ onBeforeUnmount(
 
 }
 
-
-
 /* =========================================================
 
    ITEM
@@ -3457,8 +3745,6 @@ onBeforeUnmount(
 
 }
 
-
-
 .announcement-bell__item:hover {
 
     background:
@@ -3470,8 +3756,6 @@ onBeforeUnmount(
         translateY(-1px);
 
 }
-
-
 
 .announcement-bell__item--pinned {
 
@@ -3491,8 +3775,6 @@ onBeforeUnmount(
 
 }
 
-
-
 .announcement-bell__item--important {
 
     box-shadow:
@@ -3509,8 +3791,6 @@ onBeforeUnmount(
 
 }
 
-
-
 .announcement-bell__item--read {
 
     opacity:
@@ -3523,8 +3803,6 @@ onBeforeUnmount(
 
 }
 
-
-
 .announcement-bell__item--read:hover {
 
     opacity:
@@ -3532,8 +3810,6 @@ onBeforeUnmount(
         0.82;
 
 }
-
-
 
 /* =========================================================
 
@@ -3583,8 +3859,6 @@ onBeforeUnmount(
 
 }
 
-
-
 /* =========================================================
 
    ITEM CONTENT
@@ -3598,8 +3872,6 @@ onBeforeUnmount(
         0;
 
 }
-
-
 
 .announcement-bell__item-top {
 
@@ -3621,8 +3893,6 @@ onBeforeUnmount(
 
 }
 
-
-
 .announcement-bell__item-top time {
 
     flex-shrink:
@@ -3643,8 +3913,6 @@ onBeforeUnmount(
 
 }
 
-
-
 .announcement-bell__item-badges {
 
     display:
@@ -3660,8 +3928,6 @@ onBeforeUnmount(
         5px;
 
 }
-
-
 
 .announcement-bell__item-badges span {
 
@@ -3693,8 +3959,6 @@ onBeforeUnmount(
 
 }
 
-
-
 .announcement-bell__item-badges .is-important {
 
     color:
@@ -3717,8 +3981,6 @@ onBeforeUnmount(
 
 }
 
-
-
 .announcement-bell__item h3 {
 
     margin:
@@ -3738,8 +4000,6 @@ onBeforeUnmount(
         1.3;
 
 }
-
-
 
 .announcement-bell__item p {
 
@@ -3764,8 +4024,6 @@ onBeforeUnmount(
         pre-wrap;
 
 }
-
-
 
 /* =========================================================
 
@@ -3806,8 +4064,6 @@ onBeforeUnmount(
         cover;
 
 }
-
-
 
 /* =========================================================
 
@@ -3885,8 +4141,6 @@ onBeforeUnmount(
 
 }
 
-
-
 .announcement-bell__item-link:hover {
 
     transform:
@@ -3898,8 +4152,6 @@ onBeforeUnmount(
         brightness(1.08);
 
 }
-
-
 
 /* =========================================================
 
@@ -3931,8 +4183,6 @@ onBeforeUnmount(
 
 }
 
-
-
 .announcement-bell__item-actions
 
 .announcement-bell__item-link {
@@ -3942,8 +4192,6 @@ onBeforeUnmount(
         0;
 
 }
-
-
 
 /* =========================================================
 
@@ -4019,8 +4267,6 @@ onBeforeUnmount(
 
 }
 
-
-
 .announcement-bell__read-button:hover:not(:disabled) {
 
     color:
@@ -4047,8 +4293,6 @@ onBeforeUnmount(
 
 }
 
-
-
 .announcement-bell__read-button.is-read {
 
     color:
@@ -4065,8 +4309,6 @@ onBeforeUnmount(
 
 }
 
-
-
 .announcement-bell__read-button:disabled {
 
     cursor:
@@ -4074,8 +4316,6 @@ onBeforeUnmount(
         default;
 
 }
-
-
 
 /* =========================================================
 
@@ -4119,8 +4359,6 @@ onBeforeUnmount(
 
     }
 
-
-
     .announcement-bell__list {
 
         max-height:
@@ -4130,8 +4368,6 @@ onBeforeUnmount(
     }
 
 }
-
-
 
 /* =========================================================
 
@@ -4157,8 +4393,6 @@ onBeforeUnmount(
 
     }
 
-
-
     .announcement-bell__loader {
 
         animation:
@@ -4170,37 +4404,170 @@ onBeforeUnmount(
 }
 
 /* =========================================
+
    ICÔNE NOTIFICATIONS RONDE
-========================================= */
+
+\========================================= */
 
 .announcement-bell__icon {
+
     display: flex;
+
     align-items: center;
+
     justify-content: center;
 
     width: 50px;
+
     height: 50px;
 
     border-radius: 50%;
+
     overflow: hidden;
+
 }
 
 /* IMAGE FIXE OU GIF */
+
 .announcement-bell__image {
+
     display: block;
 
     width: 100%;
+
     height: 100%;
 
     border-radius: 50%;
+
     object-fit: cover;
 
     pointer-events: none;
+
 }
 
 /* Supprimer l'ancienne animation */
+
 .announcement-bell__button.has-notifications
+
 .announcement-bell__icon {
+
     animation: none;
+
 }
+
+
+/* Badges personnels dans la cloche */
+.announcement-bell__item--badge {
+    border-color: rgba(255, 65, 185, 0.42);
+    box-shadow: inset 3px 0 0 #f22292;
+}
+.announcement-bell__item--badge .announcement-bell__item-icon {
+    background: linear-gradient(135deg, rgba(151, 0, 200, .25), rgba(255, 38, 165, .18));
+}
+
+/* Bordures de succès par rareté : commun, rare, épique, légendaire */
+.announcement-bell__item--badge.rarity-common {
+    --badge-accent: #a6a8b6;
+    --badge-soft: rgba(166, 168, 182, .16);
+}
+.announcement-bell__item--badge.rarity-rare {
+    --badge-accent: #42b8ff;
+    --badge-soft: rgba(66, 184, 255, .17);
+}
+.announcement-bell__item--badge.rarity-epic {
+    --badge-accent: #b777ff;
+    --badge-soft: rgba(183, 119, 255, .18);
+}
+.announcement-bell__item--badge.rarity-legendary {
+    --badge-accent: #f4bf4c;
+    --badge-soft: rgba(244, 191, 76, .18);
+}
+.announcement-bell__item--badge[class*="rarity-"] {
+    border: 1px solid var(--badge-accent);
+    box-shadow: inset 3px 0 0 var(--badge-accent), 0 0 15px var(--badge-soft);
+}
+.announcement-bell__item--badge[class*="rarity-"] .announcement-bell__item-icon {
+    border: 1px solid var(--badge-accent);
+    background: var(--badge-soft);
+}
+.announcement-bell__item--badge.rarity-legendary:not(.announcement-bell__item--read) {
+    animation: couaxia-legendary-glow 3s ease-in-out infinite;
+}
+@keyframes couaxia-legendary-glow {
+    0%, 100% { box-shadow: inset 3px 0 0 #f4bf4c, 0 0 8px rgba(244,191,76,.14); }
+    50% { box-shadow: inset 3px 0 0 #f4bf4c, 0 0 23px rgba(244,191,76,.40); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .announcement-bell__item--badge.rarity-legendary { animation: none; }
+}
+
+/* =========================================================
+   COUAXIA V2 — CORRECTION SCROLL NOTIFICATIONS
+========================================================= */
+
+/* Fenêtre principale */
+.announcement-bell__panel {
+    display: flex;
+    flex-direction: column;
+
+    max-height: calc(100dvh - 24px);
+    min-height: 0;
+
+    overflow: hidden;
+}
+
+/* Zone contenant les notifications */
+.announcement-bell__list {
+    flex: 1 1 auto;
+    min-height: 0;
+
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    overscroll-behavior: contain;
+
+    padding-bottom: 24px;
+
+    scrollbar-width: thin;
+    scrollbar-color: #d225b5 #210b30;
+}
+
+/* Scrollbar Chrome / Edge */
+.announcement-bell__list::-webkit-scrollbar {
+    width: 7px;
+}
+
+.announcement-bell__list::-webkit-scrollbar-track {
+    background: #210b30;
+    border-radius: 10px;
+}
+
+.announcement-bell__list::-webkit-scrollbar-thumb {
+    background: linear-gradient(
+        180deg,
+        #a600ff,
+        #ff25a9
+    );
+
+    border-radius: 10px;
+}
+
+/* Adaptation mobile */
+@media (max-width: 600px) {
+    .announcement-bell__panel {
+        max-height: calc(100dvh - 12px);
+    }
+
+    .announcement-bell__list {
+        padding-bottom: 32px;
+    }
+}
+
+</style>
+
+<style scoped>
+/* Commandes propres aux notifications de succès */
+.announcement-bell__badge-toolbar { display: flex; justify-content: flex-end; padding: 4px 4px 10px; }
+.announcement-bell__badge-delete { cursor: pointer; border: 1px solid rgba(245, 110, 185, .28); border-radius: 10px; padding: 8px 11px; background: rgba(115, 28, 105, .16); color: #f3b4da; font: inherit; font-size: 12px; font-weight: 700; }
+.announcement-bell__badge-delete:hover { border-color: #f35db7; background: rgba(195, 38, 131, .24); color: #fff; }
 </style>

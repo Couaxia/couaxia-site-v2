@@ -49,6 +49,7 @@ import { announceUnlockedBadges } from "../services/badge-notifications.service"
 import { getFeaturedBadges, setFeaturedBadges } from "../services/profile-featured-badges.service";
 import { getProfileTitle, setProfileTitle } from "../services/profile-titles.service";
 import { TRACKED_PAGES, getVisitedPages, type TrackedPageId } from "../services/page-visits.service";
+import { getDailyVisitCount } from "../services/daily-visits.service";
 
 import AppLoader
     from "../../src/components/ui/AppLoader.vue";
@@ -164,7 +165,7 @@ const pollSuggestions =
    BADGES ÉVOLUTIFS — chaque palier reste acquis
 ========================================================= */
 type BadgeRarity = "Commun" | "Rare" | "Épique" | "Légendaire" | "Mythique";
-type BadgeFamily = "favorites" | "unique-cards" | "copies" | "suggestions" | "loyalty" | "exploration" | "pages" | "special";
+type BadgeFamily = "favorites" | "unique-cards" | "copies" | "suggestions" | "loyalty" | "return-visits" | "exploration" | "pages" | "special";
 interface ProfileBadge {
   id: string;
   family: BadgeFamily;
@@ -185,8 +186,25 @@ const badgeFamilies: { family: BadgeFamily; icons: string[]; names: string[]; go
   { family: "copies", icons: ["🎴","📚","🎁","💫","👑"], names: ["Premiers exemplaires","Pile de cartes","Réserve de cartes","Trésor de cartes","Roi des cartes"], goals: [1,10,50,100,250], description: "exemplaires obtenus" },
   { family: "suggestions", icons: ["💡","🗳️","🧠","🌠","🔮"], names: ["Boîte à idées","Créatif POUP","Inventeur","Architecte d'idées","Visionnaire POUP"], goals: [1,5,10,25,50], description: "suggestions proposées" },
   { family: "exploration", icons: ["🧭","🗺️","🚀","🌍","👑"], names: ["Première découverte","Curieux de l’équipage","Explorateur POUP","Grand voyageur","Maître de Couaxia V2"], goals: [1,3,5,7,9], description: "pages différentes visitées" },
+  { family: "return-visits", icons: ["🌱","🐙","💜","🌟","🚀","👑"], names: ["Premier retour","Petit habitué","Fidèle POUP","Résident de Saphira","Équipage de l’Avadora","Gardien éternel de Saphira"], goals: [2,3,7,15,30,100], description: "jours différents de visite" },
   { family: "loyalty", icons: ["🐙","🌱","🌟","🌌","👑"], names: ["Bienvenue à bord","Première semaine","Membre fidèle","Explorateur de Saphira","Vétéran de Saphira"], goals: [0,7,30,90,365], description: "jours depuis l'inscription" }
 ];
+const dailyVisitsCount = ref(0);
+const dailyVisitsError = ref("");
+async function loadDailyVisits() {
+  if (!profile.value) return;
+  try {
+    dailyVisitsCount.value = await getDailyVisitCount(profile.value.id);
+    dailyVisitsError.value = "";
+  } catch (error) {
+    console.error("Chargement des jours de visite :", error);
+    dailyVisitsError.value = "Impossible de charger les jours de visite.";
+  }
+}
+function onDailyVisit(event: Event) {
+  const detail = (event as CustomEvent<{ userId: string }>).detail;
+  if (profile.value?.id === detail?.userId) void loadDailyVisits();
+}
 const visitedPages = ref<TrackedPageId[]>([]);
 const visitedPagesError = ref("");
 async function loadVisitedPages() {
@@ -205,7 +223,7 @@ function onPageVisited(event: Event) {
     visitedPages.value = [...visitedPages.value, detail.pageId];
   }
 }
-const rarityByLevel: BadgeRarity[] = ["Commun", "Commun", "Rare", "Épique", "Légendaire"];
+const rarityByLevel: BadgeRarity[] = ["Commun", "Commun", "Rare", "Épique", "Légendaire", "Mythique"];
 const storedBadgeDates = ref<Record<string,string>>({});
 const badgesError = ref("");
 const badgesSaving = ref(false);
@@ -222,6 +240,7 @@ const profileBadges = computed<ProfileBadge[]>(() => {
     copies: cardCollection.value?.stats.totalCopies ?? 0,
     suggestions: pollSuggestions.value.length,
     loyalty: membershipDays.value,
+    "return-visits": dailyVisitsCount.value,
     exploration: visitedPages.value.length
   };
   return badgeFamilies.flatMap(group => group.goals.map((target, index) => {
@@ -840,7 +859,8 @@ async function loadProfile() {
         loadBadges(),
         loadFeaturedBadges(),
         loadProfileTitle(),
-        loadVisitedPages()
+        loadVisitedPages(),
+        loadDailyVisits()
       ]);
       badgesReady.value = true;
       void syncBadges();
@@ -1327,6 +1347,7 @@ async function logout() {
     featuredBadgeIds.value = [];
     selectedTitleBadgeId.value = null;
     badgesReady.value = false;
+    dailyVisitsCount.value = 0;
 
     if (pollSuggestionsChannel) {
 
@@ -1419,6 +1440,7 @@ function formatDate(
 
 onMounted(() => {
   window.addEventListener("couaxia:page-visited", onPageVisited);
+  window.addEventListener("couaxia:daily-visit", onDailyVisit);
   void loadProfile();
 });
 
@@ -1430,6 +1452,7 @@ onMounted(() => {
 onBeforeUnmount(
   () => {
     window.removeEventListener("couaxia:page-visited", onPageVisited);
+    window.removeEventListener("couaxia:daily-visit", onDailyVisit);
 
     if (pollSuggestionsChannel) {
 

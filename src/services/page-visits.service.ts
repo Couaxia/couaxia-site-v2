@@ -1,5 +1,6 @@
 import type { Router } from "vue-router";
 import { supabase } from "../lib/supabase";
+import { recordDailyVisit } from "./daily-visits.service";
 
 /** Pages publiques suivies pour les succès Couaxia V2. */
 export const TRACKED_PAGES = [
@@ -39,9 +40,12 @@ export function installPageVisitTracking(router: Router): void {
   let lastVisitKey = "";
   const track = async (path: string) => {
     const page = TRACKED_PAGES.find(item => item.path === path);
-    if (!page) return;
     const { data: { user }, error } = await supabase.auth.getUser();
     if (error || !user) return;
+    // La fidélité est suivie même sur une route non répertoriée.
+    try { await recordDailyVisit(user.id); }
+    catch (error) { console.error("Enregistrement fidélité :", error); }
+    if (!page) return;
     const key = `${user.id}:${page.id}`;
     if (lastVisitKey === key) return;
     try {
