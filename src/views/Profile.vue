@@ -300,6 +300,38 @@ const pageBadges = computed<ProfileBadge[]>(() => TRACKED_PAGES.map(page => {
 const allBadges = computed(() => [...profileBadges.value, ...pageBadges.value, ...secretBadges.value]);
 const unlockedBadgesCount = computed(() => allBadges.value.filter(b => b.unlocked).length);
 
+// Vitrine : uniquement les succès réellement obtenus, sans révéler les secrets.
+const showcaseTotal = computed(() => allBadges.value.length);
+const showcasePercent = computed(() =>
+  showcaseTotal.value > 0
+    ? Math.round((unlockedBadgesCount.value / showcaseTotal.value) * 100)
+    : 0
+);
+const showcaseRemaining = computed(() => Math.max(0, showcaseTotal.value - unlockedBadgesCount.value));
+const showcaseRarityOrder: Record<BadgeRarity, number> = {
+  "Commun": 1,
+  "Rare": 2,
+  "Épique": 3,
+  "Légendaire": 4,
+  "Mythique": 5
+};
+const showcaseTopBadges = computed(() =>
+  allBadges.value
+    .filter(badge => badge.unlocked)
+    .slice()
+    .sort((a, b) =>
+      showcaseRarityOrder[b.rarity] - showcaseRarityOrder[a.rarity]
+      || (Date.parse(b.unlockedAt ?? "") || 0) - (Date.parse(a.unlockedAt ?? "") || 0)
+      || a.id.localeCompare(b.id)
+    )
+    .slice(0, 3)
+);
+function openBadgeCollection() {
+  activeProfileTab.value = "badges";
+  badgeFilter.value = "unlocked";
+}
+
+
 // Badges épinglés : trois emplacements maximum, conservés dans Supabase.
 const featuredBadgeIds = ref<string[]>([]);
 const featuredBadgesError = ref("");
@@ -2146,6 +2178,76 @@ onBeforeUnmount(
 
 
         <!-- =================================================
+             VITRINE DES SUCCÈS — ONGLET APERÇU
+        ================================================== -->
+        <section
+          v-if="activeProfileTab === 'overview'"
+          class="profile-showcase"
+          aria-labelledby="profile-showcase-title"
+        >
+          <header class="profile-showcase__header">
+            <div>
+              <span class="profile-showcase__eyebrow">✦ TRÉSORS DE SAPHIRA ✦</span>
+              <h2 id="profile-showcase-title">🏆 Ma vitrine de succès</h2>
+              <p>Les plus beaux succès de ton aventure POUP.</p>
+            </div>
+            <button type="button" class="profile-showcase__link" @click="openBadgeCollection">
+              Voir tous mes succès ↗
+            </button>
+          </header>
+
+          <div v-if="!badgesReady" class="profile-showcase__empty" role="status">
+            🐙 Chargement de tes succès...
+          </div>
+          <template v-else>
+            <div class="profile-showcase__progress-card">
+              <div class="profile-showcase__progress-top">
+                <strong>✨ Progression globale</strong>
+                <span>{{ unlockedBadgesCount }} / {{ showcaseTotal }}</span>
+              </div>
+              <div
+                class="profile-showcase__track"
+                role="progressbar"
+                :aria-valuenow="unlockedBadgesCount"
+                :aria-valuemin="0"
+                :aria-valuemax="showcaseTotal"
+                aria-label="Succès débloqués"
+              >
+                <span :style="{ width: `${showcasePercent}%` }"></span>
+              </div>
+              <div class="profile-showcase__progress-bottom">
+                <span>{{ showcasePercent }} % des succès débloqués</span>
+                <span>{{ showcaseRemaining }} à découvrir</span>
+              </div>
+            </div>
+
+            <div class="profile-showcase__subheading">
+              <h3>💎 Mes succès les plus rares</h3>
+              <span>Top 3</span>
+            </div>
+            <div v-if="showcaseTopBadges.length" class="profile-showcase__grid">
+              <article
+                v-for="badge in showcaseTopBadges"
+                :key="badge.id"
+                class="profile-showcase__badge"
+                :class="`profile-showcase__badge--${badge.rarity.toLowerCase()}`"
+                :title="`${badge.title} · ${badge.rarity}`"
+              >
+                <span class="profile-showcase__icon" aria-hidden="true">{{ badge.icon }}</span>
+                <strong>{{ badge.title }}</strong>
+                <span class="profile-showcase__rarity">{{ badge.rarity }}</span>
+              </article>
+            </div>
+            <p v-else class="profile-showcase__empty">
+              Tes premiers succès apparaîtront ici dès leur déblocage. 💜
+            </p>
+          </template>
+          <p v-if="badgesError" class="profile-showcase__warning" role="alert">
+            ⚠️ {{ badgesError }}
+          </p>
+        </section>
+
+        <!-- =================================================
              STATISTIQUES ET COLLECTION
         ================================================== -->
         <section v-if="activeProfileTab === 'overview' || activeProfileTab === 'cards'" class="profile-collection" aria-labelledby="profile-collection-title">
@@ -2841,5 +2943,107 @@ onBeforeUnmount(
   .profile-badges { padding: 20px 14px; border-radius: 21px; }
   .profile-badges__grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr)); }
 }
+
+
+/* =========================================================
+   VITRINE DE SUCCÈS — APERÇU
+========================================================= */
+.profile-showcase {
+  margin-top: 34px;
+  padding: clamp(20px, 4vw, 34px);
+  border: 1px solid rgba(203, 91, 235, .36);
+  border-radius: 26px;
+  background: linear-gradient(145deg, rgba(38, 9, 59, .94), rgba(20, 7, 37, .94));
+  box-shadow: 0 15px 40px rgba(14, 2, 28, .18);
+}
+.profile-showcase__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 22px;
+}
+.profile-showcase__eyebrow { color: #ff8ae2; font-size: .76rem; font-weight: 800; letter-spacing: .13em; }
+.profile-showcase__header h2 { color: #fff; font-size: clamp(1.45rem, 3vw, 2rem); margin: 8px 0; }
+.profile-showcase__header p { color: #d0b7df; margin: 0; }
+.profile-showcase__link {
+  border: 1px solid rgba(244, 143, 245, .45);
+  border-radius: 13px;
+  padding: 11px 14px;
+  color: #fff;
+  background: rgba(172, 36, 191, .20);
+  cursor: pointer;
+  font-weight: 700;
+  transition: background .2s, transform .2s;
+}
+.profile-showcase__link:hover { background: rgba(206, 43, 188, .35); transform: translateY(-2px); }
+.profile-showcase__link:focus-visible { outline: 2px solid #ff8ae2; outline-offset: 3px; }
+.profile-showcase__progress-card {
+  border: 1px solid rgba(208, 118, 242, .18);
+  border-radius: 18px;
+  padding: 20px;
+  background: rgba(113, 45, 143, .17);
+}
+.profile-showcase__progress-top, .profile-showcase__progress-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.profile-showcase__progress-top { color: #fff; margin-bottom: 14px; }
+.profile-showcase__progress-top > span { color: #ff85da; font-size: 1.2rem; font-weight: 900; font-variant-numeric: tabular-nums; }
+.profile-showcase__track { height: 12px; border-radius: 999px; background: rgba(219, 174, 245, .22); overflow: hidden; }
+.profile-showcase__track > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #a52eea, #ff3bb8);
+  transition: width .4s ease;
+}
+.profile-showcase__progress-bottom { margin-top: 10px; color: #d6bfe3; font-size: .83rem; }
+.profile-showcase__subheading { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 24px 0 14px; }
+.profile-showcase__subheading h3 { color: #fff; font-size: 1.1rem; margin: 0; }
+.profile-showcase__subheading > span { color: #e2b3f2; font-size: .83rem; }
+.profile-showcase__grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.profile-showcase__badge {
+  --showcase-accent: #bcb7c7;
+  min-width: 0;
+  padding: 18px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  text-align: center;
+  border: 1px solid var(--showcase-accent);
+  border-radius: 17px;
+  background: rgba(83, 30, 107, .25);
+}
+.profile-showcase__badge--rare { --showcase-accent: #67b7ff; }
+.profile-showcase__badge--épique { --showcase-accent: #c08aff; }
+.profile-showcase__badge--légendaire { --showcase-accent: #f3c75b; }
+.profile-showcase__badge--mythique { --showcase-accent: #ff80d1; }
+.profile-showcase__icon { font-size: 2.5rem; line-height: 1.2; }
+.profile-showcase__badge strong { color: #fff; font-size: .94rem; overflow-wrap: anywhere; }
+.profile-showcase__rarity { color: var(--showcase-accent); font-size: .81rem; font-weight: 800; }
+.profile-showcase__empty { color: #dfc8e9; padding: 18px; text-align: center; }
+.profile-showcase__warning { color: #ffd2de; margin: 14px 0 0; }
+:global(html[data-theme="light"]) .profile-showcase { background: linear-gradient(145deg, #fff7ff, #f5eafa); border-color: rgba(150, 44, 177, .28); }
+:global(html[data-theme="light"]) .profile-showcase__header h2,
+:global(html[data-theme="light"]) .profile-showcase__subheading h3,
+:global(html[data-theme="light"]) .profile-showcase__progress-top,
+:global(html[data-theme="light"]) .profile-showcase__badge strong { color: #38134c; }
+:global(html[data-theme="light"]) .profile-showcase__header p,
+:global(html[data-theme="light"]) .profile-showcase__progress-bottom,
+:global(html[data-theme="light"]) .profile-showcase__empty { color: #634574; }
+:global(html[data-theme="light"]) .profile-showcase__badge { background: rgba(255,255,255,.68); }
+:global(html[data-theme="light"]) .profile-showcase__link { color: #681178; }
+@media (max-width: 620px) {
+  .profile-showcase__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .profile-showcase__badge:last-child:nth-child(odd) { grid-column: 1 / -1; }
+}
+@media (max-width: 380px) { .profile-showcase__grid { grid-template-columns: 1fr; } .profile-showcase__badge:last-child:nth-child(odd) { grid-column: auto; } }
 
 </style>
