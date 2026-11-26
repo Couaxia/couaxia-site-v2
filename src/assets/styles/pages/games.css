@@ -6537,3 +6537,28 @@ html[data-theme="light"]
     background:
         rgba(242, 34, 146, 0.10);
 }
+
+
+/* =========================================================
+   GAMES — ESPACE AVANT LE FOOTER
+========================================================= */
+
+.games-page {
+    padding-bottom: 100px;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 768px) {
+    .games-page {
+        padding-bottom: 70px;
+    }
+}
+
+@media (max-width: 480px) {
+    .games-page {
+        padding-bottom: 50px;
+    }
+}

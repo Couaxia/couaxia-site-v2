@@ -50,6 +50,7 @@ import { getFeaturedBadges, setFeaturedBadges } from "../services/profile-featur
 import { getProfileTitle, setProfileTitle } from "../services/profile-titles.service";
 import { TRACKED_PAGES, getVisitedPages, type TrackedPageId } from "../services/page-visits.service";
 import { getDailyVisitCount } from "../services/daily-visits.service";
+import { getTentacleStats } from "../services/tentacle-run.service";
 
 import AppLoader
     from "../../src/components/ui/AppLoader.vue";
@@ -165,7 +166,7 @@ const pollSuggestions =
    BADGES ÉVOLUTIFS — chaque palier reste acquis
 ========================================================= */
 type BadgeRarity = "Commun" | "Rare" | "Épique" | "Légendaire" | "Mythique";
-type BadgeFamily = "favorites" | "unique-cards" | "copies" | "suggestions" | "loyalty" | "return-visits" | "exploration" | "pages" | "special";
+type BadgeFamily = "tentacle-run" | "favorites" | "unique-cards" | "copies" | "suggestions" | "loyalty" | "return-visits" | "exploration" | "pages" | "special";
 interface ProfileBadge {
   id: string;
   family: BadgeFamily;
@@ -205,6 +206,21 @@ function onDailyVisit(event: Event) {
   const detail = (event as CustomEvent<{ userId: string }>).detail;
   if (profile.value?.id === detail?.userId) void loadDailyVisits();
 }
+function onTentacleUpdated() { void loadTentacleStats(); }
+const tentacleBest = ref(0);
+const tentacleGames = ref(0);
+const tentacleDiscovered = ref(false);
+async function loadTentacleStats() {
+  try {
+    tentacleDiscovered.value = localStorage.getItem(`couaxia:tentacle-run:discovered:${profile.value?.id}`) === "1";
+    const stats = await getTentacleStats();
+    tentacleBest.value = stats?.best_score ?? 0;
+    tentacleGames.value = stats?.games_played ?? 0;
+  } catch (error) {
+    console.error("Erreur statistiques Tentacle Run :", error);
+  }
+}
+
 const visitedPages = ref<TrackedPageId[]>([]);
 const visitedPagesError = ref("");
 async function loadVisitedPages() {
@@ -241,7 +257,8 @@ const profileBadges = computed<ProfileBadge[]>(() => {
     suggestions: pollSuggestions.value.length,
     loyalty: membershipDays.value,
     "return-visits": dailyVisitsCount.value,
-    exploration: visitedPages.value.length
+    exploration: visitedPages.value.length,
+    "tentacle-run": 0
   };
   return badgeFamilies.flatMap(group => group.goals.map((target, index) => {
     const current = values[group.family as Exclude<BadgeFamily,"special" | "pages">];
@@ -297,7 +314,31 @@ const pageBadges = computed<ProfileBadge[]>(() => TRACKED_PAGES.map(page => {
     unlocked, progress: unlocked ? 100 : 0, unlockedAt: stored
   };
 }));
-const allBadges = computed(() => [...profileBadges.value, ...pageBadges.value, ...secretBadges.value]);
+const tentacleBadges = computed<ProfileBadge[]>(() => {
+  const goals = [
+    { id: "tentacle-discovery", icon: "🪙", title: "Secret de Saphira", description: "Découvrir Tentacle Run", rarity: "Rare" as BadgeRarity, current: tentacleDiscovered.value ? 1 : 0, target: 1 },
+    { id: "tentacle-first-game", icon: "🐙", title: "Premier plongeon", description: "Terminer une partie", rarity: "Commun" as BadgeRarity, current: tentacleGames.value, target: 1 },
+    ...([250, 500, 1000, 2500, 5000] as const).map((target, index) => ({
+      id: `tentacle-score-${target}`,
+      icon: ["🐟", "🪸", "🐚", "🔱", "👑"][index] ?? "🏆",
+      title: ["Petit nageur", "Explorateur des fonds", "Aventurier des abysses", "Maître des profondeurs", "Légende de Saphira"][index] ?? "Succès Tentacle Run",
+      description: `Atteindre ${target} points dans Tentacle Run`,
+      rarity: (["Commun", "Rare", "Épique", "Légendaire", "Mythique"] as BadgeRarity[])[index] ?? "Commun",
+      current: tentacleBest.value,
+      target
+    }))
+  ];
+  return goals.map(goal => {
+    const stored = storedBadgeDates.value[goal.id] ?? null;
+    const unlocked = stored !== null || (badgesReady.value && goal.current >= goal.target);
+    return {
+      ...goal, family: "tentacle-run" as BadgeFamily, level: 1,
+      unlocked, unlockedAt: stored,
+      progress: Math.min(100, Math.round(goal.current / goal.target * 100))
+    };
+  });
+});
+const allBadges = computed(() => [...profileBadges.value, ...pageBadges.value, ...secretBadges.value, ...tentacleBadges.value]);
 const unlockedBadgesCount = computed(() => allBadges.value.filter(b => b.unlocked).length);
 
 // Vitrine : uniquement les succès réellement obtenus, sans révéler les secrets.
@@ -411,7 +452,7 @@ async function chooseProfileTitle(badgeId: string | null) {
 const activeGoals = computed(() => badgeFamilies.map(group => {
   const familyBadges = profileBadges.value.filter(b => b.family === group.family);
   return familyBadges.find(b => !b.unlocked) ?? familyBadges[familyBadges.length - 1];
-}).filter((b): b is ProfileBadge => Boolean(b)));
+}).filter((b): b is ProfileBadge => Boolean(b)).concat(tentacleBadges.value.filter(b => !b.unlocked).slice(0, 1)));
 const visibleBadges = computed(() => {
   if (badgeFilter.value === "progress") return activeGoals.value;
   if (badgeFilter.value === "secrets") return secretBadges.value;
@@ -892,7 +933,8 @@ async function loadProfile() {
         loadFeaturedBadges(),
         loadProfileTitle(),
         loadVisitedPages(),
-        loadDailyVisits()
+        loadDailyVisits(),
+        loadTentacleStats()
       ]);
       badgesReady.value = true;
       void syncBadges();
@@ -1380,6 +1422,9 @@ async function logout() {
     selectedTitleBadgeId.value = null;
     badgesReady.value = false;
     dailyVisitsCount.value = 0;
+    tentacleBest.value = 0;
+    tentacleGames.value = 0;
+    tentacleDiscovered.value = false;
 
     if (pollSuggestionsChannel) {
 
@@ -1473,6 +1518,7 @@ function formatDate(
 onMounted(() => {
   window.addEventListener("couaxia:page-visited", onPageVisited);
   window.addEventListener("couaxia:daily-visit", onDailyVisit);
+  window.addEventListener("couaxia:tentacle-run-updated", onTentacleUpdated);
   void loadProfile();
 });
 
@@ -1485,6 +1531,7 @@ onBeforeUnmount(
   () => {
     window.removeEventListener("couaxia:page-visited", onPageVisited);
     window.removeEventListener("couaxia:daily-visit", onDailyVisit);
+    window.removeEventListener("couaxia:tentacle-run-updated", onTentacleUpdated);
 
     if (pollSuggestionsChannel) {
 

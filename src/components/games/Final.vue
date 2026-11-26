@@ -1,5 +1,7 @@
 <script setup lang="ts">
 
+const emit = defineEmits<{ (e: "open-tentacle-run"): void }>();
+
 /* =========================================================
    FINAL IMAGE
 ========================================================= */
@@ -236,6 +238,18 @@ const imageMessages = [
 
 ];
 
+
+
+/* =========================================================
+   EASTER EGG — SECRET COIN MESSAGES
+========================================================= */
+
+const coinMessages: string[] = [
+    "Mais qu'est-ce que ma pièce fait ici ?! 🪙",
+    "Une pièce ici ? 👀"
+];
+
+
 </script>
 
 
@@ -340,9 +354,25 @@ const imageMessages = [
                 </p>
 
 
-                <p class="games-final__message">
-                    On se retrouve pour la prochaine aventure 💜
-                </p>
+                <div class="games-final__secret-row">
+                    <p class="games-final__message">
+                        On se retrouve pour la prochaine aventure 💜
+                    </p>
+
+                    <button
+                        type="button"
+                        class="games-final__secret-coin"
+                        aria-label="Examiner la pièce mystérieuse"
+                        title="Une pièce mystérieuse..."
+                        @mouseenter.stop="startMascotHover(coinMessages)"
+                        @mouseleave.stop="stopMascotHover"
+                        @focus.stop="startMascotHover(coinMessages)"
+                        @blur.stop="stopMascotHover"
+                        @click.stop="stopMascotHover(); emit('open-tentacle-run')"
+                    >
+                        <img src="../../assets/images/money.gif" alt="" aria-hidden="true" />
+                    </button>
+                </div>
 
 
                 <!-- =========================================
@@ -569,3 +599,48 @@ const imageMessages = [
     </section>
 
 </template>
+<style scoped>
+.games-final__secret-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+.games-final__secret-row .games-final__message { margin: 0; }
+.games-final__secret-coin {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    flex: 0 0 auto;
+    width: 44px;
+    height: 44px;
+    padding: 3px;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    cursor: pointer;
+    transition: transform .2s ease, filter .2s ease;
+}
+.games-final__secret-coin img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+}
+.games-final__secret-coin:hover,
+.games-final__secret-coin:focus-visible {
+    transform: rotate(-12deg) scale(1.16);
+    filter: drop-shadow(0 0 9px #ff62d2);
+}
+.games-final__secret-coin:focus-visible {
+    outline: 2px solid #ff8cde;
+    outline-offset: 3px;
+}
+@media (max-width: 600px) {
+    .games-final__secret-row { gap: 8px; }
+    .games-final__secret-coin { width: 38px; height: 38px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .games-final__secret-coin { transition: none; }
+}
+</style>
